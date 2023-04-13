@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="응원곡"
+        android:id="@+id/home"
+        android:icon="@drawable/baseline_home_24" />
+    <item android:title="곡 검색"
+        android:id="@+id/search"
+        android:icon="@drawable/baseline_search_24"/>
+    <item android:title="야구장"
+        android:icon="@drawable/baseline_map_24"
+        android:id="@+id/stadium"/>
+</menu>
