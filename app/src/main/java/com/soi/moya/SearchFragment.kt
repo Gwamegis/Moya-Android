@@ -1,6 +1,8 @@
 package com.soi.moya
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,8 +10,14 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.SearchView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 
 class SearchFragment : Fragment() {
+
+    private lateinit var viewModel: MusicViewModel
+    private lateinit var adapter: SongListViewAdapter
+    private var musicData: List<MusicModel> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,26 +31,33 @@ class SearchFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_search, container, false)
 
-        val result = arrayOf("abc", "Anvi", "ajsi", "sjti", "wneit", "vnditl", "djiwtk")
-        val resultAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, result)
         val listView = view.findViewById<ListView>(R.id.searchResultListView)
-        listView.adapter = resultAdapter
 
+        viewModel = ViewModelProvider(requireActivity()).get(MusicViewModel::class.java)
+        adapter = SongListViewAdapter(emptyList())
+        listView.adapter = adapter
+
+        viewModel.fetchData().observe(viewLifecycleOwner, Observer { data ->
+            musicData = data
+            adapter = SongListViewAdapter(musicData)
+            listView.adapter = adapter
+        })
         val searchView = view.findViewById<SearchView>(R.id.searchView)
-        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 searchView.clearFocus()
-                if (result.contains(query)) {
-                    resultAdapter.filter.filter(query)
+                val titleList = musicData.map { it.title }
+                if (titleList.contains(query)) {
+                    adapter.filter.filter(query)
                 }
                 return false
             }
 
-            override fun onQueryTextChange(nextText: String?): Boolean {
-                resultAdapter.filter.filter(nextText)
-                return false
+            override fun onQueryTextChange(newText: String?): Boolean {
+                adapter.filter.filter(newText)
+                return true
             }
-
         })
 
         return view
