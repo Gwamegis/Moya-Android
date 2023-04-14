@@ -6,16 +6,18 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.SimpleAdapter
 
 
 class StadiumFragment : Fragment() {
 
-    val listItem = mutableListOf("고척 스카이돔", "광주 기아 챔피언스 필드", "대구 삼성 라이온즈 파크",
+    val listItem = arrayOf("고척 스카이돔", "광주 기아 챔피언스 필드", "대구 삼성 라이온즈 파크",
                                 "사직 야구장", "수원 KT 위즈 파크", "울산 문수 야구장", "인천 SSG 랜더스 필드",
                                 "잠실 야구장", "창원 NC 파크", "한화생명 이글스 파크")
 
-    val imageNameList = mutableListOf("gocheok_sky_dome", "gwangju_kia_champions_field", "daegu_samsung_lions_park",
+    val imageNameList = arrayOf("gocheok_sky_dome", "gwangju_kia_champions_field", "daegu_samsung_lions_park",
         "sajik_baseball_stadium", "suwon_kt_wiz_park", "ulsan_munsu_baseball_stadium", "incheon_ssg_landers_field",
         "seoul_sports_complex_baseball_stadium", "changwon_nc_park", "daejeon_hanwha_life_eagles_park")
 
@@ -29,7 +31,8 @@ class StadiumFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_stadium, container, false)
         val listView = view.findViewById<ListView>(R.id.stadiumListView)
-        val adapter = SongListViewAdapter(listItem)
+//        val adapter = SongListViewAdapter(listItem)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listItem)
         listView.adapter = adapter
 
         // activity 이동
