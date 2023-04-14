@@ -1,13 +1,16 @@
 package com.soi.moya
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ListView
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.os.bundleOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -19,15 +22,8 @@ private lateinit var viewModel: MusicViewModel
 class HomeFragment : Fragment() {
     private lateinit var musicData: List<MusicModel>
 
-    val listItem = mutableListOf<String>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        listItem.add("song1")
-        listItem.add("song2")
-        listItem.add("song3")
-
     }
 
     override fun onCreateView(
@@ -38,6 +34,11 @@ class HomeFragment : Fragment() {
         viewModel = ViewModelProvider(requireActivity()).get(MusicViewModel::class.java)
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+
+        val mainBanner = view.findViewById<ImageView>(R.id.mainBannerImage)
+
+        mainBanner.clipToOutline = true
+
         val listView = view.findViewById<ListView>(R.id.songListView)
 
         viewModel.fetchData().observe(viewLifecycleOwner, Observer { data ->

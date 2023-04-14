@@ -9,4 +9,46 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#EFEFEF</color>
     <color name="darkGray">#7D7D7D</color>
+    
+    <color name="lotte_background">#062045</color>
+    <color name="lotte_point">#D00024</color>
+    <color name="lotte_sub">#374C69</color>
+
+    <color name="ssg_background">#C2182D</color>
+    <color name="ssg_point">#F6B100</color>
+    <color name="ssg_sub">#CD4556</color>
+
+    <color name="dosan_background">#131230</color>
+    <color name="dosan_point">#ED1C24</color>
+    <color name="dosan_sub">#414159</color>
+
+    <color name="hanwha_background">#25282A</color>
+    <color name="hanwha_point">#FF6600</color>
+    <color name="hanwha_sub">#505254</color>
+
+    <color name="kiwoom_background">#62000A</color>
+    <color name="kiwoom_point">#E4007F</color>
+    <color name="kiwoom_sub">#893241</color>
+
+    <color name="kia_background">#06141F</color>
+    <color name="kia_point">#EB0029</color>
+    <color name="kia_sub">#37424B</color>
+
+    <color name="nc_background">#1D467D</color>
+    <color name="nc_point">#C7A079</color>
+    <color name="nc_sub">#496A96</color>
+
+    <color name="samsung_background">#0066B3</color>
+    <color name="samsung_point">#B4924C</color>
+    <color name="samsung_sub">#3284C1</color>
+
+    <color name="kt_background">#231F20</color>
+    <color name="kt_point">#EC1C24</color>
+    <color name="kt_sub">#4E4B4C</color>
+
+    <color name="lg_background">#737071</color>
+    <color name="lg_point">#AE263B</color>
+    <color name="lg_sub">#8E8C8D</color>
+
+
 </resources>
