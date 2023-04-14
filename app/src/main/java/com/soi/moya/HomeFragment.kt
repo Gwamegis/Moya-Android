@@ -36,16 +36,14 @@ class HomeFragment : Fragment() {
     ): View? {
 
         viewModel = ViewModelProvider(requireActivity()).get(MusicViewModel::class.java)
-        viewModel.fetchData().observe(viewLifecycleOwner, Observer { data ->
-            musicData = data
-            Log.d("firebase-store", data.toString())
-        })
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-
         val listView = view.findViewById<ListView>(R.id.songListView)
-        val adapter = SongListViewAdapter(listItem)
-        listView.adapter = adapter
+
+        viewModel.fetchData().observe(viewLifecycleOwner, Observer { data ->
+            val adapter = SongListViewAdapter(data)
+            listView.adapter = adapter
+        })
 
         listView.setOnItemClickListener { adapterView, view, i, l ->
             val intent = Intent(requireContext(), PlaySongActivity::class.java)
