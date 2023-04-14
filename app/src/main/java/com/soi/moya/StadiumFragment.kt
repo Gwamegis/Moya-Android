@@ -1,59 +1,47 @@
 package com.soi.moya
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ListView
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [StadiumFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class StadiumFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    val listItem = mutableListOf("고척 스카이돔", "광주 기아 챔피언스 필드", "대구 삼성 라이온즈 파크",
+                                "사직 야구장", "수원 KT 위즈 파크", "울산 문수 야구장", "인천 SSG 랜더스 필드",
+                                "잠실 야구장", "창원 NC 파크", "한화생명 이글스 파크")
+
+    val imageNameList = mutableListOf("gocheok_sky_dome", "gwangju_kia_champions_field", "daegu_samsung_lions_park",
+        "sajik_baseball_stadium", "suwon_kt_wiz_park", "ulsan_munsu_baseball_stadium", "incheon_ssg_landers_field",
+        "seoul_sports_complex_baseball_stadium", "changwon_nc_park", "daejeon_hanwha_life_eagles_park")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_stadium, container, false)
+        val view = inflater.inflate(R.layout.fragment_stadium, container, false)
+        val listView = view.findViewById<ListView>(R.id.stadiumListView)
+        val adapter = SongListViewAdapter(listItem)
+        listView.adapter = adapter
+
+        // activity 이동
+        listView.setOnItemClickListener { adapterView, view, i, l ->
+//            val clickItem = listItem[i]
+            val intent = Intent(requireContext(), StadiumDetailActivity::class.java)
+            intent.putExtra("stadiumName", listItem[i])
+            intent.putExtra("imageName", imageNameList[i])
+            startActivity(intent)
+        }
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment StadiumFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            StadiumFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
-    }
 }

@@ -12,6 +12,9 @@
         android:theme="@style/Theme.Moya"
         tools:targetApi="31">
         <activity
+            android:name=".StadiumDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
