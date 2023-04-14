@@ -20,7 +20,7 @@ private const val MUSIC_LIST = "musicList"
 private lateinit var viewModel: MusicViewModel
 
 class HomeFragment : Fragment() {
-    private lateinit var musicData: List<MusicModel>
+    private var musicData: List<MusicModel> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,12 +42,16 @@ class HomeFragment : Fragment() {
         val listView = view.findViewById<ListView>(R.id.songListView)
 
         viewModel.fetchData().observe(viewLifecycleOwner, Observer { data ->
-            val adapter = SongListViewAdapter(data)
+            musicData = data
+            val adapter = SongListViewAdapter(musicData)
             listView.adapter = adapter
         })
 
         listView.setOnItemClickListener { adapterView, view, i, l ->
             val intent = Intent(requireContext(), PlaySongActivity::class.java)
+            intent.putExtra("title", musicData[i].title)
+            intent.putExtra("lyrics", musicData[i].lyrics)
+            intent.putExtra("url", musicData[i].url)
             startActivity(intent)
         }
 

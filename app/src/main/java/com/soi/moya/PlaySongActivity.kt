@@ -3,6 +3,7 @@ package com.soi.moya
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import com.soi.moya.databinding.ActivityPlaySongBinding
 
@@ -18,6 +19,10 @@ class PlaySongActivity : AppCompatActivity() {
         setContentView(R.layout.activity_play_song)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_play_song)
+
+        binding.songTitle.text = intent.getStringExtra("title")
+        binding.songLyric.text = intent.getStringExtra("lyrics")?.replace("\\n", "\n")
+
         mediaPlayer = MediaPlayer.create(this, R.raw.test)
         mediaPlayer?.start()
 
