@@ -1,12 +1,12 @@
 package com.soi.moya
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
-import com.soi.moya.databinding.ActivityMainBinding
 
 class HomeFragment : Fragment() {
 
@@ -30,6 +30,11 @@ class HomeFragment : Fragment() {
         val listView = view.findViewById<ListView>(R.id.songListView)
         val adapter = SongListViewAdapter(listItem)
         listView.adapter = adapter
+
+        listView.setOnItemClickListener { adapterView, view, i, l ->
+            val intent = Intent(requireContext(), PlaySongActivity::class.java)
+            startActivity(intent)
+        }
 
         return view
     }
