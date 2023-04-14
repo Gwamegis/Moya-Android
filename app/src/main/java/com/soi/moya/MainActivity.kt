@@ -2,7 +2,10 @@ package com.soi.moya
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.soi.moya.databinding.ActivityMainBinding
 
 
@@ -14,8 +17,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        replaceFragment(HomeFragment())
 
+        // navigation
+        replaceFragment(HomeFragment())
         binding.bottomNavigationView.setOnItemSelectedListener {
 
             when(it.itemId) {
@@ -30,6 +34,19 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+
+        // firestore
+        val db = Firebase.firestore
+        db.collection("Doosan")
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    Log.d("firestore-result", document.toString())
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w("firestore", "Error getting documents.")
+            }
     }
 
     private fun replaceFragment(fragment: Fragment) {
