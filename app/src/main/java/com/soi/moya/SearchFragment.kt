@@ -1,5 +1,6 @@
 package com.soi.moya
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -43,6 +44,16 @@ class SearchFragment : Fragment() {
             adapter = SongListViewAdapter(musicData)
             listView.adapter = adapter
         })
+
+        listView.setOnItemClickListener { adapterView, view, i, l ->
+            val musicModel = adapter.getItem(i) as MusicModel
+            val intent = Intent(requireContext(), PlaySongActivity::class.java)
+            intent.putExtra("title", musicModel.title)
+            intent.putExtra("lyrics", musicModel.lyrics)
+            intent.putExtra("url", musicModel.url)
+            startActivity(intent)
+        }
+
         val searchView = view.findViewById<SearchView>(R.id.searchView)
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
