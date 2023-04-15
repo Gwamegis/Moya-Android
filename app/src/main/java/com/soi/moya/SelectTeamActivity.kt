@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -49,6 +50,13 @@ class SelectTeamActivity : AppCompatActivity() {
                     adapter.setSelected(position)
                     selectedTeamName = teams[position]
                     selectedPosition = position
+                }
+
+                completeButton.isEnabled = selectedTeamName.isNotEmpty() && selectedTeamName != teamInfo
+                if (completeButton.isEnabled) {
+                    completeButton.setBackgroundColor(ContextCompat.getColor(baseContext, R.color.custom_black))
+                } else {
+                    completeButton.setBackgroundColor(ContextCompat.getColor(baseContext, R.color.enabled))
                 }
             }
         }
