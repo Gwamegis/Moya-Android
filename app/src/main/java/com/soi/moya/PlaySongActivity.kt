@@ -3,6 +3,7 @@ package com.soi.moya
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore.Audio.Media
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import com.soi.moya.databinding.ActivityPlaySongBinding
@@ -20,11 +21,16 @@ class PlaySongActivity : AppCompatActivity() {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_play_song)
 
+        val url = intent.getStringExtra("url")!!
         binding.songTitle.text = intent.getStringExtra("title")
         binding.songLyric.text = intent.getStringExtra("lyrics")?.replace("\\n", "\n")
 
-        mediaPlayer = MediaPlayer.create(this, R.raw.test)
-        mediaPlayer?.start()
+        mediaPlayer = MediaPlayer()
+        mediaPlayer?.setDataSource(url)
+        mediaPlayer?.prepareAsync()
+        mediaPlayer?.setOnPreparedListener {
+            mediaPlayer?.start()
+        }
 
         binding.playSongButton.setOnClickListener {
             onTappedPlayButton()
