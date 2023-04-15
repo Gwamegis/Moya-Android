@@ -2,6 +2,9 @@ package com.soi.moya
 
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ListView
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
@@ -45,8 +49,12 @@ class HomeFragment : Fragment() {
     ): View? {
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+        val pointColor = ContextCompat.getColor(requireContext(), R.color.dosan_point)
         viewPager = view.findViewById(R.id.viewPager)
         tabs = view.findViewById(R.id.tabLayout)
+
+        tabs.setSelectedTabIndicatorColor(pointColor)
+        tabs.setTabTextColors(Color.parseColor("#66ffffff"), Color.parseColor("#ffffff"))
 
         viewModel = ViewModelProvider(requireActivity()).get(MusicViewModel::class.java)
 
