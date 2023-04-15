@@ -1,5 +1,6 @@
 package com.soi.moya
 
+import android.annotation.SuppressLint
 import android.content.ClipData.Item
 import android.media.Image
 import android.view.LayoutInflater
@@ -54,8 +55,9 @@ class RecyclerViewAdapter(val List: Array<String>): RecyclerView.Adapter<Recycle
         private val imageView = itemView.findViewById<ImageView>(R.id.selectTeamImage)
         private val selectedImage = itemView.findViewById<ImageView>(R.id.chooseTeam)
 
+        @SuppressLint("DiscouragedApi")
         fun bindItems(item: String) {
-            val id = itemView.context.resources.getIdentifier(item, "drawable", "com.soi.moya")
+            val id = itemView.context.resources.getIdentifier("select_team_${item}", "drawable", "com.soi.moya")
             imageView.setImageResource(id)
         }
 

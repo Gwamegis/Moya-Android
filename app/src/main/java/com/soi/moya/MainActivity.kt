@@ -1,5 +1,6 @@
 package com.soi.moya
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +24,11 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(MusicViewModel::class.java)
 
+        val sharedPrefs = getSharedPreferences("selected_team", Context.MODE_PRIVATE)
+        val teamInfo = sharedPrefs.getString("selected_team", "")
+        val firebaseTeamName = teamInfo!!.capitalizeFirst()
+
+
         replaceFragment(HomeFragment())
 
         binding.bottomNavigationView.setOnItemSelectedListener {
@@ -43,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         // firestore
         val db = Firebase.firestore
         val musicList = mutableListOf<MusicModel>()
-        db.collection("Doosan")
+        db.collection(firebaseTeamName)
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {
@@ -68,4 +74,10 @@ class MainActivity : AppCompatActivity() {
         fragmentTransaction.replace(R.id.frameLayout, fragment)
         fragmentTransaction.commit()
     }
+
+    private fun String.capitalizeFirst(): String {
+        if (isEmpty()) return this
+        return this[0].uppercase() + substring(1)
+    }
+    
 }

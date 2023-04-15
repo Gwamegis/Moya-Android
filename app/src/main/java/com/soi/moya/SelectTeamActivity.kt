@@ -15,10 +15,7 @@ class SelectTeamActivity : AppCompatActivity() {
     private var selectedPosition = -1
     private var selectedTeamName = ""
     private val teams = arrayOf(
-        "select_team_doosan", "select_team_hanwha", "select_team_samsung",
-        "select_team_lotte", "select_team_lg", "select_team_ssg",
-        "select_team_kt", "select_team_nc", "select_team_kiwoom", "select_team_kia"
-    )
+        "doosan", "hanwha", "samsung", "lotte", "lg", "ssg", "kt", "nc", "kiwoom", "kia")
 
     @SuppressLint("CommitPrefEdits")
     override fun onCreate(savedInstanceState: Bundle?) {
