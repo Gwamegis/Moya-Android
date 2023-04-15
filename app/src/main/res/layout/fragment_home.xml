@@ -13,6 +13,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/doosan_sub"
+        android:padding="20dp"
+        app:tabIndicatorHeight="3dp"
+        app:tabTextAppearance="@style/TabTextAppearance"
+        app:tabMode="scrollable"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tabGravity="fill">
@@ -22,8 +26,7 @@
     <View
         android:id="@+id/backgroundView"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-
+        android:layout_height="100dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tabLayout" />
@@ -32,7 +35,6 @@
             android:id="@+id/mainBannerImage"
             android:layout_width="wrap_content"
             android:layout_height="120dp"
-            android:layout_marginTop="70dp"
             android:src="@drawable/main_banner_doosan"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/backgroundView"
