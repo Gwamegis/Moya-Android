@@ -3,6 +3,7 @@ package com.soi.moya
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -50,6 +51,8 @@ class SearchFragment : Fragment() {
                 val titleList = musicData.map { it.title }
                 if (titleList.contains(query)) {
                     adapter.filter.filter(query)
+                } else {
+                    adapter.filter.filter("")
                 }
                 return false
             }
