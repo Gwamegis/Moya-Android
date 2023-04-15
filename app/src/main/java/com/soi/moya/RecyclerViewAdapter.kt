@@ -55,8 +55,6 @@ class RecyclerViewAdapter(val List: Array<String>): RecyclerView.Adapter<Recycle
         private val selectedImage = itemView.findViewById<ImageView>(R.id.chooseTeam)
 
         fun bindItems(item: String) {
-//            val imageView = itemView.findViewById<ImageView>(R.id.selectTeamImage)
-
             val id = itemView.context.resources.getIdentifier(item, "drawable", "com.soi.moya")
             imageView.setImageResource(id)
         }
@@ -78,5 +76,11 @@ class RecyclerViewAdapter(val List: Array<String>): RecyclerView.Adapter<Recycle
             notifyItemChanged(previousPosition)
             notifyItemChanged(selectedPosition)
         }
+    }
+
+    fun setSelectedTeam(teamName: String) {
+        val index = List.indexOf(teamName)
+        selectedPosition = index
+        notifyItemChanged(selectedPosition)
     }
 }
