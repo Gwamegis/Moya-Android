@@ -2,6 +2,7 @@ package com.soi.moya
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -58,8 +59,10 @@ class SelectTeamActivity : AppCompatActivity() {
         recyclerView.layoutManager = GridLayoutManager(this, 2)
 
         completeButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
             editor.putString("selected_team", selectedTeamName)
             editor.apply()
+            startActivity(intent)
             finish()
         }
     }
