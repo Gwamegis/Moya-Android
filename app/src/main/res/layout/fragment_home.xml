@@ -8,6 +8,16 @@
     tools:context=".HomeFragment"
     android:orientation="vertical">
 
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabGravity="fill"
+        >
+
+    </com.google.android.material.tabs.TabLayout>
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
@@ -31,16 +41,26 @@
             app:layout_constraintStart_toStartOf="@+id/view"
             app:layout_constraintTop_toTopOf="@+id/view" />
 
+
+
+<!--        <androidx.viewpager.widget.ViewPager-->
+<!--            -->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_weight="1"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/mainBannerImage"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"/>-->
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
-    <ListView
-        android:id="@+id/songListView"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="111dp" />
+        android:layout_height="match_parent"/>
+
+
 
 
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -12,15 +12,28 @@ import android.widget.ImageView
 import android.widget.ListView
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.os.bundleOf
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.viewpager.widget.ViewPager
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
 private const val MUSIC_LIST = "musicList"
 private lateinit var viewModel: MusicViewModel
 
 class HomeFragment : Fragment() {
-    private var musicData: List<MusicModel> = emptyList()
+    private lateinit var viewPager: ViewPager2
+    private lateinit var tabs: TabLayout
+    private lateinit var viewModel: MusicViewModel
+    private val musicViewModel: MusicViewModel by activityViewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,31 +44,43 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        viewPager = view.findViewById(R.id.viewPager)
+        tabs = view.findViewById(R.id.tabLayout)
+
         viewModel = ViewModelProvider(requireActivity()).get(MusicViewModel::class.java)
 
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        viewModel.fetchData().observe(viewLifecycleOwner, Observer { musicList ->
+            val adapter = ViewPagerAdapter(childFragmentManager, lifecycle, musicList)
+            viewPager.adapter = adapter
+
+            TabLayoutMediator(tabs, viewPager) { tab, position ->
+                when(position) {
+                    0 -> tab.text = "팀 응원가"
+                    1 -> tab.text = "선수 응원가"
+                }
+            }.attach()
+        })
 
         val mainBanner = view.findViewById<ImageView>(R.id.mainBannerImage)
 
         mainBanner.clipToOutline = true
-
-        val listView = view.findViewById<ListView>(R.id.songListView)
-
-        viewModel.fetchData().observe(viewLifecycleOwner, Observer { data ->
-            musicData = data
-            val adapter = SongListViewAdapter(musicData)
-            listView.adapter = adapter
-        })
-
-        listView.setOnItemClickListener { adapterView, view, i, l ->
-            val intent = Intent(requireContext(), PlaySongActivity::class.java)
-            intent.putExtra("title", musicData[i].title)
-            intent.putExtra("lyrics", musicData[i].lyrics)
-            intent.putExtra("url", musicData[i].url)
-            startActivity(intent)
-        }
-
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.fetchData().observe(viewLifecycleOwner, Observer { musicList ->
+            val adapter = ViewPagerAdapter(childFragmentManager, lifecycle, musicList)
+            viewPager.adapter = adapter
+            TabLayoutMediator(tabs, viewPager) { tab, position ->
+                when(position) {
+                    0 -> tab.text = "팀 응원가"
+                    1 -> tab.text = "선수 응원가"
+                }
+            }.attach()
+        })
     }
 
     companion object {
@@ -66,3 +91,4 @@ class HomeFragment : Fragment() {
         }
     }
 }
+

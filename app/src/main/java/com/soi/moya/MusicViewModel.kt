@@ -1,16 +1,22 @@
 package com.soi.moya
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class MusicViewModel: ViewModel() {
     private var _data = MutableLiveData<List<MusicModel>>()
+    var teamMusicList: List<MusicModel> = emptyList()
 
     fun setData(data: List<MusicModel>) {
-        _data.value = data
+        _data.postValue(data)
+        teamMusicList = data.filter { music ->
+            music.type
+        }
     }
 
-    fun fetchData(): MutableLiveData<List<MusicModel>> {
+    fun fetchData(): LiveData<List<MusicModel>> {
         return _data
     }
+
 }
