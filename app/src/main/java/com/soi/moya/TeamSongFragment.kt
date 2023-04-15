@@ -1,5 +1,6 @@
 package com.soi.moya
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,6 +13,8 @@ import androidx.fragment.app.activityViewModels
 class TeamSongFragment : Fragment() {
 
     private val viewModel: MusicViewModel by activityViewModels()
+    private var musicData: List<MusicModel> = emptyList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -20,21 +23,28 @@ class TeamSongFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+
         val view = inflater.inflate(R.layout.fragment_team_song, container, false)
         return view
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
-        val adapter = SongListViewAdapter(viewModel.teamMusicList)
+
+        musicData = viewModel.teamMusicList
+        val adapter = SongListViewAdapter(musicData)
         val listView = view.findViewById<ListView>(R.id.songListView)
         listView.adapter = adapter
-    }
 
-    companion object {
-        fun newInstance(): TeamSongFragment {
-            return TeamSongFragment()
+        listView.setOnItemClickListener { adapterView, view, i, l ->
+            val intent = Intent(requireContext(), PlaySongActivity::class.java)
+            intent.putExtra("title", musicData[i].title)
+            intent.putExtra("lyrics", musicData[i].lyrics)
+            intent.putExtra("url", musicData[i].url)
+            startActivity(intent)
         }
+
     }
 }
