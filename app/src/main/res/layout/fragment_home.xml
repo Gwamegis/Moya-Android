@@ -12,7 +12,7 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/dosan_sub"
+        android:background="@color/doosan_sub"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tabGravity="fill">
@@ -20,10 +20,10 @@
     </com.google.android.material.tabs.TabLayout>
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/backgroundView"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:background="@color/dosan_sub"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tabLayout" />
@@ -35,8 +35,8 @@
             android:layout_marginTop="70dp"
             android:src="@drawable/main_banner_doosan"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/view"
-            app:layout_constraintTop_toTopOf="@+id/view" />
+            app:layout_constraintStart_toStartOf="@+id/backgroundView"
+            app:layout_constraintTop_toTopOf="@+id/backgroundView" />
 
 
     <androidx.viewpager2.widget.ViewPager2

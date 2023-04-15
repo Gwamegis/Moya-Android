@@ -1,9 +1,13 @@
 package com.soi.moya
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.ColorFilter
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ListView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.os.bundleOf
@@ -38,22 +43,38 @@ class HomeFragment : Fragment() {
     private lateinit var viewModel: MusicViewModel
     private val musicViewModel: MusicViewModel by activityViewModels()
 
+    private var pointColor: Int = 0
+    private var backgroundColor: Int = 0
+    private var subColor: Int = 0
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
+
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-        val pointColor = ContextCompat.getColor(requireContext(), R.color.dosan_point)
         viewPager = view.findViewById(R.id.viewPager)
         tabs = view.findViewById(R.id.tabLayout)
+        val backgroundView = view.findViewById<View>(R.id.backgroundView)
 
-        tabs.setSelectedTabIndicatorColor(pointColor)
+        val prefs = requireContext().getSharedPreferences("selected_team", Context.MODE_PRIVATE)
+        val selectedTeamName = prefs.getString("selected_team", "")
+        fetchColor(selectedTeamName ?: "hanwha")
+        backgroundView.setBackgroundResource(subColor)
+        tabs.setSelectedTabIndicatorColor(ContextCompat.getColor(requireContext(), pointColor))
+        tabs.setBackgroundColor(ContextCompat.getColor(requireContext(), subColor))
+
+
+        val selectedTeam = arguments?.getString("selectedTeam")
+        fetchColor(selectedTeam!!)
+
         tabs.setTabTextColors(Color.parseColor("#66ffffff"), Color.parseColor("#ffffff"))
 
         viewModel = ViewModelProvider(requireActivity()).get(MusicViewModel::class.java)
@@ -63,7 +84,7 @@ class HomeFragment : Fragment() {
             viewPager.adapter = adapter
 
             TabLayoutMediator(tabs, viewPager) { tab, position ->
-                when(position) {
+                when (position) {
                     0 -> tab.text = "팀 응원가"
                     1 -> tab.text = "선수 응원가"
                 }
@@ -76,23 +97,16 @@ class HomeFragment : Fragment() {
             startActivity(intent)
         }
 
+        val mainBannerImageSrc =
+            resources.getIdentifier("main_banner_${selectedTeamName}", "drawable", "com.soi.moya")
+        mainBanner.setImageResource(mainBannerImageSrc)
+
         mainBanner.clipToOutline = true
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel.fetchData().observe(viewLifecycleOwner, Observer { musicList ->
-            val adapter = ViewPagerAdapter(childFragmentManager, lifecycle, musicList)
-            viewPager.adapter = adapter
-            TabLayoutMediator(tabs, viewPager) { tab, position ->
-                when(position) {
-                    0 -> tab.text = "팀 응원가"
-                    1 -> tab.text = "선수 응원가"
-                }
-            }.attach()
-        })
     }
 
     companion object {
@@ -101,6 +115,14 @@ class HomeFragment : Fragment() {
         fun newInstance(data: MutableList<MusicModel>) = HomeFragment().apply {
             arguments = bundleOf(ARG_DATA to data)
         }
+    }
+
+    @SuppressLint("DiscouragedApi")
+    private fun fetchColor(selectedTeam: String) {
+        pointColor = resources.getIdentifier("${selectedTeam}_point", "color", "com.soi.moya")
+        backgroundColor =
+            resources.getIdentifier("${selectedTeam}_background", "color", "com.soi.moya")
+        subColor = resources.getIdentifier("${selectedTeam}_sub", "color", "com.soi.moya")
     }
 }
 

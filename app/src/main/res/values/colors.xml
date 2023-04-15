@@ -20,9 +20,9 @@
     <color name="ssg_point">#F6B100</color>
     <color name="ssg_sub">#CD4556</color>
 
-    <color name="dosan_background">#131230</color>
-    <color name="dosan_point">#ED1C24</color>
-    <color name="dosan_sub">#414159</color>
+    <color name="doosan_background">#131230</color>
+    <color name="doosan_point">#ED1C24</color>
+    <color name="doosan_sub">#414159</color>
 
     <color name="hanwha_background">#25282A</color>
     <color name="hanwha_point">#FF6600</color>

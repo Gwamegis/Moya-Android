@@ -10,7 +10,6 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.soi.moya.databinding.ActivityMainBinding
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -29,13 +28,17 @@ class MainActivity : AppCompatActivity() {
         val firebaseTeamName = teamInfo!!.capitalizeFirst()
 
 
-        replaceFragment(HomeFragment())
+        val bundle = Bundle()
+        bundle.putString("selectedTeam", teamInfo)
+
+
+        replaceFragment(HomeFragment(), bundle)
 
         binding.bottomNavigationView.setOnItemSelectedListener {
 
             when(it.itemId) {
 
-                R.id.home -> replaceFragment(HomeFragment())
+                R.id.home -> replaceFragment(HomeFragment(), bundle)
                 R.id.search -> replaceFragment(SearchFragment())
                 R.id.stadium -> replaceFragment(StadiumFragment())
 
@@ -68,9 +71,12 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    private fun replaceFragment(fragment: Fragment) {
+
+
+    private fun replaceFragment(fragment: Fragment, bundle: Bundle? = null) {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
+        fragment.arguments = bundle
         fragmentTransaction.replace(R.id.frameLayout, fragment)
         fragmentTransaction.commit()
     }
