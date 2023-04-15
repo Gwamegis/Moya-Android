@@ -71,6 +71,10 @@ class HomeFragment : Fragment() {
         })
 
         val mainBanner = view.findViewById<ImageView>(R.id.mainBannerImage)
+        mainBanner.setOnClickListener {
+            val intent = Intent(requireActivity(), SelectTeamActivity::class.java)
+            startActivity(intent)
+        }
 
         mainBanner.clipToOutline = true
         return view

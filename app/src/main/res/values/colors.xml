@@ -9,6 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#EFEFEF</color>
     <color name="darkGray">#7D7D7D</color>
+
+    <color name="custom_black">#2B2B2B</color>
     
     <color name="lotte_background">#062045</color>
     <color name="lotte_point">#D00024</color>
