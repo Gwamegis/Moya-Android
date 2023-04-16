@@ -3,10 +3,7 @@
 
 <h1 align="center">
   <br>
-  <!--
-  <a href="http://www.amitmerchant.com/electron-markdownify">
-  --!>
-  <img src="https://user-images.githubusercontent.com/77262576/226194974-de830b8f-5d54-45a2-826c-ae3922eff9bf.svg" alt="Markdownify" width="200"></a>
+  <img src="https://user-images.githubusercontent.com/77262576/226194974-de830b8f-5d54-45a2-826c-ae3922eff9bf.svg" alt="Markdownify" width="200">
   <br>
   모두의 야구(Moya)
   <br>
@@ -18,13 +15,6 @@
 야구 응원가 및 야구장 지도 정보 앱
 </p>
 
-<!--
-<p align="center">
-  <a href="https://apps.apple.com/us/app/%EB%AA%A8%EB%91%90%EC%9D%98-%EC%95%BC%EA%B5%AC/id6444238142">
-    <img src="https://user-images.githubusercontent.com/52993882/219651102-a12adc2c-7913-439b-9bcb-b46c44d66a4b.png" width="260" height="90" style="display:block; margin:0 auto;" />
-  </a>
-</p>
---!>
 
 <p align="center">
   <a href="#features">Features</a> •
@@ -33,7 +23,8 @@
 </p>
 <br>
 <h1 align="center">
-  <img src = "https://user-images.githubusercontent.com/68676844/232319495-35dd424e-ecc4-479a-87cb-e93a23fae7cd.png" width="600" class= "center"></h1>
+  <img src = "https://user-images.githubusercontent.com/68676844/232319495-35dd424e-ecc4-479a-87cb-e93a23fae7cd.png" width="600" class= "center">
+  </h1>
 
 
 
