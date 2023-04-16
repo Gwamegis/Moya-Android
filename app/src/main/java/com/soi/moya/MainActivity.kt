@@ -1,9 +1,12 @@
 package com.soi.moya
 
 import android.content.Context
+import android.content.res.ColorStateList
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.core.content.ContextCompat
+import androidx.core.view.MenuItemCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.firestore.ktx.firestore
@@ -14,6 +17,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MusicViewModel
+
+    private var pointColor: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -32,22 +37,36 @@ class MainActivity : AppCompatActivity() {
         bundle.putString("selectedTeam", teamInfo)
 
 
+
         replaceFragment(HomeFragment(), bundle)
 
-        binding.bottomNavigationView.setOnItemSelectedListener {
+        pointColor = resources.getIdentifier("${teamInfo}_point", "color", "com.soi.moya")
 
-            when(it.itemId) {
-
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+            MenuItemCompat.setIconTintList(item, ColorStateList.valueOf(ContextCompat.getColor(this, pointColor)))
+            when (item.itemId) {
                 R.id.home -> replaceFragment(HomeFragment(), bundle)
                 R.id.search -> replaceFragment(SearchFragment())
                 R.id.stadium -> replaceFragment(StadiumFragment())
-
-                else -> {
-
-                }
+                else -> {}
             }
             true
         }
+
+
+
+        val colorStateList = ColorStateList(
+            arrayOf(
+                intArrayOf(android.R.attr.state_checked),
+                intArrayOf(-android.R.attr.state_checked)
+            ),
+            intArrayOf(
+                ContextCompat.getColor(this, R.color.doosan_point),
+                ContextCompat.getColor(this, R.color.darkGray)
+            )
+        )
+        binding.bottomNavigationView.itemIconTintList = colorStateList
+        binding.bottomNavigationView.itemTextColor = colorStateList
 
         // firestore
         val db = Firebase.firestore
