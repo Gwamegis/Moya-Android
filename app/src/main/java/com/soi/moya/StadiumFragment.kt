@@ -32,8 +32,10 @@ class StadiumFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_stadium, container, false)
         val listView = view.findViewById<ListView>(R.id.stadiumListView)
 //        val adapter = SongListViewAdapter(listItem)
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, listItem)
+//        val adapter = ArrayAdapter(requireContext(), R.layout.stadium_listview_item, listItem)
+        val adapter = StadiumArrayAdapter(requireContext(), R.layout.stadium_listview_item, listItem)
         listView.adapter = adapter
+
 
         // activity 이동
         listView.setOnItemClickListener { adapterView, view, i, l ->
