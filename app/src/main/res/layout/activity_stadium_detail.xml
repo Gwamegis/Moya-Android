@@ -6,23 +6,36 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".StadiumDetailActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:ignore="MissingClass">
 
     <TextView
         android:id="@+id/stadiumTitleTextView"
         android:text="stadium title"
+        android:fontFamily="@font/pretendard_bold"
+        android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
+        android:layout_margin="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <ImageView
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="손가락으로 확대해 자리를 찾아보세요!"
+        android:fontFamily="@font/pretendard_medium"
+        android:layout_margin="10dp"
+        android:textSize="16dp"
+        android:textColor="@color/darkGray"
+        android:gravity="center"/>
+
+    <com.ortiz.touchview.TouchImageView
         android:id="@+id/stadiumImageView"
         android:src="@drawable/gocheok_sky_dome"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"/>
+        android:layout_height="match_parent" />
 
 
 </LinearLayout>
