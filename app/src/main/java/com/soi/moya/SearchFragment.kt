@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.SearchView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 
@@ -96,4 +97,11 @@ class SearchFragment : Fragment() {
 
         return view
     }
+
+    override fun onResume() {
+        super.onResume()
+        val window = requireActivity().window
+        window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.white)
+    }
+
 }

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.SimpleAdapter
+import androidx.core.content.ContextCompat
 
 
 class StadiumFragment : Fragment() {
@@ -47,6 +48,12 @@ class StadiumFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val window = requireActivity().window
+        window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.white)
     }
 
 }
