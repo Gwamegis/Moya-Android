@@ -9,6 +9,7 @@ import android.graphics.ColorFilter
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -115,6 +116,12 @@ class HomeFragment : Fragment() {
         fun newInstance(data: MutableList<MusicModel>) = HomeFragment().apply {
             arguments = bundleOf(ARG_DATA to data)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val window = requireActivity().window
+        window.statusBarColor = ContextCompat.getColor(requireContext(), subColor)
     }
 
     @SuppressLint("DiscouragedApi")
