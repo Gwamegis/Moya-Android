@@ -10,6 +10,7 @@ import android.widget.Filterable
 import android.widget.TextView
 import com.soi.moya.databinding.ActivityMainBinding
 import java.util.*
+import kotlin.collections.ArrayList
 
 class SongListViewAdapter(private var songList: List<MusicModel>): BaseAdapter(), Filterable {
 

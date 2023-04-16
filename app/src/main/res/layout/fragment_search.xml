@@ -28,9 +28,35 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <TextView
+        android:id="@+id/searchHintTextView"
+        android:text="선수 이름, 응원가를 검색해주세요"
+        android:textColor="@color/darkGray"
+        android:fontFamily="@font/pretendard_medium"
+        android:textSize="16sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/emptyListTextView"
+        android:visibility="gone"
+        android:text="검색 결과가 없어요"
+        android:textColor="@color/darkGray"
+        android:fontFamily="@font/pretendard_medium"
+        android:textSize="16sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:gravity="center"/>
+
+
     <ListView
-         android:id="@+id/searchResultListView"
+        android:id="@+id/searchResultListView"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
+
 
 </LinearLayout>
