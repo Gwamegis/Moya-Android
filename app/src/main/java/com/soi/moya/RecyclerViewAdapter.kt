@@ -1,14 +1,11 @@
 package com.soi.moya
 
 import android.annotation.SuppressLint
-import android.content.ClipData.Item
-import android.media.Image
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.common.io.Resources.getResource
 
 class RecyclerViewAdapter(val List: Array<String>): RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
