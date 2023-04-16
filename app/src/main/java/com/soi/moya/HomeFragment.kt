@@ -43,29 +43,38 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-
         val view = inflater.inflate(R.layout.fragment_home, container, false)
-        viewPager = view.findViewById(R.id.viewPager)
-        tabs = view.findViewById(R.id.tabLayout)
-        val backgroundView = view.findViewById<View>(R.id.backgroundView)
 
+        val backgroundView = view.findViewById<View>(R.id.backgroundView)
         val prefs = requireContext().getSharedPreferences("selected_team", Context.MODE_PRIVATE)
         val selectedTeamName = prefs.getString("selected_team", "")
+        val mainBanner = view.findViewById<ImageView>(R.id.mainBannerImage)
+        val mainBannerImageSrc =
+            resources.getIdentifier("main_banner_${selectedTeamName}",
+                                   "drawable",
+                                    "com.soi.moya")
+
+        // setting UI
+        viewPager = view.findViewById(R.id.viewPager)
+        tabs = view.findViewById(R.id.tabLayout)
         fetchColor(selectedTeamName ?: "hanwha")
         backgroundView.setBackgroundResource(subColor)
         tabs.setSelectedTabIndicatorColor(ContextCompat.getColor(requireContext(), pointColor))
         tabs.setBackgroundColor(ContextCompat.getColor(requireContext(), subColor))
-
-
-        val selectedTeam = arguments?.getString("selectedTeam")
-        fetchColor(selectedTeam!!)
-
         tabs.setTabTextColors(Color.parseColor("#66ffffff"), Color.parseColor("#ffffff"))
+        mainBanner.setImageResource(mainBannerImageSrc)
+        mainBanner.clipToOutline = true
 
-        viewModel = ViewModelProvider(requireActivity()).get(MusicViewModel::class.java)
+//        val selectedTeam = arguments?.getString("selectedTeam")
+//        fetchColor(selectedTeam!!)
+
+        // setting Tab view
+        viewModel = ViewModelProvider(requireActivity())[MusicViewModel::class.java]
 
         viewModel.fetchData().observe(viewLifecycleOwner, Observer { musicList ->
+
             val adapter = ViewPagerAdapter(childFragmentManager, lifecycle, musicList)
+
             viewPager.adapter = adapter
 
             TabLayoutMediator(tabs, viewPager) { tab, position ->
@@ -76,17 +85,13 @@ class HomeFragment : Fragment() {
             }.attach()
         })
 
-        val mainBanner = view.findViewById<ImageView>(R.id.mainBannerImage)
+
+        // intent Select Team Activity
         mainBanner.setOnClickListener {
             val intent = Intent(requireActivity(), SelectTeamActivity::class.java)
             startActivity(intent)
         }
 
-        val mainBannerImageSrc =
-            resources.getIdentifier("main_banner_${selectedTeamName}", "drawable", "com.soi.moya")
-        mainBanner.setImageResource(mainBannerImageSrc)
-
-        mainBanner.clipToOutline = true
         return view
     }
 

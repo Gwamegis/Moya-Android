@@ -26,14 +26,14 @@ class SelectTeamActivity : AppCompatActivity() {
 
         val completeButton = findViewById<Button>(R.id.selectedTeamButton)
 
+        // recyclerview
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        val adapter = RecyclerViewAdapter(teams)
+
         // Shared Preferences
         val sharedPref = getSharedPreferences("selected_team", Context.MODE_PRIVATE)
         val teamInfo = sharedPref.getString("selected_team", "")
         val editor = sharedPref.edit()
-
-        // recyclerview
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        val adapter = RecyclerViewAdapter(teams)
 
         // Shared Preference에서 기본 팀 정보 호출
         if (teamInfo != "") {
@@ -43,6 +43,7 @@ class SelectTeamActivity : AppCompatActivity() {
         }
 
         recyclerView.adapter = adapter
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
 
         adapter.itemClick = object : RecyclerViewAdapter.ItemClick {
             override fun onClick(view: View, position: Int) {
@@ -60,8 +61,6 @@ class SelectTeamActivity : AppCompatActivity() {
                 }
             }
         }
-
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
 
         completeButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)

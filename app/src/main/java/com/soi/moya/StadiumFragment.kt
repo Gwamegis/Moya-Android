@@ -28,17 +28,15 @@ class StadiumFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         val view = inflater.inflate(R.layout.fragment_stadium, container, false)
         val listView = view.findViewById<ListView>(R.id.stadiumListView)
-//        val adapter = SongListViewAdapter(listItem)
-//        val adapter = ArrayAdapter(requireContext(), R.layout.stadium_listview_item, listItem)
         val adapter = StadiumArrayAdapter(requireContext(), R.layout.stadium_listview_item, listItem)
-        listView.adapter = adapter
 
+        listView.adapter = adapter
 
         // activity 이동
         listView.setOnItemClickListener { adapterView, view, i, l ->
-//            val clickItem = listItem[i]
             val intent = Intent(requireContext(), StadiumDetailActivity::class.java)
             intent.putExtra("stadiumName", listItem[i])
             intent.putExtra("imageName", imageNameList[i])

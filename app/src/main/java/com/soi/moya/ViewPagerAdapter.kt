@@ -7,8 +7,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class ViewPagerAdapter(fragmentManager: FragmentManager,
                        lifecycle: Lifecycle,
-                       private val musicData: List<MusicModel>) : FragmentStateAdapter(fragmentManager,
-    lifecycle) {
+                       private val musicData: List<MusicModel>) : FragmentStateAdapter(fragmentManager, lifecycle) {
     override fun getItemCount(): Int {
         return 2
     }

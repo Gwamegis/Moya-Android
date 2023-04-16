@@ -36,8 +36,9 @@ class SearchFragment : Fragment() {
         val listView = view.findViewById<ListView>(R.id.searchResultListView)
         val hintText = view.findViewById<TextView>(R.id.searchHintTextView)
         val emptyText = view.findViewById<TextView>(R.id.emptyListTextView)
+        val searchView = view.findViewById<SearchView>(R.id.searchView)
 
-        viewModel = ViewModelProvider(requireActivity()).get(MusicViewModel::class.java)
+        viewModel = ViewModelProvider(requireActivity())[MusicViewModel::class.java]
         adapter = SongListViewAdapter(emptyList())
         listView.adapter = adapter
 
@@ -47,16 +48,18 @@ class SearchFragment : Fragment() {
             listView.adapter = adapter
         })
 
-        listView.setOnItemClickListener { adapterView, view, i, l ->
+        listView.setOnItemClickListener { _, _, i, _ ->
+
             val musicModel = adapter.getItem(i) as MusicModel
             val intent = Intent(requireContext(), PlaySongActivity::class.java)
+
             intent.putExtra("title", musicModel.title)
             intent.putExtra("lyrics", musicModel.lyrics)
             intent.putExtra("url", musicModel.url)
+
             startActivity(intent)
         }
 
-        val searchView = view.findViewById<SearchView>(R.id.searchView)
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -99,5 +102,4 @@ class SearchFragment : Fragment() {
         val window = requireActivity().window
         window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.white)
     }
-
 }

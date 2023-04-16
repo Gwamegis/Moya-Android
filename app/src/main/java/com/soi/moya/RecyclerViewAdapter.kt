@@ -76,10 +76,4 @@ class RecyclerViewAdapter(val List: Array<String>): RecyclerView.Adapter<Recycle
             notifyItemChanged(selectedPosition)
         }
     }
-
-    fun setSelectedTeam(teamName: String) {
-        val index = List.indexOf(teamName)
-        selectedPosition = index
-        notifyItemChanged(selectedPosition)
-    }
 }

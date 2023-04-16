@@ -33,8 +33,10 @@ class PlayerSongFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         musicData = viewModel.playerMusicList
+
         val adapter = SongListViewAdapter(musicData)
         val listView = view.findViewById<ListView>(R.id.songListView)
+
         listView.adapter = adapter
 
         listView.setOnItemClickListener { adapterView, view, i, l ->
