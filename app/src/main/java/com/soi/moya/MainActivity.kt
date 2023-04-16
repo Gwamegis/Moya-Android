@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         val sharedPrefs = getSharedPreferences("selected_team", Context.MODE_PRIVATE)
         val teamInfo = sharedPrefs.getString("selected_team", "")
-        val firebaseTeamName = teamInfo!!.capitalizeFirst()
+        var firebaseTeamName = teamInfo!!.capitalizeFirst()
 
 
         val bundle = Bundle()
@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         // firestore
         val db = Firebase.firestore
         val musicList = mutableListOf<MusicModel>()
+        if (firebaseTeamName == "Ssg") { firebaseTeamName = "SSG" }
         db.collection(firebaseTeamName)
             .get()
             .addOnSuccessListener { result ->
