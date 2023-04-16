@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
                 intArrayOf(-android.R.attr.state_checked)
             ),
             intArrayOf(
-                ContextCompat.getColor(this, R.color.doosan_point),
+                ContextCompat.getColor(this, pointColor),
                 ContextCompat.getColor(this, R.color.darkGray)
             )
         )
