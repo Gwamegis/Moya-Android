@@ -28,6 +28,7 @@
 
 
 
+
 ## Features
 
 * **응원하는 야구 팀 선택하기**
@@ -53,7 +54,7 @@
 ## Screenshots
 |팀 선택|음악 탐색|응원가 상세 뷰|응원가 검색|지도 탐색|
 |---|---|---|---|---|
-|<img src = "https://user-images.githubusercontent.com/68676844/232319485-69377d96-a82c-4508-afc3-f1cd9ad8d7c6.png" width=250>|<img src = "https://user-images.githubusercontent.com/68676844/232319488-7a64337b-4d43-489a-b2a5-0c9837890703.png" width=250>|<img src = "https://user-images.githubusercontent.com/68676844/232319490-08d73cb3-6b39-4887-9aab-cecdf458a474.png" width = 250>|<img src = "https://user-images.githubusercontent.com/68676844/232319492-df2d114b-f523-4edc-862b-7270093d7377.png" width = 250>|<img src = "https://user-images.githubusercontent.com/68676844/232319494-4d2e471a-9c68-4712-9e91-64e67433b763.png" width = 250>
+|<img src = "https://user-images.githubusercontent.com/68676844/232887131-b0ffa5d4-878b-47a5-92b3-1a456910a9ee.png" width=250>|<img src = "https://user-images.githubusercontent.com/68676844/232319488-7a64337b-4d43-489a-b2a5-0c9837890703.png" width=250>|<img src = "https://user-images.githubusercontent.com/68676844/232319490-08d73cb3-6b39-4887-9aab-cecdf458a474.png" width = 250>|<img src = "https://user-images.githubusercontent.com/68676844/232319492-df2d114b-f523-4edc-862b-7270093d7377.png" width = 250>|<img src = "https://user-images.githubusercontent.com/68676844/232319494-4d2e471a-9c68-4712-9e91-64e67433b763.png" width = 250>
 
 
 ## License
