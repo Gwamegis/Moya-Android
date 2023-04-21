@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="야구장 좌석 배치도"
-        android:textSize="20sp"
+        android:textSize="20dp"
         android:textStyle="bold"
         android:gravity="center"
         android:layout_marginVertical="20dp"

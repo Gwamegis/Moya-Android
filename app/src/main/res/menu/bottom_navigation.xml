@@ -3,11 +3,11 @@
 
     <item android:title="응원곡"
         android:id="@+id/home"
-        android:icon="@drawable/baseline_home_24" />
+        android:icon="@drawable/navigation_icon_home" />
     <item android:title="곡 검색"
         android:id="@+id/search"
-        android:icon="@drawable/baseline_search_24"/>
+        android:icon="@drawable/navigation_icon_search"/>
     <item android:title="야구장"
-        android:icon="@drawable/baseline_map_24"
+        android:icon="@drawable/navigation_icon_map"
         android:id="@+id/stadium"/>
 </menu>
