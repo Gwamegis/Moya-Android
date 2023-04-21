@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.res.ColorStateList
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuItemCompat
 import androidx.fragment.app.Fragment
@@ -18,9 +20,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MusicViewModel
 
-    private var pointColor: Int = 0
-    private var selectedTeam: String = ""
-    private var firebaseTeamName: String = ""
+    private var pointColor = 0
+    private var selectedTeam = ""
+    private var firebaseTeamName = ""
+    private var backButtonPressedTime = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -112,5 +115,14 @@ class MainActivity : AppCompatActivity() {
             .addOnFailureListener { exception ->
                 Log.w("firestore", "Error getting documents.")
             }
+    }
+
+    override fun onBackPressed() {
+        if (System.currentTimeMillis() > backButtonPressedTime + 1500) {
+            backButtonPressedTime = System.currentTimeMillis()
+            Toast.makeText(this, "종료하시려면, 한 번 더 눌러주세요.", Toast.LENGTH_SHORT).show()
+        } else {
+            finish()
+        }
     }
 }
