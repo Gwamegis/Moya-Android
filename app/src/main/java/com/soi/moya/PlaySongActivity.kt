@@ -15,12 +15,13 @@ class PlaySongActivity : AppCompatActivity() {
 
     private var mediaPlayer: MediaPlayer? = null
     private var subColor: Int = 0
+    private var url = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
 
-        val url = intent.getStringExtra("url")!!
+        url = intent.getStringExtra("url")!!
 
         setContentView(R.layout.activity_play_song)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_play_song)
@@ -43,6 +44,7 @@ class PlaySongActivity : AppCompatActivity() {
     private fun onTappedPlayButton() {
         if (mediaPlayer?.isPlaying == true) {
             mediaPlayer?.pause()
+            mediaPlayer?.seekTo(0)
             binding.playSongButton.setImageResource(R.drawable.baseline_play_circle_24)
         } else {
             mediaPlayer?.start()
