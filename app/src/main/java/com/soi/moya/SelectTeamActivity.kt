@@ -64,6 +64,7 @@ class SelectTeamActivity : AppCompatActivity() {
 
         completeButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             editor.putString("selected_team", selectedTeamName)
             editor.apply()
             startActivity(intent)
