@@ -65,9 +65,6 @@ class HomeFragment : Fragment() {
         mainBanner.setImageResource(mainBannerImageSrc)
         mainBanner.clipToOutline = true
 
-//        val selectedTeam = arguments?.getString("selectedTeam")
-//        fetchColor(selectedTeam!!)
-
         // setting Tab view
         viewModel = ViewModelProvider(requireActivity())[MusicViewModel::class.java]
 
