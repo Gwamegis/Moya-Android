@@ -26,29 +26,62 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ScrollView
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_margin="20dp"
             app:layout_constraintBottom_toTopOf="@+id/playSongButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/songTitle">
 
-            <TextView
-                android:id="@+id/songLyric"
+            <ScrollView
+                android:id="@+id/scrollView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/pretendard_bold"
-                android:lineSpacingExtra="8dp"
-                android:textColor="@color/white"
-                android:textSize="26dp"
-                app:layout_constraintBottom_toTopOf="@+id/playSongButton"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/songTitle" />
+                app:layout_constraintTop_toTopOf="parent">
 
-        </ScrollView>
+                <LinearLayout
+                    android:id="@+id/songLyricLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/songLyric"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="20dp"
+                        android:fontFamily="@font/pretendard_bold"
+                        android:lineSpacingExtra="8dp"
+                        android:textColor="@color/white"
+                        android:textSize="26dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </LinearLayout>
+
+            </ScrollView>
+
+            <View
+                android:id="@+id/scrollTopOfGradientView"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="@+id/scrollView" />
+
+            <View
+                android:id="@+id/scrollBottomOfGradientView"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                app:layout_constraintBottom_toBottomOf="@+id/scrollView" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
         <ImageView
