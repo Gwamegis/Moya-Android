@@ -33,8 +33,10 @@
 
         <ImageView
             android:id="@+id/mainBannerImage"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="120dp"
+            android:scaleType="fitCenter"
+            android:layout_marginHorizontal="20dp"
             android:src="@drawable/main_banner_doosan"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/backgroundView"
