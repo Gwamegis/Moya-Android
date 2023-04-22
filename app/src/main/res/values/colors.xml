@@ -10,6 +10,8 @@
     <color name="gray">#EFEFEF</color>
     <color name="darkGray">#7D7D7D</color>
 
+    <color name="lyricsColor">#CCFFFFFF</color>
+
     <color name="custom_black">#2B2B2B</color>
     <color name="enabled">#D1D1D1</color>
     
