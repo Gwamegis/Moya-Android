@@ -1,18 +1,23 @@
 package com.soi.moya
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 
 class SearchFragment : Fragment() {
 
@@ -37,6 +42,7 @@ class SearchFragment : Fragment() {
         val hintText = view.findViewById<TextView>(R.id.searchHintTextView)
         val emptyText = view.findViewById<TextView>(R.id.emptyListTextView)
         val searchView = view.findViewById<SearchView>(R.id.searchView)
+        val songRequestButton = view.findViewById<LinearLayout>(R.id.songRequestButton)
 
         viewModel = ViewModelProvider(requireActivity())[MusicViewModel::class.java]
         adapter = SongListViewAdapter(emptyList())
@@ -59,7 +65,6 @@ class SearchFragment : Fragment() {
 
             startActivity(intent)
         }
-
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -93,6 +98,12 @@ class SearchFragment : Fragment() {
                 return true
             }
         })
+
+        songRequestButton.setOnClickListener {
+            val webView = WebView(requireContext())
+            webView.loadUrl("https://forms.gle/522hhU1Riq5wQhbv7")
+        }
+
 
         return view
     }
