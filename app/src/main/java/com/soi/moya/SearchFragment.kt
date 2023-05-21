@@ -25,11 +25,6 @@ class SearchFragment : Fragment() {
     private lateinit var adapter: SongListViewAdapter
     private var musicData: List<MusicModel> = emptyList()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
-
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,7 +38,7 @@ class SearchFragment : Fragment() {
         val emptyText = view.findViewById<TextView>(R.id.emptyListTextView)
         val searchView = view.findViewById<SearchView>(R.id.searchView)
         val songRequestButton = view.findViewById<LinearLayout>(R.id.songRequestButton)
-
+        var songRequestView = view.findViewById<LinearLayout>(R.id.songRequestView)
         viewModel = ViewModelProvider(requireActivity())[MusicViewModel::class.java]
         adapter = SongListViewAdapter(emptyList())
         listView.adapter = adapter
@@ -87,12 +82,14 @@ class SearchFragment : Fragment() {
                 if (newText.isNullOrBlank()) {
                     emptyText.visibility = View.GONE
                     listView.visibility = View.GONE
+                    songRequestView.visibility = View.GONE
                     hintText.visibility = View.VISIBLE
                 } else {
                     adapter.filter.filter(newText)
                     listView.visibility = View.VISIBLE
                     val filteredResult = musicData.filter { it.title.contains(newText, true) }
                     emptyText.visibility = if (filteredResult.isEmpty()) View.VISIBLE else View.GONE
+                    songRequestView.visibility = emptyText.visibility
                     hintText.visibility = View.GONE
                 }
                 return true

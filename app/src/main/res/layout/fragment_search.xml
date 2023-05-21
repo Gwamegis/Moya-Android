@@ -49,54 +49,71 @@
 
     <ListView
         android:id="@+id/searchResultListView"
-        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="원하는 응원가가 없으신가요?"
-        android:fontFamily="@font/pretendard_medium"
-        android:textSize="10dp"
-        android:textColor="@color/darkGray"
-        android:paddingBottom="12dp"
-        app:layout_constraintBottom_toTopOf="@+id/songRequestButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <LinearLayout
-        android:id="@+id/songRequestButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center|bottom"
-        android:layout_marginBottom="40dp"
-        android:background="@drawable/floating_button"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:paddingHorizontal="40dp"
-        android:paddingVertical="8dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:clickable="true"
-        android:focusable="true">
+        app:layout_constraintTop_toBottomOf="@+id/searchView" />
 
-        <ImageView
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/send_icon"
-            app:tint="@color/main_green" />
+    <LinearLayout
+        android:id="@+id/songRequestView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/pretendard_bold"
-            android:paddingStart="8dp"
-            android:text="응원가 신청하기"
-            android:textColor="@color/main_green"
-            android:textSize="16dp" />
+            android:fontFamily="@font/pretendard_medium"
+            android:paddingBottom="12dp"
+            android:text="원하는 응원가가 없으신가요?"
+            android:textColor="@color/darkGray"
+            android:textSize="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/songRequestButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/songRequestButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="center|bottom"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/floating_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="40dp"
+            android:paddingVertical="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/send_icon"
+                app:tint="@color/main_green" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/pretendard_bold"
+                android:paddingStart="8dp"
+                android:text="응원가 신청하기"
+                android:textColor="@color/main_green"
+                android:textSize="16dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
