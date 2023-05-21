@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
@@ -67,6 +68,10 @@ class TeamSongFragment : Fragment() {
             intent.putExtra("lyrics", musicData[i].lyrics)
             intent.putExtra("url", musicData[i].url)
             startActivity(intent)
+        }
+        songRequestButton.setOnClickListener {
+            val webView = WebView(requireContext())
+            webView.loadUrl("https://forms.gle/522hhU1Riq5wQhbv7")
         }
 
     }

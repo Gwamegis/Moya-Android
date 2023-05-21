@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ListView
@@ -46,6 +47,17 @@ class PlayerSongFragment : Fragment() {
 
         val songRequestText = footerView.findViewById<TextView>(R.id.songRequestText)
         val sendIcon = footerView.findViewById<ImageView>(R.id.songRequestIcon)
+        val requestButton = footerView.findViewById<LinearLayout>(R.id.songRequestButton)
+
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.point_floating_button)
+        if (drawable is GradientDrawable) {
+            drawable.setStroke(1, ContextCompat.getColor(requireContext(), pointColor!!))
+        }
+
+        requestButton.setOnClickListener {
+            val webView = WebView(requireContext())
+            webView.loadUrl("https://forms.gle/522hhU1Riq5wQhbv7")
+        }
 
         songRequestText.setTextColor(ContextCompat.getColor(requireContext(),pointColor!!))
         sendIcon.setColorFilter(ContextCompat.getColor(requireContext(), pointColor))
