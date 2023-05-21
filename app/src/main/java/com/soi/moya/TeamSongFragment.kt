@@ -1,12 +1,17 @@
 package com.soi.moya
 
 import android.content.Intent
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ListView
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 
 
@@ -36,6 +41,24 @@ class TeamSongFragment : Fragment() {
         musicData = viewModel.teamMusicList
         val adapter = SongListViewAdapter(musicData)
         val listView = view.findViewById<ListView>(R.id.songListView)
+        val footerView = LayoutInflater.from(context).inflate(R.layout.request_song_view, null, false)
+        val pointColor = viewModel.pointColor.value
+
+        val songRequestText = footerView.findViewById<TextView>(R.id.songRequestText)
+        val sendIcon = footerView.findViewById<ImageView>(R.id.songRequestIcon)
+        val songRequestButton = footerView.findViewById<LinearLayout>(R.id.songRequestButton)
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.point_floating_button)
+        if (drawable is GradientDrawable) {
+            drawable.setStroke(1, ContextCompat.getColor(requireContext(), pointColor!!))
+        }
+
+        songRequestButton.background = drawable
+
+        songRequestText.setTextColor(ContextCompat.getColor(requireContext(), pointColor!!))
+        sendIcon.setColorFilter(ContextCompat.getColor(requireContext(), pointColor!!))
+
+        listView.addFooterView(footerView)
+
         listView.adapter = adapter
 
         listView.setOnItemClickListener { adapterView, view, i, l ->
