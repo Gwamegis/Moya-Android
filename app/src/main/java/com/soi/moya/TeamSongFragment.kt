@@ -50,7 +50,8 @@ class TeamSongFragment : Fragment() {
         val songRequestButton = footerView.findViewById<LinearLayout>(R.id.songRequestButton)
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.point_floating_button)
         if (drawable is GradientDrawable) {
-            drawable.setStroke(1, ContextCompat.getColor(requireContext(), pointColor!!))
+            drawable.setStroke(dpToPx(1.6), ContextCompat.getColor(requireContext(), pointColor!!))
+            songRequestButton.background = drawable  // 보더 색상 설정
         }
 
         songRequestButton.background = drawable
@@ -73,6 +74,9 @@ class TeamSongFragment : Fragment() {
             val webView = WebView(requireContext())
             webView.loadUrl("https://forms.gle/522hhU1Riq5wQhbv7")
         }
-
+    }
+    private fun dpToPx(dp: Double): Int {
+        val density = resources.displayMetrics.density
+        return (dp * density + 0.5f).toInt()
     }
 }

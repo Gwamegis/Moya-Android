@@ -51,7 +51,8 @@ class PlayerSongFragment : Fragment() {
 
         val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.point_floating_button)
         if (drawable is GradientDrawable) {
-            drawable.setStroke(1, ContextCompat.getColor(requireContext(), pointColor!!))
+            drawable.setStroke(dpToPx(1.6), ContextCompat.getColor(requireContext(), pointColor!!))
+            requestButton.background = drawable  // 보더 색상 설정
         }
 
         requestButton.setOnClickListener {
@@ -59,11 +60,12 @@ class PlayerSongFragment : Fragment() {
             webView.loadUrl("https://forms.gle/522hhU1Riq5wQhbv7")
         }
 
-        songRequestText.setTextColor(ContextCompat.getColor(requireContext(),pointColor!!))
+        songRequestText.setTextColor(ContextCompat.getColor(requireContext(), pointColor!!))
         sendIcon.setColorFilter(ContextCompat.getColor(requireContext(), pointColor))
 
         listView.addFooterView(footerView)
         listView.adapter = adapter
+
 
         listView.setOnItemClickListener { adapterView, view, i, l ->
             val intent = Intent(requireContext(), PlaySongActivity::class.java)
@@ -72,5 +74,10 @@ class PlayerSongFragment : Fragment() {
             intent.putExtra("url", musicData[i].url)
             startActivity(intent)
         }
+    }
+
+    private fun dpToPx(dp: Double): Int {
+        val density = resources.displayMetrics.density
+        return (dp * density + 0.5f).toInt()
     }
 }
