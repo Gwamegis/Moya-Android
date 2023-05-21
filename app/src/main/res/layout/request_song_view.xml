@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/pretendard_medium"
         android:paddingBottom="12dp"
+        android:paddingTop="20dp"
         android:text="원하는 응원가가 없으신가요?"
         android:textColor="@color/darkGray"
         android:textSize="10dp"/>
