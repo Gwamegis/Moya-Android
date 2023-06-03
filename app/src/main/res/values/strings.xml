@@ -2,5 +2,6 @@
     <string name="app_name">모두의 야구</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="firebase_config_file_name">google-services.json</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>
