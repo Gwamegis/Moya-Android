@@ -23,14 +23,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug {
-            task copyGoogleServicesJson(type: Copy) {
-                from 'src/debug'
-                include 'google-services.json'
-                into '.'
-            }
-            preBuild.dependsOn(copyGoogleServicesJson)
-        }
+//        debug {
+//            task copyGoogleServicesJson(type: Copy) {
+//                from 'src/debug'
+//                include 'google-services.json'
+//                into '.'
+//            }
+//            preBuild.dependsOn(copyGoogleServicesJson)
+//        }
     }
 
     compileOptions {

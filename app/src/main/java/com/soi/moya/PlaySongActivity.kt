@@ -9,11 +9,14 @@ import android.graphics.drawable.GradientDrawable
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
+import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.databinding.DataBindingUtil
 import com.soi.moya.databinding.ActivityPlaySongBinding
+import java.util.concurrent.TimeUnit
 
 class PlaySongActivity : AppCompatActivity() {
 
@@ -40,11 +43,30 @@ class PlaySongActivity : AppCompatActivity() {
 
         mediaPlayer?.setOnPreparedListener {
             mediaPlayer?.start()
+            initSeekBar()
         }
 
         binding.playSongButton.setOnClickListener {
             onTappedPlayButton()
         }
+
+        binding.seekBar.setOnClickListener {
+            if (mediaPlayer !== null) mediaPlayer?.pause()
+        }
+
+        binding.seekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) mediaPlayer?.seekTo(progress)
+                binding.songCurrentTime.text = formatDuration(mediaPlayer!!.currentPosition)
+            }
+
+            override fun onStartTrackingTouch(seekBarseekBarseekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+        })
 
         // scoll 위치에 따른 gradient
         binding.scrollView.viewTreeObserver.addOnGlobalLayoutListener {
@@ -120,6 +142,29 @@ class PlaySongActivity : AppCompatActivity() {
         binding.scrollBottomOfGradientView.background = bottomOfGradientDrawable
 
         window.statusBarColor = ContextCompat.getColor(this, subColor)
+    }
+
+    private fun initSeekBar() {
+        binding.seekBar.max = mediaPlayer!!.duration
+        binding.songEndTime.text = formatDuration(mediaPlayer!!.duration)
+
+        val handler = Handler()
+        handler.postDelayed(object: Runnable {
+            override fun run() {
+                try {
+                    binding.seekBar.progress = mediaPlayer!!.currentPosition
+                    handler.postDelayed(this, 1000)
+                } catch(e: Exception) {
+                    binding.seekBar.progress = 0
+                }
+            }
+        }, 0)
+    }
+
+    private fun formatDuration(duration: Int): String {
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(duration.toLong())
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(duration.toLong()) % 60
+        return String.format("%02d:%02d", minutes, seconds)
     }
 }
 
