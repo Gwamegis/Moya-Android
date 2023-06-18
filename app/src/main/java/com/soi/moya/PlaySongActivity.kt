@@ -43,7 +43,7 @@ class PlaySongActivity : AppCompatActivity() {
 
         mediaPlayer?.setOnPreparedListener {
             mediaPlayer?.start()
-            initSeekBar()
+            startSeekBarUpdate()
         }
 
         binding.playSongButton.setOnClickListener {
@@ -108,6 +108,15 @@ class PlaySongActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        startSeekBarUpdate()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopSeekBarUpdate()
+    }
     override fun onDestroy() {
         super.onDestroy()
         mediaPlayer?.release()
@@ -144,23 +153,29 @@ class PlaySongActivity : AppCompatActivity() {
         window.statusBarColor = ContextCompat.getColor(this, subColor)
     }
 
-    private fun initSeekBar() {
-        binding.seekBar.max = mediaPlayer!!.duration
-        binding.songEndTime.text = formatDuration(mediaPlayer!!.duration)
-
-        val handler = Handler()
-        handler.postDelayed(object: Runnable {
-            override fun run() {
-                try {
-                    binding.seekBar.progress = mediaPlayer!!.currentPosition
-                    handler.postDelayed(this, 1000)
-                } catch(e: Exception) {
-                    binding.seekBar.progress = 0
-                }
-            }
-        }, 0)
+    private fun startSeekBarUpdate() {
+        if (mediaPlayer?.isPlaying == true) {
+            binding.seekBar.post(updateSeekBar)
+        }
     }
 
+    private fun stopSeekBarUpdate() {
+        binding.seekBar.removeCallbacks(updateSeekBar)
+    }
+
+    private val updateSeekBar: Runnable = object: Runnable {
+        override fun run() {
+            try {
+                binding.seekBar.max = mediaPlayer?.duration ?: 0
+                binding.songEndTime.text = formatDuration((mediaPlayer?.duration ?: 0))
+                binding.seekBar.progress = mediaPlayer?.currentPosition ?: 0
+                binding.songCurrentTime.text = formatDuration(mediaPlayer?.currentPosition ?: 0)
+                binding.seekBar.postDelayed(this, 1000)
+            } catch(e: Exception) {
+                binding.seekBar.progress = 0
+            }
+        }
+    }
     private fun formatDuration(duration: Int): String {
         val minutes = TimeUnit.MILLISECONDS.toMinutes(duration.toLong())
         val seconds = TimeUnit.MILLISECONDS.toSeconds(duration.toLong()) % 60
