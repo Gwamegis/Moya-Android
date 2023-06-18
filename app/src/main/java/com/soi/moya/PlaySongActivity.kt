@@ -2,16 +2,14 @@ package com.soi.moya
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
-import android.graphics.LinearGradient
-import android.graphics.Shader
+import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.view.View
 import android.widget.SeekBar
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.databinding.DataBindingUtil
@@ -24,6 +22,7 @@ class PlaySongActivity : AppCompatActivity() {
 
     private var mediaPlayer: MediaPlayer? = null
     private var subColor: Int = 0
+    private var pointColor: Int = 0
     private var url = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +45,20 @@ class PlaySongActivity : AppCompatActivity() {
             startSeekBarUpdate()
         }
 
+        mediaPlayer?.setOnErrorListener { mp, what, extra ->
+            // 오류 발생 시 처리하는 부분
+            Toast.makeText(this, "노래 재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+            stopSeekBarUpdate()
+            mediaPlayer?.release()
+            mediaPlayer = null
+            true
+        }
+
+        mediaPlayer?.setOnCompletionListener {
+            mediaPlayer?.seekTo(0)
+            mediaPlayer?.start()
+        }
+
         binding.playSongButton.setOnClickListener {
             onTappedPlayButton()
         }
@@ -54,9 +67,12 @@ class PlaySongActivity : AppCompatActivity() {
             if (mediaPlayer !== null) mediaPlayer?.pause()
         }
 
+        var color = ContextCompat.getColor(this, pointColor)
+        binding.seekBar.progressTintList = ColorStateList.valueOf(color)
+        binding.seekBar.thumbTintList = ColorStateList.valueOf(color)
         binding.seekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) mediaPlayer?.seekTo(progress)
+                if (fromUser && mediaPlayer != null && mediaPlayer?.isPlaying == true) mediaPlayer?.seekTo(progress)
                 binding.songCurrentTime.text = formatDuration(mediaPlayer!!.currentPosition)
             }
 
@@ -100,11 +116,10 @@ class PlaySongActivity : AppCompatActivity() {
     private fun onTappedPlayButton() {
         if (mediaPlayer?.isPlaying == true) {
             mediaPlayer?.pause()
-            mediaPlayer?.seekTo(0)
             binding.playSongButton.setImageResource(R.drawable.baseline_play_circle_24)
         } else {
             mediaPlayer?.start()
-            binding.playSongButton.setImageResource(R.drawable.baseline_stop_circle_24)
+            binding.playSongButton.setImageResource(R.drawable.baseline_pause_circle_24)
         }
     }
 
@@ -130,7 +145,7 @@ class PlaySongActivity : AppCompatActivity() {
         val selectedTeam = sharedPrefs.getString("selected_team", "") ?: "doosan"
 
         subColor = resources.getIdentifier("${selectedTeam}_sub", "color", "com.soi.moya")
-
+        pointColor = resources.getIdentifier("${selectedTeam}_point", "color", "com.soi.moya")
         // gradient view
         val gradientSubColor = ContextCompat.getColor(this, subColor)
         val alphaValue = 1

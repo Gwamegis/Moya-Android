@@ -90,7 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
-            android:layout_marginHorizontal="40dp"
+            android:layout_marginHorizontal="20dp"
             app:layout_constraintBottom_toTopOf="@+id/playSongButton" />
 
         <TextView
@@ -99,11 +99,11 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/pretendard_medium"
             android:textSize="10dp"
-            android:text="0:00"
+            android:text="00:00"
             android:textColor="@color/gray"
             android:layout_marginTop="12dp"
-            android:layout_marginLeft="40dp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginLeft="10dp"
+            app:layout_constraintStart_toStartOf="@+id/seekBar"
             app:layout_constraintTop_toBottomOf="@+id/seekBar" />
 
         <TextView
@@ -112,11 +112,11 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/pretendard_medium"
             android:textSize="10dp"
-            android:text="0:00"
+            android:text="00:00"
             android:textColor="@color/gray"
             android:layout_marginTop="12dp"
-            android:layout_marginRight="40dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginRight="10dp"
+            app:layout_constraintEnd_toEndOf="@+id/seekBar"
             app:layout_constraintTop_toBottomOf="@+id/seekBar"/>
 
         <ImageView
@@ -124,7 +124,7 @@
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_margin="20dp"
-            android:src="@drawable/baseline_stop_circle_24"
+            android:src="@drawable/baseline_pause_circle_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
