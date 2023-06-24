@@ -47,7 +47,7 @@ class SongListViewAdapter(private var songList: List<MusicModel>): BaseAdapter()
                 val filterResults = FilterResults()
 
                 filterResults.values = songList.filter  {
-                    it.title.contains(query!!)
+                    it.title.contains(query!!, true)
                 }
 
                 return filterResults
