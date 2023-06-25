@@ -21,6 +21,7 @@ class PlaySongActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlaySongBinding
 
     private var mediaPlayer: MediaPlayer? = null
+    private var isSongPrepared = false
     private var subColor: Int = 0
     private var pointColor: Int = 0
     private var url = ""
@@ -41,6 +42,7 @@ class PlaySongActivity : AppCompatActivity() {
         mediaPlayer?.prepareAsync()
 
         mediaPlayer?.setOnPreparedListener {
+            isSongPrepared = true
             mediaPlayer?.start()
             startSeekBarUpdate()
         }
@@ -114,12 +116,17 @@ class PlaySongActivity : AppCompatActivity() {
     }
 
     private fun onTappedPlayButton() {
-        if (mediaPlayer?.isPlaying == true) {
-            mediaPlayer?.pause()
-            binding.playSongButton.setImageResource(R.drawable.baseline_play_circle_24)
+
+        if (isSongPrepared) {
+            if (mediaPlayer?.isPlaying == true) {
+                mediaPlayer?.pause()
+                binding.playSongButton.setImageResource(R.drawable.baseline_play_circle_24)
+            } else {
+                mediaPlayer?.start()
+                binding.playSongButton.setImageResource(R.drawable.baseline_pause_circle_24)
+            }
         } else {
-            mediaPlayer?.start()
-            binding.playSongButton.setImageResource(R.drawable.baseline_pause_circle_24)
+            Toast.makeText(this, "잠시만 기다려주세요", Toast.LENGTH_SHORT).show()
         }
     }
 
