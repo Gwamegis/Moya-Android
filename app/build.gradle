@@ -12,7 +12,7 @@ android {
         applicationId "com.soi.moya"
         minSdk 24
         targetSdk 33
-        versionCode 14
+        versionCode 15
         versionName "1.1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
