@@ -1,29 +1,29 @@
 package com.soi.moya
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 
 class SearchFragment : Fragment() {
 
     private lateinit var viewModel: MusicViewModel
     private lateinit var adapter: SongListViewAdapter
     private var musicData: List<MusicModel> = emptyList()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -37,7 +37,8 @@ class SearchFragment : Fragment() {
         val hintText = view.findViewById<TextView>(R.id.searchHintTextView)
         val emptyText = view.findViewById<TextView>(R.id.emptyListTextView)
         val searchView = view.findViewById<SearchView>(R.id.searchView)
-
+        val songRequestButton = view.findViewById<LinearLayout>(R.id.songRequestButton)
+        var songRequestView = view.findViewById<LinearLayout>(R.id.songRequestView)
         viewModel = ViewModelProvider(requireActivity())[MusicViewModel::class.java]
         adapter = SongListViewAdapter(emptyList())
         listView.adapter = adapter
@@ -60,7 +61,6 @@ class SearchFragment : Fragment() {
             startActivity(intent)
         }
 
-
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 searchView.clearFocus()
@@ -82,17 +82,25 @@ class SearchFragment : Fragment() {
                 if (newText.isNullOrBlank()) {
                     emptyText.visibility = View.GONE
                     listView.visibility = View.GONE
+                    songRequestView.visibility = View.GONE
                     hintText.visibility = View.VISIBLE
                 } else {
                     adapter.filter.filter(newText)
                     listView.visibility = View.VISIBLE
                     val filteredResult = musicData.filter { it.title.contains(newText, true) }
                     emptyText.visibility = if (filteredResult.isEmpty()) View.VISIBLE else View.GONE
+                    songRequestView.visibility = emptyText.visibility
                     hintText.visibility = View.GONE
                 }
                 return true
             }
         })
+
+        songRequestButton.setOnClickListener {
+            val webView = WebView(requireContext())
+            webView.loadUrl("https://forms.gle/522hhU1Riq5wQhbv7")
+        }
+
 
         return view
     }

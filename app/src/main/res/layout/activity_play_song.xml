@@ -27,9 +27,10 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/playSongButton"
+            app:layout_constraintBottom_toTopOf="@+id/seekBar"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/songTitle">
@@ -38,6 +39,8 @@
                 android:id="@+id/scrollView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_margin="20dp"
+                android:scrollbars="none"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -55,8 +58,8 @@
                         android:layout_height="match_parent"
                         android:layout_margin="20dp"
                         android:fontFamily="@font/pretendard_bold"
-                        android:lineSpacingExtra="8dp"
-                        android:textColor="@color/white"
+                        android:lineSpacingExtra="12dp"
+                        android:textColor="@color/lyricsColor"
                         android:textSize="26dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -83,13 +86,46 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:layout_marginHorizontal="20dp"
+            app:layout_constraintBottom_toTopOf="@+id/playSongButton" />
+
+        <TextView
+            android:id="@+id/songCurrentTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pretendard_medium"
+            android:textSize="10dp"
+            android:text="00:00"
+            android:textColor="@color/gray"
+            android:layout_marginTop="12dp"
+            android:layout_marginLeft="10dp"
+            app:layout_constraintStart_toStartOf="@+id/seekBar"
+            app:layout_constraintTop_toBottomOf="@+id/seekBar" />
+
+        <TextView
+            android:id="@+id/songEndTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pretendard_medium"
+            android:textSize="10dp"
+            android:text="00:00"
+            android:textColor="@color/gray"
+            android:layout_marginTop="12dp"
+            android:layout_marginRight="10dp"
+            app:layout_constraintEnd_toEndOf="@+id/seekBar"
+            app:layout_constraintTop_toBottomOf="@+id/seekBar"/>
 
         <ImageView
             android:id="@+id/playSongButton"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_margin="20dp"
-            android:src="@drawable/baseline_stop_circle_24"
+            android:src="@drawable/baseline_pause_circle_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

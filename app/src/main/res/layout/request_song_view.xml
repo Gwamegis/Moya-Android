@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/songRequestView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/pretendard_medium"
+        android:paddingBottom="12dp"
+        android:paddingTop="20dp"
+        android:text="원하는 응원가가 없으신가요?"
+        android:textColor="@color/darkGray"
+        android:textSize="10dp"/>
+
+    <LinearLayout
+        android:id="@+id/songRequestButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/point_floating_button"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="40dp"
+        android:paddingVertical="8dp">
+
+        <ImageView
+            android:id="@+id/songRequestIcon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/send_icon"
+            app:tint="@color/main_green" />
+
+        <TextView
+            android:id="@+id/songRequestText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pretendard_bold"
+            android:paddingStart="8dp"
+            android:text="응원가 신청하기"
+            android:textColor="@color/main_green"
+            android:textSize="16dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

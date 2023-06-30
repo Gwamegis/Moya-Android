@@ -82,6 +82,8 @@ class HomeFragment : Fragment() {
             }.attach()
         })
 
+        viewModel.setPointColor(pointColor)
+
 
         // intent Select Team Activity
         mainBanner.setOnClickListener {
