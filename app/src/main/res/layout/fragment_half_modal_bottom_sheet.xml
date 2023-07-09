@@ -31,22 +31,6 @@
         android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/updateButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="업데이트하러 가기"
-            android:textColor="@color/white"
-            android:fontFamily="@font/pretendard_bold"
-            android:textSize="16dp"
-            android:background="@drawable/corner_radius_button_background"
-            android:paddingHorizontal="20dp" />
-
-        <Space
-            android:layout_width="8dp"
-            android:layout_height="match_parent" />
-
-        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/ignoreUpdateButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -58,8 +42,21 @@
             android:background="@drawable/corner_radius_next_update_button_background"
             android:paddingHorizontal="20dp" />
 
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="match_parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/updateButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="업데이트하러 가기"
+            android:textColor="@color/white"
+            android:fontFamily="@font/pretendard_bold"
+            android:textSize="16dp"
+            android:background="@drawable/corner_radius_button_background"
+            android:paddingHorizontal="20dp" />
     </LinearLayout>
-
-
 
 </LinearLayout>
