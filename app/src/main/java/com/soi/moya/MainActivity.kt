@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         pointColor = resources.getIdentifier("${selectedTeam}_point", "color", "com.soi.moya")
         setNavigationUI()
         fetchVersionData()
-//        fetchFirebaseData()
     }
 
     private fun replaceFragment(fragment: Fragment) {
