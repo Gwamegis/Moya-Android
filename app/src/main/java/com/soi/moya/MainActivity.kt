@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -14,6 +13,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.soi.moya.databinding.ActivityMainBinding
+import com.soi.moya.BuildConfig
+import kotlin.math.max
 
 class MainActivity : AppCompatActivity() {
 
@@ -37,7 +38,8 @@ class MainActivity : AppCompatActivity() {
 
         pointColor = resources.getIdentifier("${selectedTeam}_point", "color", "com.soi.moya")
         setNavigationUI()
-        fetchFirebaseData()
+        fetchVersionData()
+//        fetchFirebaseData()
     }
 
     private fun replaceFragment(fragment: Fragment) {
@@ -94,6 +96,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     // fetch Data
+    private fun fetchVersionData() {
+        val db = Firebase.firestore
+        db.collection("AndroidVersion")
+            .limit(1)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val documentSnapshot = querySnapshot.documents[0]
+                    val version = documentSnapshot.getString("version")
+                    val features = documentSnapshot.get("feature") as? List<String>
+
+                    if (version != null && features != null) {
+                        processVersionData(version, features)
+                    }
+                } else {
+                    Log.w("firebase", "Error null documents.")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w("firebase", "Error getting documents.")
+            }
+    }
+
     private fun fetchFirebaseData() {
         // firestore
         val db = Firebase.firestore
@@ -115,6 +140,39 @@ class MainActivity : AppCompatActivity() {
             .addOnFailureListener { exception ->
                 Log.w("firestore", "Error getting documents.")
             }
+
+
+    }
+
+    private fun processVersionData(version: String, features: List<String>) {
+        if (!isRecentVersion(version)) {
+            Log.d("새로운 기능이 나왔음", "hello world!")
+            val bottomSheetFragment = HalfModalBottomSheetFragment()
+            bottomSheetFragment.show(supportFragmentManager, "HalfModalBottomSheet")
+
+        }
+        for(feature in features) {
+            Log.d("new feature", "feature: $feature")
+        }
+        fetchFirebaseData()
+    }
+
+    private fun isRecentVersion(version: String): Boolean {
+        val currentVersion = BuildConfig.VERSION_NAME
+        Log.d("versions", "$version, $currentVersion")
+        val versionParts = version.split(".")
+        val currentVersionParts = currentVersion.split(".")
+
+        for (i in 0 until max(versionParts.size, currentVersionParts.size)) {
+            val newVersionName = if (i < versionParts.size) versionParts[i] else ""
+            val currentVersionName =
+                if (i < currentVersionParts.size) currentVersionParts[i] else ""
+
+            if (newVersionName != currentVersionName) {
+                return false
+            }
+        }
+        return true
     }
 
     override fun onBackPressed() {
