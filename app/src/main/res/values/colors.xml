@@ -17,6 +17,7 @@
     <color name="lyricsColor">#CCFFFFFF</color>
 
     <color name="custom_black">#2B2B2B</color>
+    <color name="custom_dark_gray">#7D7D7D</color>
     <color name="enabled">#D1D1D1</color>
     
     <color name="lotte_background">#062045</color>

@@ -1,0 +1,27 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/alarm" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="모두의 야구 새단장 소식"
+        android:textColor="@color/custom_black"
+        android:textSize="20dp"
+        android:paddingTop="20dp"
+        android:fontFamily="@font/pretendard_bold" />
+
+    <ListView
+        android:id="@+id/featureListView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp" />
+
+</LinearLayout>

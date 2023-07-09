@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- list_item_feature.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingBottom="13dp">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/imageViewFeature"
+            android:layout_width="27dp"
+            android:layout_height="27dp"
+            android:src="@drawable/new_feature_rectangle"/>
+
+        <TextView
+            android:id="@+id/textViewNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:fontFamily="@font/pretendard_bold"
+            android:textColor="@android:color/white"
+            android:textSize="16dp" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/textViewFeature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="16dp"
+        android:textColor="@color/custom_dark_gray"
+        android:fontFamily="@font/pretendard_medium"
+        android:layout_marginStart="16dp" />
+
+</LinearLayout>

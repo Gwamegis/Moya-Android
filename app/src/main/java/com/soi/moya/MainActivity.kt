@@ -146,16 +146,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun processVersionData(version: String, features: List<String>) {
         if (!isRecentVersion(version)) {
-            Log.d("새로운 기능이 나왔음", "hello world!")
             val bottomSheetFragment = HalfModalBottomSheetFragment()
-            bottomSheetFragment.show(supportFragmentManager, "HalfModalBottomSheet")
+            val bundle = Bundle()
 
-        }
-        for(feature in features) {
-            Log.d("new feature", "feature: $feature")
+            bundle.putStringArrayList("features", ArrayList(features))
+            bottomSheetFragment.arguments = bundle
+            bottomSheetFragment.show(supportFragmentManager, "HalfModalBottomSheet")
         }
         fetchFirebaseData()
     }
+
 
     private fun isRecentVersion(version: String): Boolean {
         val currentVersion = BuildConfig.VERSION_NAME
