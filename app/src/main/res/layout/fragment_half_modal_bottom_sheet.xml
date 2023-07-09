@@ -22,23 +22,41 @@
         android:id="@+id/featureListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="16dp" />
+        android:paddingTop="30dp"
+        android:paddingBottom="36dp"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/corner_radius_button_background">
+        android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/updateButton"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="업데이트하러 가기"
             android:textColor="@color/white"
             android:fontFamily="@font/pretendard_bold"
             android:textSize="16dp"
-            android:background="@android:color/transparent"
-            android:paddingHorizontal="20dp"/>
+            android:background="@drawable/corner_radius_button_background"
+            android:paddingHorizontal="20dp" />
+
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="match_parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/ignoreUpdateButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="다음에 하기"
+            android:textColor="@color/custom_dark_gray"
+            android:fontFamily="@font/pretendard_bold"
+            android:textSize="16dp"
+            android:background="@drawable/corner_radius_next_update_button_background"
+            android:paddingHorizontal="20dp" />
 
     </LinearLayout>
 
