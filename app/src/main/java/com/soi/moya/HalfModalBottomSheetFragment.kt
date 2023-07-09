@@ -19,6 +19,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
 
+    private val PREFS_NAME = "UserPrefs"
+    private val KEY_APP_VERSION = "appVersion"
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -30,6 +33,7 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val version = arguments?.getString("newVersion")
         val features = arguments?.getStringArrayList("features")
 
         val featureListView = view.findViewById<ListView>(R.id.featureListView)
@@ -37,8 +41,12 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
         featureListView.adapter = adapter
 
         val updateButton = view.findViewById<Button>(R.id.updateButton)
+        val ignoreUpdateButton = view.findViewById<Button>(R.id.ignoreUpdateButton)
         updateButton.setOnClickListener {
             openPlayStore()
+        }
+        ignoreUpdateButton.setOnClickListener {
+            onLaterButtonClick(version ?: "")
         }
     }
 
@@ -109,4 +117,11 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
+    private fun onLaterButtonClick(version: String) {
+        val sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString(KEY_APP_VERSION, version)
+        editor.apply()
+        dismiss()
+    }
 }

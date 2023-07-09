@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.soi.moya.databinding.ActivityMainBinding
-import com.soi.moya.BuildConfig
 import kotlin.math.max
 
 class MainActivity : AppCompatActivity() {
@@ -25,6 +24,8 @@ class MainActivity : AppCompatActivity() {
     private var selectedTeam = ""
     private var firebaseTeamName = ""
     private var backButtonPressedTime = 0L
+    private val PREFS_NAME = "UserPrefs"
+    private val KEY_APP_VERSION = "appVersion"
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -145,28 +146,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun processVersionData(version: String, features: List<String>) {
-        if (!isRecentVersion(version)) {
-            val bottomSheetFragment = HalfModalBottomSheetFragment()
-            val bundle = Bundle()
+        if (!checkRecentVersion(version)) {
+            val sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val currentVersion = BuildConfig.VERSION_NAME
+            val savedVersion = sharedPreferences.getString(KEY_APP_VERSION, "")
 
-            bundle.putStringArrayList("features", ArrayList(features))
-            bottomSheetFragment.arguments = bundle
-            bottomSheetFragment.show(supportFragmentManager, "HalfModalBottomSheet")
+            if (savedVersion != version) {
+                val bottomSheetFragment = HalfModalBottomSheetFragment()
+                val bundle = Bundle()
+                bundle.putStringArrayList("features", ArrayList(features))
+                bundle.putString("newVersion", version)
+                bottomSheetFragment.arguments = bundle
+                bottomSheetFragment.show(supportFragmentManager, "HalfModalBottomSheet")
+            }
         }
         fetchFirebaseData()
     }
 
-
-    private fun isRecentVersion(version: String): Boolean {
+    private fun checkRecentVersion(version: String): Boolean {
         val currentVersion = BuildConfig.VERSION_NAME
-        Log.d("versions", "$version, $currentVersion")
         val versionParts = version.split(".")
         val currentVersionParts = currentVersion.split(".")
 
         for (i in 0 until max(versionParts.size, currentVersionParts.size)) {
             val newVersionName = if (i < versionParts.size) versionParts[i] else ""
-            val currentVersionName =
-                if (i < currentVersionParts.size) currentVersionParts[i] else ""
+            val currentVersionName = if (i < currentVersionParts.size) currentVersionParts[i] else ""
 
             if (newVersionName != currentVersionName) {
                 return false
