@@ -1,12 +1,16 @@
 package com.soi.moya
 
 import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
@@ -31,6 +35,11 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
         val featureListView = view.findViewById<ListView>(R.id.featureListView)
         val adapter = FeatureAdapter(requireContext(), features)
         featureListView.adapter = adapter
+
+        val updateButton = view.findViewById<Button>(R.id.updateButton)
+        updateButton.setOnClickListener {
+            openPlayStore()
+        }
     }
 
     private class FeatureAdapter(
@@ -88,4 +97,16 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
 
         return dialog
     }
+    private fun openPlayStore() {
+        val appPackageName = requireContext().packageName
+        val marketIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName"))
+        val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName"))
+
+        try {
+            startActivity(marketIntent)
+        } catch (e: ActivityNotFoundException) {
+            startActivity(webIntent)
+        }
+    }
+
 }
