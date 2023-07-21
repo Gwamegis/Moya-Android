@@ -34,6 +34,7 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
 
         val version = arguments?.getString("newVersion")
         val features = arguments?.getStringArrayList("features")
+        val isRequired = arguments?.getBoolean("isRequired")
 
         val featureListView = view.findViewById<ListView>(R.id.featureListView)
         val adapter = FeatureAdapter(requireContext(), features)
@@ -45,7 +46,7 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
             openPlayStore()
         }
         ignoreUpdateButton.setOnClickListener {
-            onLaterButtonClick(version ?: "")
+            onLaterButtonClick(version ?: "", isRequired ?: false)
         }
     }
 
@@ -116,11 +117,15 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun onLaterButtonClick(version: String) {
+    private fun onLaterButtonClick(version: String, isRequired: Boolean) {
         val sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString(KEY_APP_VERSION, version)
-        editor.apply()
-        dismiss()
+        if (isRequired) {
+            requireActivity().finish()
+        } else {
+            editor.putString(KEY_APP_VERSION, version)
+            editor.apply()
+            dismiss()
+        }
     }
 }

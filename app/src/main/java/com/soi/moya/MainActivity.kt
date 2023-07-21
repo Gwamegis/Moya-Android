@@ -106,9 +106,10 @@ class MainActivity : AppCompatActivity() {
                     val documentSnapshot = querySnapshot.documents[0]
                     val version = documentSnapshot.getString("version")
                     val features = documentSnapshot.get("feature") as? List<String>
+                    val isRequired = documentSnapshot.get("isRequired") as? Boolean
 
                     if (version != null && features != null) {
-                        processVersionData(version, features)
+                        processVersionData(version, features, isRequired ?: false)
                     }
                 } else {
                     Log.w("firebase", "Error null documents.")
@@ -140,14 +141,10 @@ class MainActivity : AppCompatActivity() {
             .addOnFailureListener { exception ->
                 Log.w("firestore", "Error getting documents.")
             }
-
-
     }
-
-    private fun processVersionData(version: String, features: List<String>) {
+    private fun processVersionData(version: String, features: List<String>, isRequired: Boolean) {
         if (!checkRecentVersion(version)) {
             val sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            val currentVersion = BuildConfig.VERSION_NAME
             val savedVersion = sharedPreferences.getString(KEY_APP_VERSION, "")
 
             if (savedVersion != version) {
@@ -155,6 +152,7 @@ class MainActivity : AppCompatActivity() {
                 val bundle = Bundle()
                 bundle.putStringArrayList("features", ArrayList(features))
                 bundle.putString("newVersion", version)
+                bundle.putBoolean("isRequired", isRequired)
                 bottomSheetFragment.arguments = bundle
                 bottomSheetFragment.show(supportFragmentManager, "HalfModalBottomSheet")
             }
