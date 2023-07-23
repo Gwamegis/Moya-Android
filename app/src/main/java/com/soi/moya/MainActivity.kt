@@ -122,21 +122,22 @@ class MainActivity : AppCompatActivity(), HalfModalBottomSheetFragment.OnUpdateS
     }
 
     private fun fetchFirebaseData() {
-        fetchTrafficData()
-        fetchVersionData()
-        fetchMusicData {
-            if (isShowUpdateBottomSheet && isRequireUpdate) {
-                showVersionBottomSheet()
-            } else if (isShowTrafficBottomSheet) {
-                showTrafficBottomSheet()
-            } else if (isShowUpdateBottomSheet) {
-                showVersionBottomSheet()
-            } else { }
+        fetchTrafficData {
+            fetchVersionData {
+                if (isShowUpdateBottomSheet && isRequireUpdate) {
+                    showVersionBottomSheet()
+                } else if (isShowTrafficBottomSheet) {
+                    showTrafficBottomSheet()
+                } else if (isShowUpdateBottomSheet) {
+                    showVersionBottomSheet()
+                } else { }
+            }
         }
+        fetchMusicData()
     }
 
     // fetch Data
-    private fun fetchTrafficData() {
+    private fun fetchTrafficData(callbacks: () -> Unit) {
         val db = Firebase.firestore
         db.collection("Traffic")
             .limit(1)
@@ -152,6 +153,7 @@ class MainActivity : AppCompatActivity(), HalfModalBottomSheetFragment.OnUpdateS
                     if (date != null) {
                         processTrafficData(date)
                     }
+                    callbacks()
                 } else {
                     Log.w("firebase", "Error null documents.")
                 }
@@ -161,7 +163,7 @@ class MainActivity : AppCompatActivity(), HalfModalBottomSheetFragment.OnUpdateS
             }
     }
 
-    private fun fetchVersionData() {
+    private fun fetchVersionData(callbacks: () -> Unit) {
         val db = Firebase.firestore
         db.collection("AndroidVersion")
             .limit(1)
@@ -176,13 +178,14 @@ class MainActivity : AppCompatActivity(), HalfModalBottomSheetFragment.OnUpdateS
                 } else {
                     Log.w("firebase", "Error null documents.")
                 }
+                callbacks()
             }
             .addOnFailureListener { exception ->
                 Log.w("firebase", "Error getting documents.")
             }
     }
 
-    private fun fetchMusicData(callbacks: () -> Unit) {
+    private fun fetchMusicData() {
         // firestore
         val db = Firebase.firestore
         val musicList = mutableListOf<MusicModel>()
@@ -199,7 +202,6 @@ class MainActivity : AppCompatActivity(), HalfModalBottomSheetFragment.OnUpdateS
                     musicList.add(MusicModel(id, info, lyrics, title, type, url))
                 }
                 viewModel.setData(musicList)
-                callbacks()
             }
             .addOnFailureListener { exception ->
                 Log.w("firestore", "Error getting documents.")
