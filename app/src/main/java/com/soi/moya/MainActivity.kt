@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity(), HalfModalBottomSheetFragment.OnUpdateS
     private var backButtonPressedTime = 0L
     private val PREFS_NAME = "UserPrefs"
     private val KEY_APP_VERSION = "appVersion"
+    private val NOTICE_ALERT = "notice"
 
     private var isShowTrafficBottomSheet = false
     private var trafficTitle: String = ""
@@ -219,6 +220,12 @@ class MainActivity : AppCompatActivity(), HalfModalBottomSheetFragment.OnUpdateS
     }
 
     private fun processTrafficData(date: Date) {
+        val sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val savedTrafficDate = sharedPreferences.getString(NOTICE_ALERT, "")
+
+        if (savedTrafficDate == date.toString()) { return }
+        Log.d("save traffic date", savedTrafficDate ?: "")
+        Log.d("firebase date", date.toString())
 
         val today = Calendar.getInstance()
         val startOfDay = today.apply {

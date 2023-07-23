@@ -10,6 +10,8 @@ import android.widget.Button
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import java.text.SimpleDateFormat
+import java.util.*
 
 class NoticeBottomSheetFragment : BottomSheetDialogFragment() {
     interface OnNoticeSheetRemovedListener {
@@ -71,7 +73,16 @@ class NoticeBottomSheetFragment : BottomSheetDialogFragment() {
     private fun onClickConfirmButton() {
         val sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString(NOTICE_ALERT, arguments?.getString("date"))
+        val today = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time
+        val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+        dateFormat.timeZone = TimeZone.getTimeZone("GMT+09:00")
+        val dateString = dateFormat.format(today)
+        editor.putString(NOTICE_ALERT, dateString)
         editor.apply()
         dismiss()
     }
