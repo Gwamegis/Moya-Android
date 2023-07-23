@@ -17,9 +17,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
-
+    interface OnUpdateSheetRemovedListener {
+        fun onUpdateSheetRemovedListener()
+    }
     private val PREFS_NAME = "UserPrefs"
     private val KEY_APP_VERSION = "appVersion"
+    private var listener: HalfModalBottomSheetFragment.OnUpdateSheetRemovedListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,6 +30,15 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_half_modal_bottom_sheet, container, false)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnUpdateSheetRemovedListener) {
+            listener = context
+        } else {
+            throw RuntimeException("$context must implement OnFragmentRemovedListener")
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -48,6 +60,24 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
         ignoreUpdateButton.setOnClickListener {
             onLaterButtonClick(version ?: "", isRequired ?: false)
         }
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+
+        dialog.setOnShowListener { dialogInterface ->
+            val bottomSheetDialog = dialogInterface as BottomSheetDialog
+            val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.setBackgroundResource(R.drawable.bottom_sheet_rounded_corners)
+        }
+
+        return dialog
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        listener?.onUpdateSheetRemovedListener()
+        listener = null
     }
 
     private class FeatureAdapter(
@@ -94,17 +124,6 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
         }
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
-
-        dialog.setOnShowListener { dialogInterface ->
-            val bottomSheetDialog = dialogInterface as BottomSheetDialog
-            val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-            bottomSheet?.setBackgroundResource(R.drawable.bottom_sheet_rounded_corners)
-        }
-
-        return dialog
-    }
     private fun openPlayStore() {
         val appPackageName = requireContext().packageName
         val marketIntent = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$appPackageName"))
