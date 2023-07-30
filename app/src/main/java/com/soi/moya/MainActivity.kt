@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.ColorStateList
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -14,8 +13,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.soi.moya.databinding.ActivityMainBinding
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.math.max
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), HalfModalBottomSheetFragment.OnUpdateSheetRemovedListener, NoticeBottomSheetFragment.OnNoticeSheetRemovedListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MusicViewModel
@@ -24,6 +26,18 @@ class MainActivity : AppCompatActivity() {
     private var selectedTeam = ""
     private var firebaseTeamName = ""
     private var backButtonPressedTime = 0L
+    private val PREFS_NAME = "UserPrefs"
+    private val KEY_APP_VERSION = "appVersion"
+    private val NOTICE_ALERT = "notice"
+
+    private var isShowTrafficBottomSheet = false
+    private var trafficTitle: String = ""
+    private var trafficDescription: String = ""
+
+    private var isShowUpdateBottomSheet = false
+    private var newVersion: String = ""
+    private var newFeatures = ArrayList<String>()
+    private var isRequireUpdate = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -38,6 +52,21 @@ class MainActivity : AppCompatActivity() {
         pointColor = resources.getIdentifier("${selectedTeam}_point", "color", "com.soi.moya")
         setNavigationUI()
         fetchFirebaseData()
+    }
+
+    override fun onNoticeSheetRemovedListener() {
+        isShowTrafficBottomSheet = false
+        if (isShowUpdateBottomSheet) {
+            showVersionBottomSheet()
+        }
+    }
+
+    override fun onUpdateSheetRemovedListener() {
+        isShowUpdateBottomSheet = false
+        if (isShowTrafficBottomSheet) {
+            showTrafficBottomSheet()
+        }
+        Log.w("isrequiredupdate", isShowTrafficBottomSheet.toString())
     }
 
     private fun replaceFragment(fragment: Fragment) {
@@ -93,8 +122,71 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigationView.itemTextColor = colorStateList
     }
 
-    // fetch Data
     private fun fetchFirebaseData() {
+        fetchTrafficData {
+            fetchVersionData {
+                if (isShowUpdateBottomSheet && isRequireUpdate) {
+                    showVersionBottomSheet()
+                } else if (isShowTrafficBottomSheet) {
+                    showTrafficBottomSheet()
+                } else if (isShowUpdateBottomSheet) {
+                    showVersionBottomSheet()
+                } else { }
+            }
+        }
+        fetchMusicData()
+    }
+
+    // fetch Data
+    private fun fetchTrafficData(callbacks: () -> Unit) {
+        val db = Firebase.firestore
+        db.collection("Traffic")
+            .limit(1)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val documentSnapshot = querySnapshot.documents[0]
+                    trafficTitle = documentSnapshot.getString("title") ?: ""
+                    trafficDescription = documentSnapshot.getString("description") ?: ""
+                    val date = documentSnapshot.getDate("date")
+                    Log.w("date", date.toString())
+
+                    if (date != null) {
+                        processTrafficData(date)
+                    }
+                    callbacks()
+                } else {
+                    Log.w("firebase", "Error null documents.")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.w("firebase", "Error getting documents.")
+            }
+    }
+
+    private fun fetchVersionData(callbacks: () -> Unit) {
+        val db = Firebase.firestore
+        db.collection("AndroidVersion")
+            .limit(1)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                if (!querySnapshot.isEmpty) {
+                    val documentSnapshot = querySnapshot.documents[0]
+                    newVersion = documentSnapshot.getString("version") ?: ""
+                    newFeatures = documentSnapshot.get("feature") as? ArrayList<String> ?: ArrayList()
+                    isRequireUpdate = documentSnapshot.get("isRequired") as? Boolean ?: false
+                    processVersionData()
+                } else {
+                    Log.w("firebase", "Error null documents.")
+                }
+                callbacks()
+            }
+            .addOnFailureListener { exception ->
+                Log.w("firebase", "Error getting documents.")
+            }
+    }
+
+    private fun fetchMusicData() {
         // firestore
         val db = Firebase.firestore
         val musicList = mutableListOf<MusicModel>()
@@ -115,6 +207,74 @@ class MainActivity : AppCompatActivity() {
             .addOnFailureListener { exception ->
                 Log.w("firestore", "Error getting documents.")
             }
+    }
+    private fun processVersionData() {
+        if (!checkRecentVersion(newVersion)) {
+            val sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val savedVersion = sharedPreferences.getString(KEY_APP_VERSION, "")
+
+            if (savedVersion != newVersion) {
+                isShowUpdateBottomSheet = true
+            }
+        }
+    }
+
+    private fun processTrafficData(date: Date) {
+        val sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val savedTrafficDate = sharedPreferences.getString(NOTICE_ALERT, "")
+
+        if (savedTrafficDate == date.toString()) { return }
+        Log.d("save traffic date", savedTrafficDate ?: "")
+        Log.d("firebase date", date.toString())
+
+        val today = Calendar.getInstance()
+        val startOfDay = today.apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time
+        val endOfDay = today.apply {
+            add(Calendar.DATE, 1)
+        }.time
+
+        isShowTrafficBottomSheet = date >= startOfDay && date < endOfDay
+        Log.d("isShowTrafficBottomSheet", isShowTrafficBottomSheet.toString())
+    }
+
+    private fun showVersionBottomSheet() {
+        val bottomSheetFragment = HalfModalBottomSheetFragment()
+        val bundle = Bundle()
+        bundle.putStringArrayList("features", newFeatures)
+        bundle.putString("newVersion", newVersion)
+        bundle.putBoolean("isRequired", isRequireUpdate)
+        bottomSheetFragment.arguments = bundle
+        bottomSheetFragment.show(supportFragmentManager, "HalfModalBottomSheet")
+    }
+
+    private fun showTrafficBottomSheet() {
+        val noticeBottomSheet = NoticeBottomSheetFragment()
+        val bundle = Bundle()
+        bundle.putString("title", trafficTitle)
+        bundle.putString("description", trafficDescription)
+        noticeBottomSheet.arguments = bundle
+        noticeBottomSheet.show(supportFragmentManager, "NoticeBottomSheet")
+    }
+
+    private fun checkRecentVersion(version: String): Boolean {
+        val currentVersion = BuildConfig.VERSION_NAME
+        val versionParts = version.split(".")
+        val currentVersionParts = currentVersion.split(".")
+
+        for (i in 0 until max(versionParts.size, currentVersionParts.size)) {
+            val newVersionName = if (i < versionParts.size) versionParts[i] else ""
+            val currentVersionName = if (i < currentVersionParts.size) currentVersionParts[i] else ""
+
+            if (newVersionName != currentVersionName) {
+                return false
+            }
+        }
+        return true
     }
 
     override fun onBackPressed() {

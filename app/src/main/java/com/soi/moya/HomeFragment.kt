@@ -19,9 +19,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
-private const val MUSIC_LIST = "musicList"
-private lateinit var viewModel: MusicViewModel
-
 class HomeFragment : Fragment() {
     private lateinit var viewPager: ViewPager2
     private lateinit var tabs: TabLayout

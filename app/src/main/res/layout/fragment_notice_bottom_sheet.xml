@@ -1,0 +1,45 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingVertical="30dp"
+    android:paddingHorizontal="20dp">
+
+    <ImageView
+        android:id="@+id/trafficImageView"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/warning"/>
+    <TextView
+        android:id="@+id/noticeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/trafficImageView"
+        android:layout_marginTop="20dp"
+        android:text="트래픽 경고 발생"
+        android:fontFamily="@font/pretendard_bold"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/noticeDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/noticeTitle"
+        android:layout_marginTop="30dp"
+        android:fontFamily="@font/pretendard_medium"
+        android:text="제송욤"
+        android:textColor="@color/custom_dark_gray"
+        android:textSize="16dp" />
+
+    <Button
+        android:id="@+id/noticeConfirmButton"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@+id/noticeDescription"
+        android:layout_marginTop="60dp"
+        android:backgroundTint="@color/main_green"
+        android:fontFamily="@font/pretendard_bold"
+        android:textColor="@color/white"
+        android:text="확인"
+        android:textSize="16dp" />
+</RelativeLayout>
