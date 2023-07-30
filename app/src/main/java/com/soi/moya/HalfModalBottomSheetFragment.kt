@@ -22,7 +22,7 @@ class HalfModalBottomSheetFragment : BottomSheetDialogFragment() {
     }
     private val PREFS_NAME = "UserPrefs"
     private val KEY_APP_VERSION = "appVersion"
-    private var listener: HalfModalBottomSheetFragment.OnUpdateSheetRemovedListener? = null
+    private var listener: OnUpdateSheetRemovedListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
