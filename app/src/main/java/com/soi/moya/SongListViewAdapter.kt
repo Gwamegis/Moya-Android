@@ -1,12 +1,10 @@
 package com.soi.moya
 
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.Filter
-import android.widget.Filterable
-import android.widget.TextView
+import android.widget.*
 import kotlin.collections.ArrayList
 
 class SongListViewAdapter(private var songList: List<MusicModel>): BaseAdapter(), Filterable {
@@ -26,7 +24,6 @@ class SongListViewAdapter(private var songList: List<MusicModel>): BaseAdapter()
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-
         var convertView = convertView
 
         if (convertView == null) {
@@ -34,10 +31,30 @@ class SongListViewAdapter(private var songList: List<MusicModel>): BaseAdapter()
         }
 
         val title = convertView!!.findViewById<TextView>(R.id.songListViewItem)
+        val category = convertView!!.findViewById<TextView>(R.id.songLIstViewItemCategory)
         title.text = filteredList[position].title
+        category.text = filteredList[position].info
+
+        if (filteredList[position].info.isEmpty()) {
+            val layoutParams = title.layoutParams as LinearLayout.LayoutParams
+            layoutParams.gravity = Gravity.CENTER
+            title.layoutParams = layoutParams
+            category.visibility = View.GONE
+        } else {
+            val layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            layoutParams.gravity = Gravity.CENTER_VERTICAL
+            title.layoutParams = layoutParams
+            category.layoutParams = layoutParams
+            category.visibility = View.VISIBLE
+        }
 
         return convertView
     }
+
+
 
     override fun getFilter(): Filter {
         return object : Filter() {
