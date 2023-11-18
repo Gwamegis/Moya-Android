@@ -54,6 +54,7 @@ class SearchFragment : Fragment() {
             intent.putExtra("title", musicModel.title)
             intent.putExtra("lyrics", musicModel.lyrics)
             intent.putExtra("url", musicModel.url)
+            intent.putExtra("id", musicModel.id)
 
             startActivity(intent)
         }

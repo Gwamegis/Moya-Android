@@ -7,13 +7,24 @@ import android.graphics.drawable.GradientDrawable
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.soi.moya.databinding.ActivityPlaySongBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.concurrent.TimeUnit
 
 class PlaySongActivity : AppCompatActivity() {
@@ -40,8 +51,10 @@ class PlaySongActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_play_song)
 
         settingUI()
-        initializeMediaPlayer()
-        setupEventListeners()
+        lifecycleScope.launch {
+            initializeMediaPlayer()
+            setupEventListeners()
+        }
     }
 
     private fun onTappedPlayButton() {
@@ -177,10 +190,48 @@ class PlaySongActivity : AppCompatActivity() {
         return String.format("%02d:%02d", minutes, seconds)
     }
 
+    private fun isFileExist(): Boolean {
+        val fileName = "$title$id.mp3"
+        val file = File(filesDir, fileName)
+        return file.exists()
+    }
+
+    // 파일 다운로드
+    private suspend fun downloadFile(): File? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val connection = URL(url).openConnection() as HttpURLConnection
+                connection.connect()
+
+                if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+                    val inputStream: InputStream = connection.inputStream
+
+                    val file = File(filesDir, "$title$id.mp3")
+                    val fileOutputStream = FileOutputStream(file)
+
+                    val buffer = ByteArray(1024)
+                    var bytesRead: Int
+
+                    while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                        fileOutputStream.write(buffer, 0, bytesRead)
+                    }
+
+                    fileOutputStream.close()
+                    inputStream.close()
+
+                    return@withContext file
+                } else {
+                    return@withContext null
+                }
+            } catch (e: Exception) {
+                return@withContext null
+            }
+        }
+    }
+
     // Media player 관련
 
-
-    private fun initializeMediaPlayer() {
+    private suspend fun initializeMediaPlayer() {
         mediaPlayer = createMediaPlayer()
         mediaPlayer?.prepareAsync()
 
@@ -198,9 +249,18 @@ class PlaySongActivity : AppCompatActivity() {
         }
     }
 
-    private fun createMediaPlayer(): MediaPlayer {
+    private suspend fun createMediaPlayer(): MediaPlayer {
         val player = MediaPlayer()
-        player.setDataSource(url)
+
+        if (isFileExist()) {
+            val fileName = "$title$id.mp3"
+            val filePath = File(filesDir, fileName).absolutePath
+            player.setDataSource(filePath)
+        } else {
+            player.setDataSource(url)
+            downloadFile()
+        }
+
         return player
     }
 
