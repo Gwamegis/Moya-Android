@@ -68,6 +68,7 @@ class TeamSongFragment : Fragment() {
             intent.putExtra("title", musicData[i].title)
             intent.putExtra("lyrics", musicData[i].lyrics)
             intent.putExtra("url", musicData[i].url)
+            intent.putExtra("id", musicData[i].id)
             startActivity(intent)
         }
         songRequestButton.setOnClickListener {

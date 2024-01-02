@@ -7,13 +7,24 @@ import android.graphics.drawable.GradientDrawable
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.view.View
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import com.soi.moya.databinding.ActivityPlaySongBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.concurrent.TimeUnit
 
 class PlaySongActivity : AppCompatActivity() {
@@ -24,6 +35,8 @@ class PlaySongActivity : AppCompatActivity() {
     private var isSongPrepared = false
     private var subColor: Int = 0
     private var pointColor: Int = 0
+    private var title = ""
+    private var id = ""
     private var url = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,87 +44,16 @@ class PlaySongActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         url = intent.getStringExtra("url")!!
+        id = intent.getStringExtra("id")!!
+        title = intent.getStringExtra("title")!!
 
         setContentView(R.layout.activity_play_song)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_play_song)
 
         settingUI()
-
-        mediaPlayer = MediaPlayer()
-        mediaPlayer?.setDataSource(url)
-        mediaPlayer?.prepareAsync()
-
-        mediaPlayer?.setOnPreparedListener {
-            isSongPrepared = true
-            mediaPlayer?.start()
-            startSeekBarUpdate()
-        }
-
-        mediaPlayer?.setOnErrorListener { mp, what, extra ->
-            // 오류 발생 시 처리하는 부분
-            Toast.makeText(this, "노래 재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
-            stopSeekBarUpdate()
-            mediaPlayer?.release()
-            mediaPlayer = null
-            true
-        }
-
-        mediaPlayer?.setOnCompletionListener {
-            mediaPlayer?.seekTo(0)
-            mediaPlayer?.start()
-        }
-
-        binding.playSongButton.setOnClickListener {
-            onTappedPlayButton()
-        }
-
-        binding.seekBar.setOnClickListener {
-            if (mediaPlayer !== null) mediaPlayer?.pause()
-        }
-
-        var color = ContextCompat.getColor(this, pointColor)
-        binding.seekBar.progressTintList = ColorStateList.valueOf(color)
-        binding.seekBar.thumbTintList = ColorStateList.valueOf(color)
-        binding.seekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser && mediaPlayer != null && mediaPlayer?.isPlaying == true) mediaPlayer?.seekTo(progress)
-                binding.songCurrentTime.text = formatDuration(mediaPlayer!!.currentPosition)
-            }
-
-            override fun onStartTrackingTouch(seekBarseekBarseekBar: SeekBar?) {
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-            }
-
-        })
-
-        // scoll 위치에 따른 gradient
-        binding.scrollView.viewTreeObserver.addOnGlobalLayoutListener {
-            val scrollView = binding.scrollView
-            val scrollViewHeight = scrollView.height
-            val contentHeight = binding.songLyricLayout.height
-
-            if (binding.songLyric.height <= scrollViewHeight) {
-                // 스크롤뷰의 높이보다 TextView가 작을 때
-                binding.scrollTopOfGradientView.visibility = View.GONE
-                binding.scrollBottomOfGradientView.visibility = View.GONE
-            } else {
-                // 스크롤뷰의 높이보다 TextView가 클 때
-                scrollView.viewTreeObserver.addOnScrollChangedListener {
-                    val scrollY = scrollView.scrollY
-                    if (scrollY == 0) {
-                        binding.scrollTopOfGradientView.visibility = View.GONE
-                        binding.scrollBottomOfGradientView.visibility = View.VISIBLE
-                    } else if (scrollY + scrollViewHeight == contentHeight) {
-                        binding.scrollTopOfGradientView.visibility = View.VISIBLE
-                        binding.scrollBottomOfGradientView.visibility = View.GONE
-                    } else {
-                        binding.scrollTopOfGradientView.visibility = View.VISIBLE
-                        binding.scrollBottomOfGradientView.visibility = View.VISIBLE
-                    }
-                }
-            }
+        lifecycleScope.launch {
+            initializeMediaPlayer()
+            setupEventListeners()
         }
     }
 
@@ -171,8 +113,52 @@ class PlaySongActivity : AppCompatActivity() {
         binding.songLyric.text = intent.getStringExtra("lyrics")?.replace("\\n", "\n")
         binding.scrollTopOfGradientView.background = topOfGradientDrawable
         binding.scrollBottomOfGradientView.background = bottomOfGradientDrawable
-
         window.statusBarColor = ContextCompat.getColor(this, subColor)
+
+        val color = ContextCompat.getColor(this, pointColor)
+        binding.seekBar.progressTintList = ColorStateList.valueOf(color)
+        binding.seekBar.thumbTintList = ColorStateList.valueOf(color)
+        binding.seekBar.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser && mediaPlayer != null && mediaPlayer?.isPlaying == true) mediaPlayer?.seekTo(progress)
+                binding.songCurrentTime.text = formatDuration(mediaPlayer!!.currentPosition)
+            }
+
+            override fun onStartTrackingTouch(seekBarseekBarseekBar: SeekBar?) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+            }
+
+        })
+
+        // scoll 위치에 따른 gradient
+        binding.scrollView.viewTreeObserver.addOnGlobalLayoutListener {
+            val scrollView = binding.scrollView
+            val scrollViewHeight = scrollView.height
+            val contentHeight = binding.songLyricLayout.height
+
+            if (binding.songLyric.height <= scrollViewHeight) {
+                // 스크롤뷰의 높이보다 TextView가 작을 때
+                binding.scrollTopOfGradientView.visibility = View.GONE
+                binding.scrollBottomOfGradientView.visibility = View.GONE
+            } else {
+                // 스크롤뷰의 높이보다 TextView가 클 때
+                scrollView.viewTreeObserver.addOnScrollChangedListener {
+                    val scrollY = scrollView.scrollY
+                    if (scrollY == 0) {
+                        binding.scrollTopOfGradientView.visibility = View.GONE
+                        binding.scrollBottomOfGradientView.visibility = View.VISIBLE
+                    } else if (scrollY + scrollViewHeight == contentHeight) {
+                        binding.scrollTopOfGradientView.visibility = View.VISIBLE
+                        binding.scrollBottomOfGradientView.visibility = View.GONE
+                    } else {
+                        binding.scrollTopOfGradientView.visibility = View.VISIBLE
+                        binding.scrollBottomOfGradientView.visibility = View.VISIBLE
+                    }
+                }
+            }
+        }
     }
 
     private fun startSeekBarUpdate() {
@@ -203,5 +189,104 @@ class PlaySongActivity : AppCompatActivity() {
         val seconds = TimeUnit.MILLISECONDS.toSeconds(duration.toLong()) % 60
         return String.format("%02d:%02d", minutes, seconds)
     }
-}
 
+    private fun isFileExist(): Boolean {
+        val fileName = "$title$id.mp3"
+        val file = File(filesDir, fileName)
+        return file.exists()
+    }
+
+    // 파일 다운로드
+    private suspend fun downloadFile(): File? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val connection = URL(url).openConnection() as HttpURLConnection
+                connection.connect()
+
+                if (connection.responseCode == HttpURLConnection.HTTP_OK) {
+                    val inputStream: InputStream = connection.inputStream
+
+                    val file = File(filesDir, "$title$id.mp3")
+                    val fileOutputStream = FileOutputStream(file)
+
+                    val buffer = ByteArray(1024)
+                    var bytesRead: Int
+
+                    while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                        fileOutputStream.write(buffer, 0, bytesRead)
+                    }
+
+                    fileOutputStream.close()
+                    inputStream.close()
+
+                    return@withContext file
+                } else {
+                    return@withContext null
+                }
+            } catch (e: Exception) {
+                return@withContext null
+            }
+        }
+    }
+
+    // Media player 관련
+
+    private suspend fun initializeMediaPlayer() {
+        mediaPlayer = createMediaPlayer()
+        mediaPlayer?.prepareAsync()
+
+        mediaPlayer?.setOnPreparedListener {
+            onMediaPlayerPrepared()
+        }
+
+        mediaPlayer?.setOnErrorListener { _, _, _ ->
+            handleMediaPlayerError()
+            true
+        }
+
+        mediaPlayer?.setOnCompletionListener {
+            restartMediaPlayer()
+        }
+    }
+
+    private suspend fun createMediaPlayer(): MediaPlayer {
+        val player = MediaPlayer()
+
+        if (isFileExist()) {
+            val fileName = "$title$id.mp3"
+            val filePath = File(filesDir, fileName).absolutePath
+            player.setDataSource(filePath)
+        } else {
+            player.setDataSource(url)
+            downloadFile()
+        }
+
+        return player
+    }
+
+    private fun onMediaPlayerPrepared() {
+        isSongPrepared = true
+        mediaPlayer?.start()
+        startSeekBarUpdate()
+    }
+
+    private fun handleMediaPlayerError() {
+        Toast.makeText(this, "노래 재생 중 오류가 발생했습니다.", Toast.LENGTH_SHORT).show()
+        stopSeekBarUpdate()
+        mediaPlayer?.release()
+    }
+
+    private fun restartMediaPlayer() {
+        mediaPlayer?.seekTo(0)
+        mediaPlayer?.start()
+    }
+
+    private fun setupEventListeners() {
+        binding.playSongButton.setOnClickListener { onTappedPlayButton() }
+
+        binding.seekBar.setOnClickListener {
+            if (mediaPlayer?.isPlaying == true) mediaPlayer?.pause()
+        }
+    }
+
+}

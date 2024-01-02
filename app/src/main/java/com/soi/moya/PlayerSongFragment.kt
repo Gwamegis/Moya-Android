@@ -69,6 +69,7 @@ class PlayerSongFragment : Fragment() {
 
         listView.setOnItemClickListener { adapterView, view, i, l ->
             val intent = Intent(requireContext(), PlaySongActivity::class.java)
+            intent.putExtra("id", musicData[i].id)
             intent.putExtra("title", musicData[i].title)
             intent.putExtra("lyrics", musicData[i].lyrics)
             intent.putExtra("url", musicData[i].url)
