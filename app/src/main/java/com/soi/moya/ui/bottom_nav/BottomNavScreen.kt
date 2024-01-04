@@ -8,14 +8,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,9 +24,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
+import com.soi.moya.models.Team
 import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
+import com.soi.moya.ui.theme.MoyaColor
 
 @Composable
 fun BottomNavScreen() {
@@ -53,6 +53,10 @@ fun TestScreen() {
 @Composable
 fun BottomNav(navController: NavHostController) {
 
+    // TODO: select_team에서 선택한 값 사용 필요
+    val selectedTeam: Team = Team.doosan
+    val color = MoyaColor()
+
     val items = listOf(
         NavItem.MusicList,
         NavItem.Search,
@@ -60,8 +64,7 @@ fun BottomNav(navController: NavHostController) {
     )
 
     BottomNavigation(
-        backgroundColor = Color.White,
-        contentColor = Color(0xFF3F414E)
+        backgroundColor = color.tabBarGray,
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -95,8 +98,8 @@ fun BottomNav(navController: NavHostController) {
                         modifier = Modifier.padding(horizontal = 4.dp)
                     )
                 },
-                selectedContentColor = MaterialTheme.colors.primary,
-                unselectedContentColor = Color.Gray
+                selectedContentColor = selectedTeam.getPointColor(),
+                unselectedContentColor = color.darkGray
             )
         }
     }
