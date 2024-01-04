@@ -2,7 +2,7 @@ package com.soi.moya.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-class Color {
+class MoyaColor {
     val gray = Color(0xffEFEFEF)
     val tabBarGray = Color(0xfff8f8f8)
     val background = Color(0xfffbfbfb)

@@ -1,10 +1,10 @@
 package com.soi.moya.models
-import com.soi.moya.ui.theme.Color
+import com.soi.moya.ui.theme.MoyaColor
 
 enum class Team {
     doosan, hanwha, samsung, lotte, lg, ssg, ktWiz, nc, kiwoom, kia;
 
-    fun getBackgroundColor(color: Color = Color()): androidx.compose.ui.graphics.Color {
+    fun getBackgroundColor(color: MoyaColor = MoyaColor()): androidx.compose.ui.graphics.Color {
         return when (this) {
             doosan -> color.doosanBackground
             hanwha -> color.hanwhaBackground
@@ -19,7 +19,7 @@ enum class Team {
         }
     }
 
-    fun getPointColor(color: Color = Color()): androidx.compose.ui.graphics.Color {
+    fun getPointColor(color: MoyaColor = MoyaColor()): androidx.compose.ui.graphics.Color {
         return when (this) {
             doosan -> color.doosanPoint
             hanwha -> color.hanwhaPoint
@@ -34,7 +34,7 @@ enum class Team {
         }
     }
 
-    fun getSubColor(color: Color = Color()): androidx.compose.ui.graphics.Color {
+    fun getSubColor(color: MoyaColor = MoyaColor()): androidx.compose.ui.graphics.Color {
         return when (this) {
             doosan -> color.doosanSub
             hanwha -> color.hanwhaSub
