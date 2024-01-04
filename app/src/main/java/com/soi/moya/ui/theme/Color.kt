@@ -20,7 +20,7 @@ class Color {
     val hanwhaPoint= Color(0xffFF6600)
     val hanwhaSub= Color(0xff505254)
 
-    val doosanBackground= Color(0xff131230)
+    val doosanBackground = Color(0xff131230)
     val doosanPoint= Color(0xffED1C24)
     val doosanSub= Color(0xff414159)
 
