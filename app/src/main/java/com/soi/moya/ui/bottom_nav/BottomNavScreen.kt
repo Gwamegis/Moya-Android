@@ -1,4 +1,4 @@
-package com.soi.moya.ui.main
+package com.soi.moya.ui.bottom_nav
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,7 +31,7 @@ import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
 
 @Composable
-fun MainScreen() {
+fun BottomNavScreen() {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { BottomNav(navController = navController) }
@@ -126,6 +126,6 @@ sealed class NavItem(val labelID: Int, val iconID: Int, val route: String) {
 
 @Preview
 @Composable
-fun MainScreenPreview() {
-    MainScreen()
+fun BottomNavScreenPreview() {
+    BottomNavScreen()
 }

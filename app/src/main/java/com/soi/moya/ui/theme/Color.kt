@@ -52,5 +52,4 @@ class Color {
     val lgPoint = Color(0xffAE263B)
     val lgSub = Color(0xff8E8C8D)
 
-
 }
