@@ -16,7 +16,7 @@
         android:theme="@style/Theme.Moya"
         tools:targetApi="31">
         <activity
-            android:name=".SplashActivity"
+            android:name=".ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,21 +24,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".SelectTeamActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PlaySongActivity"
-            android:exported="false" />
-        <activity
-            android:name=".StadiumDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="false">
+        <!--        <activity-->
+<!--            android:name=".SplashActivity"-->
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
 
-        </activity>
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+<!--        <activity-->
+<!--            android:name=".SelectTeamActivity"-->
+<!--            android:exported="false" />-->
+<!--        <activity-->
+<!--            android:name=".PlaySongActivity"-->
+<!--            android:exported="false" />-->
+<!--        <activity-->
+<!--            android:name=".StadiumDetailActivity"-->
+<!--            android:exported="false" />-->
+<!--        <activity-->
+<!--            android:name=".RemoveMainActivity"-->
+<!--            android:windowSoftInputMode="adjustResize"-->
+<!--            android:exported="false">-->
+
+<!--        </activity>-->
     </application>
 
 </manifest>

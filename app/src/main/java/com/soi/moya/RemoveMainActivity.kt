@@ -17,7 +17,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.max
 
-class MainActivity : AppCompatActivity(), HalfModalBottomSheetFragment.OnUpdateSheetRemovedListener, NoticeBottomSheetFragment.OnNoticeSheetRemovedListener {
+class RemoveMainActivity : AppCompatActivity(), HalfModalBottomSheetFragment.OnUpdateSheetRemovedListener, NoticeBottomSheetFragment.OnNoticeSheetRemovedListener {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var viewModel: MusicViewModel

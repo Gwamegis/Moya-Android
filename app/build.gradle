@@ -2,11 +2,13 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
+
+    id 'kotlin-android'
 }
 
 android {
     namespace 'com.soi.moya'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.soi.moya"
@@ -39,6 +41,10 @@ android {
         }
     }
 
+    afterEvaluate {
+        processDebugGoogleServices.dependsOn copyReleaseGoogleServicesJson
+        processDebugGoogleServices.dependsOn copyDebugGoogleServicesJson
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -51,15 +57,24 @@ android {
     dataBinding {
         enabled true
     }
+
+    buildFeatures {
+        // Enables Jetpack Compose for this module
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.3"
+    }
 }
 
 dependencies {
-
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.core:core-ktx:+'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
@@ -84,6 +99,20 @@ dependencies {
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.viewpager2:viewpager2:1.0.0'
 
-    // touch image view
+    // touch image view TODO: 삭제
     implementation 'com.github.MikeOrtiz:TouchImageView:1.4.1'
+
+    // MARK: compose
+    // Integration with activities
+    implementation 'androidx.activity:activity-compose:1.8.2'
+    // Compose Material Design
+    implementation 'androidx.compose.material:material:1.5.4'
+    // Animations
+    implementation 'androidx.compose.animation:animation:1.5.4'
+    // Tooling support (Previews, etc.)
+    implementation 'androidx.compose.ui:ui-tooling:1.5.4'
+    // Integration with ViewModels
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2'
+    // UI Tests
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.5.4'
 }
