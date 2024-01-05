@@ -1,4 +1,8 @@
 package com.soi.moya.models
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import com.soi.moya.R
 import com.soi.moya.ui.theme.MoyaColor
 
 enum class Team {
@@ -47,5 +51,21 @@ enum class Team {
             kiwoom -> color.kiwoomSub
             kia -> color.kiaSub
         }
+    }
+}
+
+@Composable
+fun getTeamImage(team: Team): Painter {
+    return when(team) {
+        Team.doosan -> { painterResource(id = R.drawable.select_team_doosan) }
+        Team.hanwha -> { painterResource(id = R.drawable.select_team_hanwha) }
+        Team.samsung -> { painterResource(id = R.drawable.select_team_samsung) }
+        Team.lotte -> { painterResource(id = R.drawable.select_team_lotte) }
+        Team.lg -> { painterResource(id = R.drawable.select_team_lg) }
+        Team.ssg -> { painterResource(id = R.drawable.select_team_ssg) }
+        Team.ktWiz -> { painterResource(id = R.drawable.select_team_kt)  }
+        Team.nc -> { painterResource(id = R.drawable.select_team_nc) }
+        Team.kiwoom -> { painterResource(id = R.drawable.select_team_kiwoom) }
+        Team.kia -> { painterResource(id = R.drawable.select_team_kia) }
     }
 }
