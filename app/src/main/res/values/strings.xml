@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">모두의 야구</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="firebase_config_file_name">google-services.json</string>
-    <!-- TODO: Remove or change this placeholder text -->
+
+<!--    navigation item-->
+    <string name="music_list">응원곡</string>
+    <string name="search">검색</string>
+    <string name="music_storage">보관함</string>
 </resources>
