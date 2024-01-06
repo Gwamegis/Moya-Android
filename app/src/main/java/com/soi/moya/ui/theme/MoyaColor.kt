@@ -2,7 +2,7 @@ package com.soi.moya.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-class MoyaColor {
+object MoyaColor {
     val gray = Color(0xffEFEFEF)
     val tabBarGray = Color(0xfff8f8f8)
     val background = Color(0xfffbfbfb)
@@ -11,6 +11,8 @@ class MoyaColor {
     val disabledGreen = Color(0x331da67d)
     val darkGray = Color(0xff898989)
     val black = Color(0xff2b2b2b)
+    val white =  Color(0xffffffff)
+    val unhighlightedWhite = Color(0xAAFFFFFF)
 
     val lotteBackground = Color(0xff062045)
     val lottePoint = Color(0xffD00024)
