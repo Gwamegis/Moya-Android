@@ -6,4 +6,7 @@
     <string name="music_list">응원곡</string>
     <string name="search">검색</string>
     <string name="music_storage">보관함</string>
+
+<!--    Components-->
+    <string name="request_music">응원가 신청하기</string>
 </resources>
