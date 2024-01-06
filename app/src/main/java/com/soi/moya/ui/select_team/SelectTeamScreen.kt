@@ -7,11 +7,11 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -39,44 +39,48 @@ class SelectTeamScreen: ComponentActivity() {
             Surface(
                 modifier = Modifier.padding(horizontal = 20.dp)
             ) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
-                ){
-                    Text(
-                        text = "어느 팀을 응원하시나요?",
-                        style = getTextStyle(style = MoyaFont.CustomTitleBold)
-                    )
-                    TeamSelectList(viewModel)
-                    ButtonContainer(
-                        text = "응원하러 가기",
-                        textColor = Color.White,
-                        bgColor = MoyaColor().mainGreen,
-                        modifier = Modifier.fillMaxWidth(),
-                        isEnabled = { viewModel.selectedTeam.value != null },
-                        onClick = { viewModel.onClickNext() }
-                    )
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 120.dp),
+                    contentPadding = PaddingValues(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    item (
+                        span = {
+                            GridItemSpan(maxLineSpan)
+                        }) {
+                        Text(
+                            text = "어느 팀을 응원하시나요?",
+                            style = getTextStyle(style = MoyaFont.CustomTitleBold),
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+                    }
+                    items(Team.values().size) {index ->
+                        ImageItem(
+                            team = Team.values()[index],
+                            viewModel = viewModel
+                        )
+                    }
+                    item (span = {
+                        GridItemSpan(maxLineSpan)
+                    }) {
+                        ButtonContainer(
+                            text = "응원하러 가기",
+                            textColor = Color.White,
+                            bgColor = MoyaColor().mainGreen,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 12.dp, bottom = 30.dp),
+                            isEnabled = { viewModel.selectedTeam.value != null },
+                            onClick = { viewModel.onClickNext() }
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-@Composable
-fun TeamSelectList(viewModel: SelectTeamViewModel) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 150.dp),
-        contentPadding = PaddingValues(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        items(Team.values().size) {index ->
-            ImageItem(
-                team = Team.values()[index],
-                viewModel = viewModel
-            )
-        }
-    }
-}
 @Composable
 fun ImageItem(team: Team, viewModel: SelectTeamViewModel) {
     val image = getTeamImage(team = team)
