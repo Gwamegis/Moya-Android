@@ -30,52 +30,46 @@ import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
 
-class SelectTeamScreen: ComponentActivity() {
-    private val viewModel: SelectTeamViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            Surface(
-                modifier = Modifier.padding(horizontal = 20.dp)
-            ) {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 120.dp),
-                    contentPadding = PaddingValues(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    item (
-                        span = {
-                            GridItemSpan(maxLineSpan)
-                        }) {
-                        Text(
-                            text = "어느 팀을 응원하시나요?",
-                            style = getTextStyle(style = MoyaFont.CustomTitleBold),
-                            modifier = Modifier.padding(bottom = 12.dp)
-                        )
-                    }
-                    items(Team.values().size) {index ->
-                        ImageItem(
-                            team = Team.values()[index],
-                            viewModel = viewModel
-                        )
-                    }
-                    item (span = {
-                        GridItemSpan(maxLineSpan)
-                    }) {
-                        ButtonContainer(
-                            text = "응원하러 가기",
-                            textColor = Color.White,
-                            bgColor = MoyaColor().mainGreen,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 12.dp, bottom = 30.dp),
-                            isEnabled = { viewModel.selectedTeam.value != null },
-                            onClick = { viewModel.onClickNext() }
-                        )
-                    }
-                }
+@Composable
+fun SelectTeamScreen(viewModel: SelectTeamViewModel) {
+    Surface(
+        modifier = Modifier.padding(horizontal = 20.dp)
+    ) {
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 150.dp),
+            contentPadding = PaddingValues(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            item (
+                span = {
+                    GridItemSpan(maxLineSpan)
+                }) {
+                Text(
+                    text = "어느 팀을 응원하시나요?",
+                    style = getTextStyle(style = MoyaFont.CustomTitleBold),
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+            }
+            items(Team.values().size) {index ->
+                ImageItem(
+                    team = Team.values()[index],
+                    viewModel = viewModel
+                )
+            }
+            item (span = {
+                GridItemSpan(maxLineSpan)
+            }) {
+                ButtonContainer(
+                    text = "응원하러 가기",
+                    textColor = Color.White,
+                    bgColor = MoyaColor().mainGreen,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp, bottom = 30.dp),
+                    isEnabled = { viewModel.selectedTeam.value != null },
+                    onClick = { viewModel.onClickNext() }
+                )
             }
         }
     }
