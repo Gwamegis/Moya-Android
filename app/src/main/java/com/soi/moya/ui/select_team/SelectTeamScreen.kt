@@ -17,11 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.soi.moya.component.ButtonContainer
+import com.soi.moya.ui.component.ButtonContainer
 import com.soi.moya.R
 import com.soi.moya.models.Team
-import com.soi.moya.models.getTeamImage
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -42,14 +42,14 @@ fun SelectTeamScreen(viewModel: SelectTeamViewModel) {
                     GridItemSpan(maxLineSpan)
                 }) {
                 Text(
-                    text = "어느 팀을 응원하시나요?",
+                    text = stringResource(R.string.select_team_title),
                     style = getTextStyle(style = MoyaFont.CustomTitleBold),
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
             }
-            items(Team.values().size) {index ->
+            items(viewModel.teams.size) {index ->
                 ImageItem(
-                    team = Team.values()[index],
+                    team = viewModel.teams[index],
                     viewModel = viewModel
                 )
             }
@@ -57,7 +57,7 @@ fun SelectTeamScreen(viewModel: SelectTeamViewModel) {
                 GridItemSpan(maxLineSpan)
             }) {
                 ButtonContainer(
-                    text = "응원하러 가기",
+                    text = stringResource(R.string.select_team_button),
                     textColor = Color.White,
                     bgColor = MoyaColor().mainGreen,
                     modifier = Modifier
@@ -73,7 +73,7 @@ fun SelectTeamScreen(viewModel: SelectTeamViewModel) {
 
 @Composable
 fun ImageItem(team: Team, viewModel: SelectTeamViewModel) {
-    val image = getTeamImage(team = team)
+    val image = painterResource(id = team.getTeamImageResourceId())
     val checkedImage = painterResource(id = R.drawable.select_team)
 
     Button(

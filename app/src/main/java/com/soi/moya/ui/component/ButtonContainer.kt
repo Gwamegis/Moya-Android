@@ -1,4 +1,4 @@
-package com.soi.moya.component
+package com.soi.moya.ui.component
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.shape.RoundedCornerShape

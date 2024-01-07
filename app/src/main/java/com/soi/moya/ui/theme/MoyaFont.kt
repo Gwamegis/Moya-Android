@@ -16,6 +16,7 @@ private val pretendard = FontFamily(
 
 private val baseTextStyle = TextStyle(
     fontStyle = FontStyle.Normal,
+    fontFamily = pretendard,
 )
 enum class MoyaFont {
     CustomTitleBold,
@@ -32,7 +33,6 @@ fun getTextStyle(style: MoyaFont): TextStyle {
     return when(style) {
         MoyaFont.CustomTitleBold -> {
             baseTextStyle.copy(
-                fontFamily = pretendard,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp,
                 lineHeight = 20.sp
@@ -40,7 +40,6 @@ fun getTextStyle(style: MoyaFont): TextStyle {
         }
         MoyaFont.CustomTitleMedium -> {
             baseTextStyle.copy(
-                fontFamily = pretendard,
                 fontWeight = FontWeight.Medium,
                 fontSize = 20.sp,
                 lineHeight = 20.sp
@@ -48,7 +47,6 @@ fun getTextStyle(style: MoyaFont): TextStyle {
         }
         MoyaFont.CustomBodyBold -> {
             baseTextStyle.copy(
-                fontFamily = pretendard,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 lineHeight = 16.sp
@@ -56,7 +54,6 @@ fun getTextStyle(style: MoyaFont): TextStyle {
         }
         MoyaFont.CustomBodyMedium -> {
             baseTextStyle.copy(
-                fontFamily = pretendard,
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,
                 lineHeight = 16.sp
@@ -64,7 +61,6 @@ fun getTextStyle(style: MoyaFont): TextStyle {
         }
         MoyaFont.CustomCaptionBold -> {
             baseTextStyle.copy(
-                fontFamily = pretendard,
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp,
                 lineHeight = 12.sp
@@ -72,7 +68,6 @@ fun getTextStyle(style: MoyaFont): TextStyle {
         }
         MoyaFont.CustomCaptionMedium -> {
             baseTextStyle.copy(
-                fontFamily = pretendard,
                 fontWeight = FontWeight.Medium,
                 fontSize = 10.sp,
                 lineHeight = 10.sp
@@ -80,7 +75,6 @@ fun getTextStyle(style: MoyaFont): TextStyle {
         }
         MoyaFont.CustomHeadline -> {
             baseTextStyle.copy(
-                fontFamily = pretendard,
                 fontWeight = FontWeight.Medium,
                 fontSize = 26.sp,
                 lineHeight = 50.sp
