@@ -114,6 +114,7 @@ fun SwitchTeamAndPlayerTitleView(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
                                 .width(96.dp)
+                                .height(34.dp)
                                 .clickable {
                                     onTabSelected(index)
                                 }
@@ -126,14 +127,12 @@ fun SwitchTeamAndPlayerTitleView(
                             )
                         }
 
-                        Spacer(modifier = Modifier.size(10.dp))
-
                         if (state.currentPage == index) {
                             Box(
                                 modifier = Modifier
                                     .padding(2.dp)
                                     .background(team.getPointColor())
-                                    .width(96.dp)
+                                    .width(92.dp)
                                     .height(3.dp)
                             )
                         }
