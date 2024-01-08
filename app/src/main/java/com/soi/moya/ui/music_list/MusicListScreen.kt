@@ -32,10 +32,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.soi.moya.R
 import com.soi.moya.models.Music
 import com.soi.moya.models.Team
-import com.soi.moya.models.musicList
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
 import com.soi.moya.ui.theme.MoyaColor
@@ -43,7 +43,9 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MusicListScreen() {
+fun MusicListScreen(
+    viewModel: MusicListViewModel
+) {
     val selectedTeam = Team.doosan
     val scope = rememberCoroutineScope()
     val tabs = listOf(R.string.team_tab, R.string.player_tab)
@@ -69,7 +71,7 @@ fun MusicListScreen() {
 
             MusicListHeaderView(
                 team = selectedTeam,
-                musicListSize = musicList.size
+                musicListSize = viewModel.getMusicListSize(page = pagerState.currentPage)
             )
 
             HorizontalPager(state = pagerState) { page ->
@@ -78,8 +80,8 @@ fun MusicListScreen() {
                 ) {
                     LazyColumn() {
 
-                        items(musicList.size) { index ->
-                            MusicListItemView(music = musicList[index])
+                        items(viewModel.getMusicListSize(page = page)) { index ->
+                            MusicListItemView(music = viewModel.getMusicAt(page = page, index = index))
                         }
 
                         item {
@@ -210,5 +212,6 @@ fun RequestMusicButtonView(color: Color) {
 @Preview
 @Composable
 fun MusicListScreenPreview() {
-    MusicListScreen()
+    val viewModel: MusicListViewModel = viewModel()
+    MusicListScreen(viewModel = viewModel)
 }
