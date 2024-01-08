@@ -1,5 +1,6 @@
 package com.soi.moya.ui.bottom_nav
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -29,6 +30,7 @@ import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
 import com.soi.moya.ui.theme.MoyaColor
+import com.soi.moya.ui.music_list.MusicListScreen as MusicListScreen
 
 @Composable
 fun BottomNavScreen() {
@@ -110,7 +112,7 @@ fun NavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         // TODO: Screen 연결
         composable(NavItem.MusicList.route) {
-            TestScreen()
+            MusicListScreen()
         }
         composable(NavItem.Search.route) {
             TestScreen()
