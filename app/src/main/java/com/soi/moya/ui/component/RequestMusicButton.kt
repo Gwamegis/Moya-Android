@@ -1,5 +1,7 @@
 package com.soi.moya.ui.component
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -22,14 +25,17 @@ import com.soi.moya.R
 
 @Composable
 fun RequestMusicButton(color: Color) {
+
+    val context = LocalContext.current
+    val webpage: Uri = Uri.parse("https://forms.gle/522hhU1Riq5wQhbv7")
+    val intent = Intent(Intent.ACTION_VIEW, webpage)
+
     Box(
         modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
     ) {
 
         OutlinedButton(
-            onClick = {
-                      // TODO: webview 연결
-            },
+            onClick = { context.startActivity(intent) },
             colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = color
             ),
