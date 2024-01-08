@@ -1,4 +1,8 @@
 package com.soi.moya.models
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import com.soi.moya.R
 import com.soi.moya.ui.theme.MoyaColor
 
 enum class Team {
@@ -46,6 +50,20 @@ enum class Team {
             nc -> color.ncSub
             kiwoom -> color.kiwoomSub
             kia -> color.kiaSub
+        }
+    }
+    fun getTeamImageResourceId(): Int {
+        return when (this) {
+            doosan -> R.drawable.select_team_doosan
+            hanwha -> R.drawable.select_team_hanwha
+            samsung -> R.drawable.select_team_samsung
+            lotte -> R.drawable.select_team_lotte
+            lg -> R.drawable.select_team_lg
+            ssg -> R.drawable.select_team_ssg
+            ktWiz -> R.drawable.select_team_kt
+            nc -> R.drawable.select_team_nc
+            kiwoom -> R.drawable.select_team_kiwoom
+            kia -> R.drawable.select_team_kia
         }
     }
 }

@@ -6,4 +6,8 @@
     <string name="music_list">응원곡</string>
     <string name="search">검색</string>
     <string name="music_storage">보관함</string>
+    
+<!-- select team screen -->
+    <string name="select_team_title">어느 팀을 응원하시나요?</string>
+    <string name="select_team_button">응원하러 가기</string>
 </resources>
