@@ -50,19 +50,4 @@ enum class Team {
             kia -> MoyaColor.kiaSub
         }
     }
-
-    fun getTeamImageResourceId(): Int {
-        return when (this) {
-            doosan -> R.drawable.select_team_doosan
-            hanwha -> R.drawable.select_team_doosan
-            samsung -> R.drawable.select_team_doosan
-            lotte -> R.drawable.select_team_doosan
-            lg -> R.drawable.select_team_doosan
-            ssg -> R.drawable.select_team_doosan
-            ktWiz -> R.drawable.select_team_doosan
-            nc -> R.drawable.select_team_doosan
-            kiwoom -> R.drawable.select_team_doosan
-            kia -> R.drawable.select_team_doosan
-        }
-    }
 }
