@@ -12,7 +12,7 @@ enum class Team {
             lotte -> color.lotteBackground
             lg -> color.lgBackground
             ssg -> color.ssgBackground
-            ktWiz -> color.ssgBackground
+            ktWiz -> color.ktBackground
             nc -> color.ncBackground
             kiwoom -> color.kiwoomBackground
             kia -> color.kiaBackground
@@ -27,7 +27,7 @@ enum class Team {
             lotte -> color.lottePoint
             lg -> color.lgPoint
             ssg -> color.ssgPoint
-            ktWiz -> color.ssgPoint
+            ktWiz -> color.ktPoint
             nc -> color.ncPoint
             kiwoom -> color.kiwoomPoint
             kia -> color.kiaPoint
@@ -42,7 +42,7 @@ enum class Team {
             lotte -> color.lotteSub
             lg -> color.lgSub
             ssg -> color.ssgSub
-            ktWiz -> color.ssgSub
+            ktWiz -> color.ktSub
             nc -> color.ncSub
             kiwoom -> color.kiwoomSub
             kia -> color.kiaSub
