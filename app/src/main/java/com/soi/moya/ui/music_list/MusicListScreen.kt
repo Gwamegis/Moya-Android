@@ -172,7 +172,7 @@ fun MusicListHeaderView(team: Team, musicListSize: Int) {
         }
 
         Text(
-            "총 $musicListSize 곡",
+            text = stringResource(R.string.count_of_song, musicListSize),
             style = getTextStyle(style = MoyaFont.CustomCaptionBold),
             color = MoyaColor.darkGray,
             modifier = Modifier
