@@ -14,22 +14,17 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.soi.moya.ui.component.ButtonContainer
 import com.soi.moya.R
 import com.soi.moya.models.Team
-import com.soi.moya.models.UserPreferences
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
-import kotlinx.coroutines.launch
 
 @Composable
 fun SelectTeamScreen(viewModel: SelectTeamViewModel) {
@@ -65,7 +60,7 @@ fun SelectTeamScreen(viewModel: SelectTeamViewModel) {
                 ButtonContainer(
                     text = stringResource(R.string.select_team_button),
                     textColor = Color.White,
-                    bgColor = MoyaColor().mainGreen,
+                    bgColor = MoyaColor.mainGreen,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 12.dp, bottom = 30.dp),

@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,9 +30,11 @@ import com.soi.moya.models.Team
 import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
+import com.soi.moya.ui.music_list.MusicListViewModel
+import com.soi.moya.ui.theme.MoyaColor
+import com.soi.moya.ui.music_list.MusicListScreen as MusicListScreen
 import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.select_team.SelectTeamViewModel
-import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaTheme
 
 @Composable
@@ -58,7 +61,7 @@ fun TestScreen() {
 fun BottomNav(navController: NavHostController) {
     // TODO: select_team에서 선택한 값 사용 필요
     val selectedTeam: Team = Team.doosan
-    val color = MoyaColor()
+    val color = MoyaColor
 
     val items = listOf(
         NavItem.MusicList,
@@ -116,7 +119,9 @@ fun NavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         // TODO: Screen 연결
         composable(NavItem.MusicList.route) {
-            SelectTeamScreen(viewModel = SelectTeamViewModel(context = context))
+            val musicListViewModel: MusicListViewModel = viewModel()
+            MusicListScreen(viewModel = musicListViewModel)
+//            SelectTeamScreen(viewModel = SelectTeamViewModel(context = context))
         }
         composable(NavItem.Search.route) {
             TestScreen()

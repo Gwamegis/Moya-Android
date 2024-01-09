@@ -1,55 +1,53 @@
 package com.soi.moya.models
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
+
 import com.soi.moya.R
 import com.soi.moya.ui.theme.MoyaColor
 
 enum class Team {
     doosan, hanwha, samsung, lotte, lg, ssg, ktWiz, nc, kiwoom, kia;
 
-    fun getBackgroundColor(color: MoyaColor = MoyaColor()): androidx.compose.ui.graphics.Color {
+    fun getBackgroundColor(): androidx.compose.ui.graphics.Color {
         return when (this) {
-            doosan -> color.doosanBackground
-            hanwha -> color.hanwhaBackground
-            samsung -> color.samsungBackground
-            lotte -> color.lotteBackground
-            lg -> color.lgBackground
-            ssg -> color.ssgBackground
-            ktWiz -> color.ktBackground
-            nc -> color.ncBackground
-            kiwoom -> color.kiwoomBackground
-            kia -> color.kiaBackground
+            doosan -> MoyaColor.doosanBackground
+            hanwha -> MoyaColor.hanwhaBackground
+            samsung -> MoyaColor.samsungBackground
+            lotte -> MoyaColor.lotteBackground
+            lg -> MoyaColor.lgBackground
+            ssg -> MoyaColor.ssgBackground
+            ktWiz -> MoyaColor.ktBackground
+            nc -> MoyaColor.ncBackground
+            kiwoom -> MoyaColor.kiwoomBackground
+            kia -> MoyaColor.kiaBackground
         }
     }
 
-    fun getPointColor(color: MoyaColor = MoyaColor()): androidx.compose.ui.graphics.Color {
+    fun getPointColor(): androidx.compose.ui.graphics.Color {
         return when (this) {
-            doosan -> color.doosanPoint
-            hanwha -> color.hanwhaPoint
-            samsung -> color.samsungPoint
-            lotte -> color.lottePoint
-            lg -> color.lgPoint
-            ssg -> color.ssgPoint
-            ktWiz -> color.ktPoint
-            nc -> color.ncPoint
-            kiwoom -> color.kiwoomPoint
-            kia -> color.kiaPoint
+            doosan -> MoyaColor.doosanPoint
+            hanwha -> MoyaColor.hanwhaPoint
+            samsung -> MoyaColor.samsungPoint
+            lotte -> MoyaColor.lottePoint
+            lg -> MoyaColor.lgPoint
+            ssg -> MoyaColor.ssgPoint
+            ktWiz -> MoyaColor.ktPoint
+            nc -> MoyaColor.ncPoint
+            kiwoom -> MoyaColor.kiwoomPoint
+            kia -> MoyaColor.kiaPoint
         }
     }
 
-    fun getSubColor(color: MoyaColor = MoyaColor()): androidx.compose.ui.graphics.Color {
+    fun getSubColor(): androidx.compose.ui.graphics.Color {
         return when (this) {
-            doosan -> color.doosanSub
-            hanwha -> color.hanwhaSub
-            samsung -> color.samsungSub
-            lotte -> color.lotteSub
-            lg -> color.lgSub
-            ssg -> color.ssgSub
-            ktWiz -> color.ktSub
-            nc -> color.ncSub
-            kiwoom -> color.kiwoomSub
-            kia -> color.kiaSub
+            doosan -> MoyaColor.doosanSub
+            hanwha -> MoyaColor.hanwhaSub
+            samsung -> MoyaColor.samsungSub
+            lotte -> MoyaColor.lotteSub
+            lg -> MoyaColor.lgSub
+            ssg -> MoyaColor.ssgSub
+            ktWiz -> MoyaColor.ktSub
+            nc -> MoyaColor.ncSub
+            kiwoom -> MoyaColor.kiwoomSub
+            kia -> MoyaColor.kiaSub
         }
     }
     fun getTeamImageResourceId(): Int {

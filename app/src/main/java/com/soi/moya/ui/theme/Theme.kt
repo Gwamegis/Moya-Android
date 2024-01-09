@@ -21,9 +21,9 @@ fun MoyaTheme(
 }
 
 fun initColors() = MoyaTeamColors(
-    background = MoyaColor().doosanBackground,
-    point = MoyaColor().doosanPoint,
-    sub =  MoyaColor().doosanSub
+    background = MoyaColor.doosanBackground,
+    point = MoyaColor.doosanPoint,
+    sub =  MoyaColor.doosanSub
 )
 
 private fun getColorScheme(team: Team): MoyaTeamColors {
@@ -42,61 +42,61 @@ private fun getColorScheme(team: Team): MoyaTeamColors {
 }
 
 private val doosanColorScheme = MoyaTeamColors(
-    background = MoyaColor().doosanBackground,
-    point = MoyaColor().doosanPoint,
-    sub =  MoyaColor().doosanSub
+    background = MoyaColor.doosanBackground,
+    point = MoyaColor.doosanPoint,
+    sub =  MoyaColor.doosanSub
 )
 
 private val hanwhaColorScheme = MoyaTeamColors(
-    background = MoyaColor().hanwhaBackground,
-    point = MoyaColor().hanwhaPoint,
-    sub =  MoyaColor().hanwhaSub
+    background = MoyaColor.hanwhaBackground,
+    point = MoyaColor.hanwhaPoint,
+    sub =  MoyaColor.hanwhaSub
 )
 
 private val samsungColorScheme = MoyaTeamColors(
-    background = MoyaColor().samsungBackground,
-    point = MoyaColor().samsungPoint,
-    sub =  MoyaColor().samsungSub
+    background = MoyaColor.samsungBackground,
+    point = MoyaColor.samsungPoint,
+    sub =  MoyaColor.samsungSub
 )
 
 private val lotteColorScheme = MoyaTeamColors(
-    background = MoyaColor().lotteBackground,
-    point = MoyaColor().lottePoint,
-    sub =  MoyaColor().lotteSub
+    background = MoyaColor.lotteBackground,
+    point = MoyaColor.lottePoint,
+    sub =  MoyaColor.lotteSub
 )
 
 private val lgColorScheme = MoyaTeamColors(
-    background = MoyaColor().lgBackground,
-    point = MoyaColor().lgPoint,
-    sub =  MoyaColor().lgSub
+    background = MoyaColor.lgBackground,
+    point = MoyaColor.lgPoint,
+    sub =  MoyaColor.lgSub
 )
 
 private val ssgColorScheme = MoyaTeamColors(
-    background = MoyaColor().ssgBackground,
-    point = MoyaColor().ssgPoint,
-    sub =  MoyaColor().ssgSub
+    background = MoyaColor.ssgBackground,
+    point = MoyaColor.ssgPoint,
+    sub =  MoyaColor.ssgSub
 )
 
 private val ktColorScheme = MoyaTeamColors(
-    background = MoyaColor().ktBackground,
-    point = MoyaColor().ktPoint,
-    sub =  MoyaColor().ktSub
+    background = MoyaColor.ktBackground,
+    point = MoyaColor.ktPoint,
+    sub =  MoyaColor.ktSub
 )
 
 private val ncColorScheme = MoyaTeamColors(
-    background = MoyaColor().ncBackground,
-    point = MoyaColor().ncPoint,
-    sub =  MoyaColor().ncSub
+    background = MoyaColor.ncBackground,
+    point = MoyaColor.ncPoint,
+    sub =  MoyaColor.ncSub
 )
 
 private val kiwoomColorScheme = MoyaTeamColors(
-    background = MoyaColor().kiwoomBackground,
-    point = MoyaColor().kiwoomPoint,
-    sub =  MoyaColor().kiwoomSub
+    background = MoyaColor.kiwoomBackground,
+    point = MoyaColor.kiwoomPoint,
+    sub =  MoyaColor.kiwoomSub
 )
 
 private val kiaColorScheme = MoyaTeamColors(
-    background = MoyaColor().kiaBackground,
-    point = MoyaColor().kiaPoint,
-    sub =  MoyaColor().kiaSub
+    background = MoyaColor.kiaBackground,
+    point = MoyaColor.kiaPoint,
+    sub =  MoyaColor.kiaSub
 )
