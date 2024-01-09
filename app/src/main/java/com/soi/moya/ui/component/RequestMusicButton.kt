@@ -22,6 +22,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.soi.moya.R
+import com.soi.moya.ui.theme.MoyaFont
+import com.soi.moya.ui.theme.getTextStyle
 
 @Composable
 fun RequestMusicButton(color: Color) {
@@ -52,7 +54,9 @@ fun RequestMusicButton(color: Color) {
                     .padding(end = 8.dp)
                     .size(20.dp)
             )
-            Text(text = stringResource(id = R.string.request_music))
+            Text(text = stringResource(id = R.string.request_music),
+                style = getTextStyle(style = MoyaFont.CustomBodyBold)
+            )
         }
     }
 }

@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import com.soi.moya.R
 import com.soi.moya.models.Music
 import com.soi.moya.ui.theme.MoyaColor
+import com.soi.moya.ui.theme.MoyaFont
+import com.soi.moya.ui.theme.getTextStyle
 
 @Composable
 fun MusicListItem(
@@ -72,11 +74,13 @@ fun MusicInfoView(music: Music) {
         modifier = Modifier.padding(start = 10.dp)
     ) {
         Text(
-            music.title, color = MoyaColor.black
+            music.title, color = MoyaColor.black,
+            style = getTextStyle(style = MoyaFont.CustomBodyMedium)
         )
         Spacer(modifier = Modifier.size(6.dp))
         Text(
-            music.info, color = MoyaColor.darkGray
+            music.info, color = MoyaColor.darkGray,
+            style = getTextStyle(style = MoyaFont.CustomCaptionMedium)
         )
     }
 }

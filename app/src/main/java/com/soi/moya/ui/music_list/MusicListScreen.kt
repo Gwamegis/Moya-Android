@@ -39,6 +39,8 @@ import com.soi.moya.models.Team
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
 import com.soi.moya.ui.theme.MoyaColor
+import com.soi.moya.ui.theme.MoyaFont
+import com.soi.moya.ui.theme.getTextStyle
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -113,14 +115,15 @@ fun SwitchTeamAndPlayerTitleView(
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .width(96.dp)
-                                .height(34.dp)
+                                .width(100.dp)
+                                .height(40.dp)
                                 .clickable {
                                     onTabSelected(index)
                                 }
                         ) {
                             Text(
                                 text = stringResource(id = tab),
+                                style = getTextStyle(style = MoyaFont.CustomTitleBold),
                                 color = if (state.currentPage == index) MoyaColor.white else {
                                     MoyaColor.unhighlightedWhite
                                 }
@@ -132,7 +135,7 @@ fun SwitchTeamAndPlayerTitleView(
                                 modifier = Modifier
                                     .padding(2.dp)
                                     .background(team.getPointColor())
-                                    .width(92.dp)
+                                    .width(96.dp)
                                     .height(3.dp)
                             )
                         }
@@ -170,6 +173,7 @@ fun MusicListHeaderView(team: Team, musicListSize: Int) {
 
         Text(
             "총 $musicListSize 곡",
+            style = getTextStyle(style = MoyaFont.CustomCaptionBold),
             color = MoyaColor.darkGray,
             modifier = Modifier
                 .padding(start = 20.dp)
@@ -199,6 +203,7 @@ fun RequestMusicButtonView(color: Color) {
     Spacer(modifier = Modifier.size(40.dp))
     Text(
         text = stringResource(id = R.string.request_music_info),
+        style = getTextStyle(style = MoyaFont.CustomCaptionMedium),
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 12.dp),
