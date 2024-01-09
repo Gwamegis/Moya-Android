@@ -1,6 +1,5 @@
 package com.soi.moya.ui.bottom_nav
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -15,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,6 +33,9 @@ import com.soi.moya.ui.SEARCH
 import com.soi.moya.ui.music_list.MusicListViewModel
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.music_list.MusicListScreen as MusicListScreen
+import com.soi.moya.ui.select_team.SelectTeamScreen
+import com.soi.moya.ui.select_team.SelectTeamViewModel
+import com.soi.moya.ui.theme.MoyaTheme
 
 @Composable
 fun BottomNavScreen() {
@@ -56,7 +59,6 @@ fun TestScreen() {
 
 @Composable
 fun BottomNav(navController: NavHostController) {
-
     // TODO: select_team에서 선택한 값 사용 필요
     val selectedTeam: Team = Team.doosan
     val color = MoyaColor
@@ -102,7 +104,7 @@ fun BottomNav(navController: NavHostController) {
                         modifier = Modifier.padding(horizontal = 4.dp)
                     )
                 },
-                selectedContentColor = selectedTeam.getPointColor(),
+                selectedContentColor = MoyaTheme.colors.point,
                 unselectedContentColor = color.darkGray
             )
         }
@@ -111,11 +113,15 @@ fun BottomNav(navController: NavHostController) {
 
 @Composable
 fun NavGraph(navController: NavHostController) {
+    //TODO: 선언 시점 변경 필요
+    val context = LocalContext.current
+
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         // TODO: Screen 연결
         composable(NavItem.MusicList.route) {
             val musicListViewModel: MusicListViewModel = viewModel()
             MusicListScreen(viewModel = musicListViewModel)
+//            SelectTeamScreen(viewModel = SelectTeamViewModel(context = context))
         }
         composable(NavItem.Search.route) {
             TestScreen()

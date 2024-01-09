@@ -10,6 +10,10 @@
 <!--    Components-->
     <string name="request_music">응원가 신청하기</string>
 
+<!-- select team screen -->
+    <string name="select_team_title">어느 팀을 응원하시나요?</string>
+    <string name="select_team_button">응원하러 가기</string>
+
     <!--    music list screen-->
     <string name="team_tab">팀 응원가</string>
     <string name="player_tab">선수 응원가</string>
