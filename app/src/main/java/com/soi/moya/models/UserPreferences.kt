@@ -17,7 +17,7 @@ class UserPreferences(private val context: Context) {
 
     val getSelectedTeam: Flow<String?> = context.dataStore.data
         .map { preferences ->
-            preferences[SELECTED_TEAM] ?: ""
+            preferences[SELECTED_TEAM] ?: "doosan"
         }
     suspend fun saveSelectedTeam(team: Team) {
         context.dataStore.edit { preferences ->
