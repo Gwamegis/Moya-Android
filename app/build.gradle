@@ -122,4 +122,5 @@ dependencies {
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.5.4'
 
     implementation "androidx.datastore:datastore-preferences:1.0.0"
+    implementation "androidx.constraintlayout:constraintlayout-compose-android:1.1.0-alpha13"
 }

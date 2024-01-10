@@ -26,6 +26,7 @@ enum class MoyaFont {
     CustomCaptionBold,
     CustomCaptionMedium,
     CustomHeadline,
+    CustomStorageHeaderTitle,
 }
 
 @Composable
@@ -78,6 +79,13 @@ fun getTextStyle(style: MoyaFont): TextStyle {
                 fontWeight = FontWeight.Medium,
                 fontSize = 26.sp,
                 lineHeight = 50.sp
+            )
+        }
+        MoyaFont.CustomStorageHeaderTitle -> {
+            baseTextStyle.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 40.sp,
+                lineHeight = 40.sp
             )
         }
     }

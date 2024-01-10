@@ -1,10 +1,7 @@
 package com.soi.moya.ui.select_team
 
 import android.content.Context
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.models.Team
