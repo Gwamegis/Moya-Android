@@ -1,23 +1,15 @@
 package com.soi.moya.ui.music_storage
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
@@ -37,7 +29,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,6 +36,7 @@ import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintSet
 import androidx.constraintlayout.compose.Dimension
+import androidx.constraintlayout.compose.ExperimentalMotionApi
 import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.layoutId
 import com.soi.moya.R
@@ -57,9 +49,9 @@ enum class SwipingStates {
     COLLAPSED
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMotionApi::class)
 @Composable
-fun SwipingHeader() {
+fun MusicStorageScreen() {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
@@ -230,7 +222,7 @@ fun SwipingHeader() {
 
                     //헤더 콘텐츠 (보관함)
                     Text(
-                        text = stringResource(R.string.storage),
+                        text = stringResource(R.string.music_storage),
                         style = getTextStyle(style = MoyaFont.CustomStorageHeaderTitle),
                         modifier = Modifier
                             .layoutId("content1")
@@ -239,18 +231,15 @@ fun SwipingHeader() {
                     Text(
                         text = "총 0곡",
                         style = getTextStyle(style = MoyaFont.CustomCaptionBold),
-                        color = MoyaColor().darkGray,
+                        color = MoyaColor.darkGray,
                         modifier = Modifier.layoutId("headerBar")
                             .background(Color.White)
                             .padding(vertical = 10.dp, horizontal = 20.dp)
                             .fillMaxWidth()
                     )
-                    Divider(startIndent = 0.dp, thickness = 1.dp, color = MoyaColor().gray)
+                    Divider(startIndent = 0.dp, thickness = 1.dp, color = MoyaColor.gray)
                 }
             }
         }
     }
-}
-
-class MusicStorageScreen {
 }

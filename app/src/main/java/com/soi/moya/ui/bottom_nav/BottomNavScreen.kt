@@ -31,10 +31,10 @@ import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
 import com.soi.moya.ui.music_list.MusicListViewModel
+import com.soi.moya.ui.music_storage.MusicStorageScreen
+import com.soi.moya.ui.music_storage.SwipingHeader
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.music_list.MusicListScreen as MusicListScreen
-import com.soi.moya.ui.select_team.SelectTeamScreen
-import com.soi.moya.ui.select_team.SelectTeamViewModel
 import com.soi.moya.ui.theme.MoyaTheme
 
 @Composable
@@ -113,21 +113,18 @@ fun BottomNav(navController: NavHostController) {
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-    //TODO: 선언 시점 변경 필요
-    val context = LocalContext.current
 
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         // TODO: Screen 연결
         composable(NavItem.MusicList.route) {
             val musicListViewModel: MusicListViewModel = viewModel()
             MusicListScreen(viewModel = musicListViewModel)
-//            SelectTeamScreen(viewModel = SelectTeamViewModel(context = context))
         }
         composable(NavItem.Search.route) {
             TestScreen()
         }
         composable(NavItem.MusicStorage.route) {
-            TestScreen()
+            MusicStorageScreen()
         }
     }
 }
