@@ -19,7 +19,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,9 +29,8 @@ import com.soi.moya.models.Team
 import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
-import com.soi.moya.ui.music_list.MusicListViewModel
 import com.soi.moya.ui.music_storage.MusicStorageScreen
-import com.soi.moya.ui.music_storage.SwipingHeader
+import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.music_list.MusicListScreen as MusicListScreen
 import com.soi.moya.ui.theme.MoyaTheme
@@ -113,15 +111,13 @@ fun BottomNav(navController: NavHostController) {
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         // TODO: Screen 연결
         composable(NavItem.MusicList.route) {
-            val musicListViewModel: MusicListViewModel = viewModel()
-            MusicListScreen(viewModel = musicListViewModel)
+            MusicListScreen()
         }
         composable(NavItem.Search.route) {
-            TestScreen()
+            SelectTeamScreen()
         }
         composable(NavItem.MusicStorage.route) {
             MusicStorageScreen()
@@ -132,7 +128,7 @@ sealed class NavItem(val labelID: Int, val iconID: Int, val route: String) {
     object MusicList : NavItem(R.string.music_list, R.drawable.navigation_icon_home, MUSIC_LIST)
     object Search : NavItem(R.string.search, R.drawable.navigation_icon_search, SEARCH)
     object MusicStorage :
-        NavItem(R.string.music_storage, R.drawable.navigation_icon_map, MUSIC_STORAGE)
+        NavItem(R.string.music_storage, R.drawable.navigation_icon_storage, MUSIC_STORAGE)
 }
 
 @Preview
