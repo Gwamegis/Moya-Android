@@ -1,5 +1,7 @@
 package com.soi.moya.ui.bottom_nav
 
+import android.app.Application
+import android.media.MediaPlayer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -26,11 +28,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
+import com.soi.moya.domain.MusicPlayerManager
 import com.soi.moya.models.Team
 import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
 import com.soi.moya.ui.music_list.MusicListViewModel
+import com.soi.moya.ui.music_player.MusicPlayerScreen
+import com.soi.moya.ui.music_player.MusicPlayerViewModel
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.music_list.MusicListScreen as MusicListScreen
 import com.soi.moya.ui.select_team.SelectTeamScreen
@@ -115,12 +120,17 @@ fun BottomNav(navController: NavHostController) {
 fun NavGraph(navController: NavHostController) {
     //TODO: 선언 시점 변경 필요
     val context = LocalContext.current
+    lateinit var musicPlayerManager: MusicPlayerManager
 
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         // TODO: Screen 연결
         composable(NavItem.MusicList.route) {
             val musicListViewModel: MusicListViewModel = viewModel()
-            MusicListScreen(viewModel = musicListViewModel)
+            MusicPlayerScreen(
+//                player = musicPlayerManager,
+                viewModel = MusicPlayerViewModel(context = context)
+            )
+//            MusicListScreen(viewModel = musicListViewModel)
 //            SelectTeamScreen(viewModel = SelectTeamViewModel(context = context))
         }
         composable(NavItem.Search.route) {
