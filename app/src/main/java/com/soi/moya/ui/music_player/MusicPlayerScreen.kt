@@ -22,13 +22,20 @@ import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,7 +46,13 @@ import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
 
 @Composable
-fun MusicPlayerScreen() {
+fun MusicPlayerScreen(
+    viewModel: MusicPlayerViewModel
+) {
+
+    val currentPosition by rememberUpdatedState(newValue = viewModel.currentPosition.value)
+    val duration = viewModel.getDuration()
+
     val music = Music(
         title = "Test title",
         info = "test team name",
@@ -55,7 +68,9 @@ fun MusicPlayerScreen() {
                 "나는 행복합니다\n"
     )
 
+    val file = R.raw.test
     val progress = remember { mutableFloatStateOf(0f) }
+    val isLike = rememberSaveable { mutableStateOf( true ) }
 
     Column(
         modifier = Modifier
@@ -65,8 +80,11 @@ fun MusicPlayerScreen() {
     ) {
         MusicNavigationBar(
             music = music,
-            isLike = true
-        )
+            isLike = isLike,
+        ) {
+            viewModel.updateLikeMusic(isLike = it)
+            isLike.value = !it
+        }
 
         MusicLylicView(
             music = music,
@@ -74,24 +92,39 @@ fun MusicPlayerScreen() {
         )
 
         MusicPlayerSlider(
-            progress = progress.value,
+            currentPosition = currentPosition ?: 0,
+            duration = duration,
+            viewModel = viewModel,
             onProgressChanged = { newProgress ->
                 progress.value = newProgress
             }
         )
 
         MusicPlayerBottomButtonView(
-            onClickPlayButton = { }
+            isPlaying = viewModel.isPlaying.value,
+            onClickPlayButton = {
+                viewModel.togglePlayPause()
+            }
         )
     }
 }
 
 @Composable
-fun MusicNavigationBar(music: Music, isLike: Boolean) {
-    val likeIcon = if (isLike) {
+fun MusicNavigationBar(
+    music: Music,
+    isLike: MutableState<Boolean>,
+    onClickHeartButton: (Boolean) -> Unit
+) {
+    val likeIcon = if (isLike.value) {
         R.drawable.heart_fill
     } else {
         R.drawable.heart
+    }
+
+    val tintColor = if (isLike.value) {
+        MoyaColor.doosanPoint
+    } else {
+        MoyaColor.white
     }
 
     Row(
@@ -103,7 +136,9 @@ fun MusicNavigationBar(music: Music, isLike: Boolean) {
         IconButton(
             modifier = Modifier
                 .size(20.dp),
-            onClick = { /*TODO*/ }) {
+            onClick = {
+                onClickHeartButton(isLike.value)
+            }) {
 
             Icon(
                 painterResource(id = R.drawable.chevron_left),
@@ -147,7 +182,7 @@ fun MusicNavigationBar(music: Music, isLike: Boolean) {
             Icon(
                 painterResource(id = likeIcon),
                 contentDescription = null,
-                tint = MoyaColor.doosanPoint
+                tint = tintColor
             )
         }
     }
@@ -159,7 +194,7 @@ fun MusicLylicView(
     music: Music
 ) {
     val scrollState = rememberScrollState()
-    val gradientTopColor = scrollState.value > 0
+    val gradientTopColor = scrollState.value > 10
     val gradientBottomColor = scrollState.value < scrollState.maxValue
 
     Box(
@@ -221,28 +256,55 @@ fun GradientBox(
 
 @Composable
 fun MusicPlayerSlider(
-    progress: Float,
+    currentPosition: Int,
+    duration: Int,
+    viewModel: MusicPlayerViewModel,
     onProgressChanged: (Float) -> Unit
 ) {
-    Slider(
-        value = progress,
-        onValueChange = onProgressChanged,
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
                 start = 20.dp,
-                end = 20.dp,
+                end = 20.dp
+            )
+    ) {
+        Slider(
+            value = if (duration > 0) currentPosition.toFloat() / duration.toFloat() else 0f,
+            onValueChange = {
+                onProgressChanged(it)
+                viewModel.seekTo((it * duration).toInt())
+            },
+            modifier = Modifier
+                .fillMaxWidth(),
+            colors = SliderDefaults.colors(
+                thumbColor = MoyaColor.doosanPoint,
+                activeTrackColor = MoyaColor.doosanPoint,
+                inactiveTrackColor = MoyaColor.gray,
             ),
-        colors = SliderDefaults.colors(
-            thumbColor = MoyaColor.doosanPoint,
-            activeTrackColor = MoyaColor.doosanPoint,
-            inactiveTrackColor = MoyaColor.gray,
-        ),
-    )
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = viewModel.formatTime(currentPosition),
+                color = MoyaColor.white
+            )
+            Text(
+                text = viewModel.formatTime(duration),
+                color = MoyaColor.white
+            )
+        }
+    }
 }
 
 @Composable
 fun MusicPlayerBottomButtonView(
+    isPlaying: Boolean,
     onClickPlayButton: () -> Unit
 ) {
     Box(
@@ -256,14 +318,19 @@ fun MusicPlayerBottomButtonView(
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(25.dp))
                 .clickable { onClickPlayButton() },
-            painter = painterResource(id = R.drawable.baseline_play_circle_24),
+            painter = painterResource(
+                id = if (isPlaying) R.drawable.baseline_pause_circle_24 else {
+                    R.drawable.baseline_play_circle_24
+                }
+            ),
             contentDescription = null
         )
     }
 }
 
-@Composable
-@Preview
-fun MusicPlayerScreenPreview() {
-    MusicPlayerScreen()
-}
+//@Composable
+//@Preview
+//fun MusicPlayerScreenPreview() {
+//    val context = LocalContext.current.applicationContext
+//    MusicPlayerScreen(viewModel = MusicPlayerViewModel(context = context))
+//}

@@ -1,82 +1,45 @@
 package com.soi.moya.ui.music_player
 
-import android.app.Application
 import android.content.Context
-import android.content.res.AssetFileDescriptor
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.soi.moya.domain.MusicPlayerManager
+import com.soi.moya.repository.MusicPlayerManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.File
 import java.util.concurrent.TimeUnit
 
 class MusicPlayerViewModel(context: Context): ViewModel() {
-    private val _musicPlayer: MusicPlayerManager = MusicPlayerManager(context = context)
+    private val _musicPlayerManager = mutableStateOf(MusicPlayerManager(context))
 
-    private val _music = MutableLiveData<File>()
-    val music: LiveData<File> get() = _music
+    private val musicPlayerManager: State<MusicPlayerManager>
+        get() = _musicPlayerManager
 
-    private val _isPlaying = MutableLiveData<Boolean>()
-    val isPlaying: LiveData<Boolean> get() = _isPlaying
-
-    private val _duration = MutableLiveData<Int>()
-    val duration: LiveData<Int> get() = _duration
-
-    private val _currentPosition = MutableLiveData<Int>()
-    val currentPosition: LiveData<Int> get() = _currentPosition
-
-    // 추가된 부분
-//    val progress: LiveData<Float>
-//        get() = Transformations.map(_currentPosition) { position ->
-//            if (_duration.value != null && _duration.value!! > 0) {
-//                position.toFloat() / _duration.value!!
-//            } else {
-//                0f
-//            }
-//        }
+    private val _isPlaying = mutableStateOf(false)
+    val isPlaying: State<Boolean> get() = _isPlaying
+    val currentPosition: State<Int> get() = _currentPosition
+    private val _currentPosition = mutableIntStateOf(0)
 
     init {
-        _isPlaying.value = _musicPlayer.isPlaying()
-        _duration.value = _musicPlayer.getMusicDuration()
-        startUpdateCurrentPosition()
+        _musicPlayerManager.value.play()
+        startUpdateCurrentPositionAndDuration()
     }
 
-    private fun startUpdateCurrentPosition() {
+
+    private fun startUpdateCurrentPositionAndDuration() {
         viewModelScope.launch {
             while (true) {
-                _currentPosition.value = _musicPlayer.getCurrentPosition()
+                _currentPosition.value = musicPlayerManager.value.getCurrentPosition()
+                _isPlaying.value = musicPlayerManager.value.isPlaying()
                 delay(1000)
             }
         }
     }
 
-    fun setMusicFile(file: File) {
-        _music.value = file
-    }
-
-    fun playMusic(file: AssetFileDescriptor) {
-        _music.value?.let { playedFile ->
-            if (_musicPlayer.isPlaying()) {
-                _musicPlayer.stopMusic()
-            }
-            _musicPlayer.playMusic()
-        }
-    }
-
     fun togglePlayPause() {
-        if (_musicPlayer.isPlaying()) {
-            _musicPlayer.stopMusic()
-        } else {
-            _musicPlayer.playMusic()
-        }
-    }
-
-    fun checkIsPlayingMusic(): Boolean {
-        return _musicPlayer.isPlaying()
+        musicPlayerManager.value.togglePlayPause()
     }
 
     fun updateLikeMusic(isLike: Boolean) {
@@ -85,14 +48,6 @@ class MusicPlayerViewModel(context: Context): ViewModel() {
         } else {
             likeMusic()
         }
-    }
-
-    fun getCurrentTime(): String {
-        return formatTime(_currentPosition.value ?: 0)
-    }
-
-    fun getEndTime(): String {
-        return formatTime(_duration.value ?: 0)
     }
 
     fun formatTime(time: Int): String {
@@ -107,6 +62,14 @@ class MusicPlayerViewModel(context: Context): ViewModel() {
 
     private fun unlikeMusic() {
 
+    }
+
+    fun getDuration(): Int {
+        return musicPlayerManager.value.getDuration()
+    }
+
+    fun seekTo(position: Int) {
+        musicPlayerManager.value.seekTo(position)
     }
 }
 
