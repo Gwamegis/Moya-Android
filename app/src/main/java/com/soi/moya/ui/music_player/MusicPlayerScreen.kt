@@ -1,5 +1,6 @@
 package com.soi.moya.ui.music_player
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,7 +23,6 @@ import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -35,9 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.soi.moya.R
 import com.soi.moya.models.Music
@@ -45,6 +43,7 @@ import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun MusicPlayerScreen(
     viewModel: MusicPlayerViewModel
@@ -68,7 +67,6 @@ fun MusicPlayerScreen(
                 "나는 행복합니다\n"
     )
 
-    val file = R.raw.test
     val progress = remember { mutableFloatStateOf(0f) }
     val isLike = rememberSaveable { mutableStateOf( true ) }
 

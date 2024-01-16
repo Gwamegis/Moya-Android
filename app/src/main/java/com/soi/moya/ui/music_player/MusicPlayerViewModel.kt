@@ -8,17 +8,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.repository.MusicPlayerManager
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class MusicPlayerViewModel(context: Context): ViewModel() {
     private val _musicPlayerManager = mutableStateOf(MusicPlayerManager(context))
 
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying: StateFlow<Boolean> = _isPlaying
+
     private val musicPlayerManager: State<MusicPlayerManager>
         get() = _musicPlayerManager
 
-    private val _isPlaying = mutableStateOf(false)
-    val isPlaying: State<Boolean> get() = _isPlaying
     val currentPosition: State<Int> get() = _currentPosition
     private val _currentPosition = mutableIntStateOf(0)
 
