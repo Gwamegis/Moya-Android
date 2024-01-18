@@ -35,13 +35,13 @@ fun NewFeatureNoticeScreen() {
             .padding(horizontal = 20.dp)
     ) {
         NoticeTitleView(type = Notice.NEW_FEATURES)
-        BottomSheetWithMultipleDescriptions(descriptions = descriptions)
+        FeatureDescriptionsView(descriptions = descriptions)
         ButtonsView()
     }
 }
 
 @Composable
-fun BottomSheetWithMultipleDescriptions(descriptions: Array<String>) {
+fun FeatureDescriptionsView(descriptions: Array<String>) {
     Column(
         modifier = Modifier
             .padding(bottom = 32.dp)
