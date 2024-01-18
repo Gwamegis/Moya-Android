@@ -17,6 +17,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.soi.moya.R
 import com.soi.moya.ui.component.ButtonContainer
+import com.soi.moya.ui.component.Notice
+import com.soi.moya.ui.component.NoticeTitleView
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -32,29 +34,9 @@ fun NewFeatureNoticeScreen() {
         modifier = Modifier
             .padding(horizontal = 20.dp)
     ) {
-        TitleView()
+        NoticeTitleView(type = Notice.NEW_FEATURES)
         BottomSheetWithMultipleDescriptions(descriptions = descriptions)
         ButtonsView()
-    }
-}
-
-@Composable
-fun TitleView() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 30.dp)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.alarm),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(bottom = 20.dp)
-        )
-        Text(
-            text = "새로운 기능이 생겼어요!",
-            style = getTextStyle(style = MoyaFont.CustomTitleBold),
-        )
     }
 }
 
