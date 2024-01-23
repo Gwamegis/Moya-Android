@@ -1,7 +1,6 @@
 package com.soi.moya.ui.search
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,6 +30,7 @@ import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -132,6 +132,9 @@ fun SearchBar(viewModel: SearchViewModel) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
 
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
     Column (
         verticalArrangement = Arrangement.Bottom,
         modifier = Modifier
