@@ -1,4 +1,5 @@
 package com.soi.moya.models
+
 import com.soi.moya.R
 import com.soi.moya.ui.theme.MoyaColor
 

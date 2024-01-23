@@ -43,16 +43,18 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.soi.moya.R
 import com.soi.moya.models.Music
 import com.soi.moya.models.Team
+import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.component.RequestMusicButton
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
 
 @Composable
-fun SearchScreen(viewModel: SearchViewModel) {
+fun SearchScreen(viewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
     val result by viewModel.searchResult.collectAsState()
     val text by viewModel.searchText.collectAsState()
 
