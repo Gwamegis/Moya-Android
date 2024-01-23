@@ -158,7 +158,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         )
     )
 
-    private val _searchText = MutableStateFlow("asdf")
+    private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText
 
     private val _musicFlow = MutableStateFlow<List<Music>>(musicList)

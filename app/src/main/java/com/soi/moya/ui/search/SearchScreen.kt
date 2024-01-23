@@ -1,6 +1,7 @@
 package com.soi.moya.ui.search
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -229,7 +230,7 @@ fun listItem(music: Music, team: Team, onClickEvent: () -> Unit) {
     Row(
         modifier = Modifier
             .background(MoyaColor.white)
-            .clickable { onClickEvent },
+            .clickable(onClick = onClickEvent),
     ) {
         Column(
             modifier = Modifier
