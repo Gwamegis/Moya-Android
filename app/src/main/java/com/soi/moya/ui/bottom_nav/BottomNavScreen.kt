@@ -1,5 +1,6 @@
 package com.soi.moya.ui.bottom_nav
 
+import android.app.Application
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -111,6 +112,10 @@ fun BottomNav(navController: NavHostController) {
 
 @Composable
 fun NavGraph(navController: NavHostController) {
+    //TODO: 선언 시점 변경 필요
+    val context = LocalContext.current
+    val application = context.applicationContext as Application
+
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         // TODO: Screen 연결
         composable(NavItem.MusicList.route) {
