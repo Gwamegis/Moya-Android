@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.rememberCoroutineScope
@@ -36,8 +37,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.soi.moya.R
 import com.soi.moya.models.Music
 import com.soi.moya.models.Team
+import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
+import com.soi.moya.ui.music_storage.MusicStorageViewModel
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -46,7 +49,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MusicListScreen(
-    viewModel: MusicListViewModel
+    viewModel: MusicListViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val selectedTeam = Team.doosan
     val scope = rememberCoroutineScope()
@@ -105,7 +108,7 @@ fun SwitchTeamAndPlayerTitleView(
         modifier = Modifier
             .fillMaxWidth()
             .background(Team.doosan.getSubColor())
-            .padding(top = 16.dp)
+            .padding(top = 60.dp)
             .padding(horizontal = 20.dp)
     ) {
         Row(horizontalArrangement = Arrangement.SpaceEvenly) {
