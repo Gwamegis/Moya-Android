@@ -1,4 +1,5 @@
 package com.soi.moya.models
+
 import com.soi.moya.R
 import com.soi.moya.ui.theme.MoyaColor
 
@@ -61,6 +62,34 @@ enum class Team {
             nc -> R.drawable.select_team_nc
             kiwoom -> R.drawable.select_team_kiwoom
             kia -> R.drawable.select_team_kia
+        }
+    }
+    fun getTeamAlbumImageResourceId(): Int {
+        return when (this) {
+            doosan -> R.drawable.album_doosan
+            hanwha -> R.drawable.album_hanwha
+            samsung -> R.drawable.album_samsung
+            lotte -> R.drawable.album_lotte
+            lg -> R.drawable.album_lg
+            ssg -> R.drawable.album_ssg
+            ktWiz -> R.drawable.album_kt
+            nc -> R.drawable.album_nc
+            kiwoom -> R.drawable.album_kiwoom
+            kia -> R.drawable.album_kia
+        }
+    }
+    fun getKrTeamName(): String {
+        return when (this) {
+            doosan -> "두산 베어스"
+            hanwha -> "한화 이글스"
+            samsung -> "삼성 라이온즈"
+            lotte -> "롯데 자이언츠"
+            lg -> "엘지 트윈스"
+            ssg -> "쓱 랜더스"
+            ktWiz -> "케이티 위즈"
+            nc -> "엔씨 다이노스"
+            kiwoom -> "키움 히어로즈"
+            kia -> "기아 타이거즈"
         }
     }
 }

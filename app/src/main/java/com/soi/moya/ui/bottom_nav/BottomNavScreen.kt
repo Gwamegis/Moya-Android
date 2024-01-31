@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +30,7 @@ import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
 import com.soi.moya.ui.music_storage.MusicStorageScreen
-import com.soi.moya.ui.select_team.SelectTeamScreen
+import com.soi.moya.ui.search.SearchScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.music_list.MusicListScreen as MusicListScreen
 import com.soi.moya.ui.theme.MoyaTheme
@@ -122,7 +121,7 @@ fun NavGraph(navController: NavHostController) {
             MusicListScreen()
         }
         composable(NavItem.Search.route) {
-            SelectTeamScreen()
+            SearchScreen()
         }
         composable(NavItem.MusicStorage.route) {
             MusicStorageScreen()
