@@ -13,6 +13,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -40,8 +41,15 @@ import com.soi.moya.ui.theme.MoyaTheme
 @Composable
 fun BottomNavScreen() {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = remember(navBackStackEntry) { navBackStackEntry?.destination?.route }
+
     Scaffold(
-        bottomBar = { BottomNav(navController = navController) }
+        bottomBar = {
+            if (currentRoute != NavItem.MusicPlayer.route) {
+                BottomNav(navController = navController)
+            }
+        }
     ) {
         Box(Modifier.padding(it)) {
             NavGraph(navController = navController)
@@ -127,7 +135,7 @@ fun NavGraph(navController: NavHostController) {
         composable(NavItem.MusicStorage.route) {
             MusicStorageScreen(navController = navController)
         }
-        composable(MUSIC_PlAYER) {backStackEntry ->
+        composable(NavItem.MusicPlayer.route) {backStackEntry ->
             MusicPlayerScreen(
                 navController = navController,
                 songId = backStackEntry.arguments?.getString("songId")
@@ -140,6 +148,8 @@ sealed class NavItem(@StringRes val labelID: Int, val iconID: Int, val route: St
     object Search : NavItem(R.string.search, R.drawable.navigation_icon_search, SEARCH)
     object MusicStorage :
         NavItem(R.string.music_storage, R.drawable.navigation_icon_storage, MUSIC_STORAGE)
+    object MusicPlayer:
+            NavItem(R.string.music_player, R.drawable.navigation_icon_search, MUSIC_PlAYER)
 }
 
 @Preview
