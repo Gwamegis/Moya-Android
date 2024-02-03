@@ -1,6 +1,5 @@
 package com.soi.moya.ui.music_storage
 
-import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
@@ -23,8 +22,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -37,7 +34,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,6 +45,7 @@ import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.MotionLayoutScope
 import androidx.constraintlayout.compose.layoutId
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.toItem
@@ -66,7 +63,10 @@ enum class SwipingStates {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MusicStorageScreen(viewModel: MusicStorageViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+fun MusicStorageScreen(
+    viewModel: MusicStorageViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    navController: NavHostController
+) {
 
     val storageUiState by viewModel.storageUiState.collectAsState()
     Surface(
@@ -146,7 +146,8 @@ fun MusicStorageScreen(viewModel: MusicStorageViewModel = viewModel(factory = Ap
                     )
                     bodyContent(
                         viewModel = viewModel,
-                        storageUiState = storageUiState
+                        storageUiState = storageUiState,
+                        navController = navController
                     )
                 }
             }
@@ -157,7 +158,8 @@ fun MusicStorageScreen(viewModel: MusicStorageViewModel = viewModel(factory = Ap
 @Composable
 fun ItemList(
     storageMusicItems: List<StoredMusic>,
-    viewModel: MusicStorageViewModel
+    viewModel: MusicStorageViewModel,
+    onClickCell: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
@@ -166,9 +168,7 @@ fun ItemList(
             MusicListItem(
                 music = item.toMusic(),
                 buttonImageResourceId = R.drawable.ellipse,
-                onClickCell = {
-                              //TODO: 클릭 시 음악 재생
-                },
+                onClickCell = { onClickCell() },
                 onClickExtraButton = {
                     //TODO: 추후 bottom sheet 띄우는 동작 추가
                     viewModel.deleteItem(item.toItem())
@@ -317,7 +317,8 @@ fun headerContent(
 @Composable
 fun bodyContent(
     viewModel: MusicStorageViewModel,
-    storageUiState: StorageUiState
+    storageUiState: StorageUiState,
+    navController: NavHostController
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -329,7 +330,11 @@ fun bodyContent(
         if (storageUiState.itemList.isNotEmpty()) {
             ItemList(
                 storageMusicItems = storageUiState.itemList,
-                viewModel = viewModel
+                viewModel = viewModel,
+                onClickCell = {
+                    //TODO: music id 전달 필요
+                    navController.navigate("MUSIC_PLAYER/123")
+                }
             )
         } else {
             emptyList()

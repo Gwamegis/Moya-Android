@@ -1,16 +1,17 @@
 package com.soi.moya.repository
 
+import android.app.Application
 import android.content.Context
 import android.media.MediaPlayer
 import com.soi.moya.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class MusicPlayerManager(context: Context) {
+class MusicPlayerManager(application: Application) {
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
 
-    private val mediaPlayer = MediaPlayer.create(context, R.raw.test)
+    private val mediaPlayer = MediaPlayer.create(application, R.raw.test)
 
     fun togglePlayPause() {
         _isPlaying.value = !_isPlaying.value

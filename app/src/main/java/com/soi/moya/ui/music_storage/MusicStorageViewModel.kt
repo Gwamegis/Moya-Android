@@ -15,8 +15,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MusicStorageViewModel(
-    private val storedMusicRepository: StoredMusicRepository
-): AndroidViewModel(application = Application()) {
+    private val storedMusicRepository: StoredMusicRepository,
+    application: Application
+): AndroidViewModel(application = application) {
     val storageUiState: StateFlow<StorageUiState> =
         storedMusicRepository.getAllItemsStream().map { StorageUiState(it) }
             .stateIn(

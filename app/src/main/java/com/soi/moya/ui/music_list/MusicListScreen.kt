@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,13 +33,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.models.Music
 import com.soi.moya.models.Team
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
-import com.soi.moya.ui.music_storage.MusicStorageViewModel
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -49,7 +50,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MusicListScreen(
-    viewModel: MusicListViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: MusicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    navController: NavHostController
 ) {
     val selectedTeam = Team.doosan
     val scope = rememberCoroutineScope()
@@ -86,7 +88,10 @@ fun MusicListScreen(
                     LazyColumn() {
 
                         items(viewModel.getMusicListSize(page = page)) { index ->
-                            MusicListItemView(music = viewModel.getMusicAt(page = page, index = index))
+                            MusicListItemView(
+                                music = viewModel.getMusicAt(page = page, index = index),
+                                navController = navController
+                            )
                         }
 
                         item {
@@ -186,12 +191,12 @@ fun MusicListHeaderView(team: Team, musicListSize: Int) {
 }
 
 @Composable
-fun MusicListItemView(music: Music) {
+fun MusicListItemView(music: Music, navController: NavHostController) {
     Divider()
     MusicListItem(
         music = music,
         onClickCell = {
-            Log.d("clicked", "cell")
+            navController.navigate("MUSIC_PLAYER/${music.id}")
         },
         onClickExtraButton = {
             Log.d("clicked", "extra button")
@@ -220,5 +225,6 @@ fun RequestMusicButtonView(color: Color) {
 @Composable
 fun MusicListScreenPreview() {
     val viewModel: MusicListViewModel = viewModel()
-    MusicListScreen(viewModel = viewModel)
+    val navController = rememberNavController()
+    MusicListScreen(viewModel = viewModel, navController = navController)
 }

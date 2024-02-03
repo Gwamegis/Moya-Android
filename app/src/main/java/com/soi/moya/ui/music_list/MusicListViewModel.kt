@@ -17,10 +17,10 @@ class MusicListViewModel(
     init {
         // TODO: 데이터 연결
         _teamMusics.value = List(10) {
-            Music(title = "team music test $it", info = "subTitle $it")
+            Music(id = "$it", title = "team music test $it", info = "subTitle $it")
         }
         _playerMusics.value = List(10) {
-            Music(title = "player music test $it", info = "subTitle $it")
+            Music(id = "$it", title = "player music test $it", info = "subTitle $it")
         }
     }
 

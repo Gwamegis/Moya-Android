@@ -37,6 +37,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.Music
 import com.soi.moya.ui.theme.MoyaColor
@@ -46,7 +48,9 @@ import com.soi.moya.ui.theme.getTextStyle
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun MusicPlayerScreen(
-    viewModel: MusicPlayerViewModel
+    viewModel: MusicPlayerViewModel = viewModel(factory = MusicPlayerViewModel.Factory),
+    navController: NavHostController,
+    songId: String?
 ) {
 
     val currentPosition by rememberUpdatedState(newValue = viewModel.currentPosition.value)
@@ -79,10 +83,14 @@ fun MusicPlayerScreen(
         MusicNavigationBar(
             music = music,
             isLike = isLike,
-        ) {
-            viewModel.updateLikeMusic(isLike = it)
-            isLike.value = !it
-        }
+            onClickBackButton = {
+                viewModel.popBackStack(navController = navController)
+            },
+            onClickHeartButton = {
+                viewModel.updateLikeMusic(isLike = it)
+                isLike.value = !it
+            }
+        )
 
         MusicLylicView(
             music = music,
@@ -111,6 +119,7 @@ fun MusicPlayerScreen(
 fun MusicNavigationBar(
     music: Music,
     isLike: MutableState<Boolean>,
+    onClickBackButton: () -> Unit,
     onClickHeartButton: (Boolean) -> Unit
 ) {
     val likeIcon = if (isLike.value) {
@@ -135,7 +144,7 @@ fun MusicNavigationBar(
             modifier = Modifier
                 .size(20.dp),
             onClick = {
-                onClickHeartButton(isLike.value)
+                onClickBackButton()
             }) {
 
             Icon(
@@ -176,7 +185,10 @@ fun MusicNavigationBar(
         IconButton(
             modifier = Modifier
                 .size(26.dp),
-            onClick = { /*TODO*/ }) {
+            onClick = {
+                //TODO: 데이터 추가
+                onClickHeartButton(isLike.value)
+            }) {
             Icon(
                 painterResource(id = likeIcon),
                 contentDescription = null,
