@@ -2,13 +2,13 @@ package com.soi.moya.data
 
 import androidx.lifecycle.LiveData
 import com.soi.moya.models.Music
-import com.soi.moya.repository.MusicRepositoryImp
+import com.soi.moya.repository.MusicRepository
 import com.soi.moya.util.UiState
 import androidx.lifecycle.MutableLiveData
 import com.soi.moya.models.Team
 
 class MusicManager private constructor() {
-    private val _musicRepositoryImp = MusicRepositoryImp()
+    private val _musicRepositoryImp = MusicRepository()
     private val _musics: MutableMap<String, LiveData<List<Music>>> = mutableMapOf()
     val musics: MutableMap<String, LiveData<List<Music>>>
         get() = _musics
