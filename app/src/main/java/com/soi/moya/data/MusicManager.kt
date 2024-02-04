@@ -2,13 +2,13 @@ package com.soi.moya.data
 
 import androidx.lifecycle.LiveData
 import com.soi.moya.models.Music
-import com.soi.moya.repository.MusicRepository
 import com.soi.moya.util.UiState
 import androidx.lifecycle.MutableLiveData
 import com.soi.moya.models.Team
+import com.soi.moya.repository.FirebaseRepository
 
 class MusicManager private constructor() {
-    private val _musicRepositoryImp = MusicRepository()
+    private val _firebaseRepository = FirebaseRepository<Music>(clazz = Music::class.java)
     private val _musics: MutableMap<String, LiveData<List<Music>>> = mutableMapOf()
     val musics: MutableMap<String, LiveData<List<Music>>>
         get() = _musics
@@ -21,16 +21,13 @@ class MusicManager private constructor() {
 
     private fun loadMusics(team: String) {
         val musicLiveData = MutableLiveData<List<Music>>()
-        _musicRepositoryImp.getMusics(team) { result ->
+        _firebaseRepository.getData(team) { result ->
             when (result) {
                 is UiState.Success -> {
                     musicLiveData.postValue(result.data ?: emptyList())
                 }
-                is UiState.Failure -> {
-                    // 에러 처리
-                }
                 else -> {
-                    // 다른 상태 처리
+                    // fail 처리
                 }
             }
         }
