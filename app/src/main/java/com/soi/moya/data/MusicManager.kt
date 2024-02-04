@@ -1,21 +1,27 @@
 package com.soi.moya.data
 
+import androidx.lifecycle.LiveData
 import com.soi.moya.models.Music
 import com.soi.moya.repository.MusicRepositoryImp
 import com.soi.moya.util.UiState
 import androidx.lifecycle.MutableLiveData
+import com.soi.moya.models.Team
 
 class MusicManager private constructor() {
-    private val _musics: MutableMap<String, MutableLiveData<List<Music>>> = mutableMapOf()
-    private val musicRepositoryImp = MusicRepositoryImp()
+    private val _musicRepositoryImp = MusicRepositoryImp()
+    private val _musics: MutableMap<String, LiveData<List<Music>>> = mutableMapOf()
+    val musics: MutableMap<String, LiveData<List<Music>>>
+        get() = _musics
 
     init {
-        loadMusics("Doosan")
+        Team.values().forEach {
+            loadMusics(it.getFirebaseCollectionName())
+        }
     }
 
     private fun loadMusics(team: String) {
         val musicLiveData = MutableLiveData<List<Music>>()
-        musicRepositoryImp.getMusics(team) { result ->
+        _musicRepositoryImp.getMusics(team) { result ->
             when (result) {
                 is UiState.Success -> {
                     musicLiveData.postValue(result.data ?: emptyList())
@@ -31,11 +37,7 @@ class MusicManager private constructor() {
         _musics[team] = musicLiveData
     }
 
-    fun getMusics(team: String): MutableLiveData<List<Music>>? {
-        return _musics[team]
-    }
-
-    fun getAllMusics(): MutableLiveData<List<Music>>? {
+    fun getAllMusics(): MutableLiveData<List<Music>> {
         val allMusicsLiveData = MutableLiveData<List<Music>>()
 
         _musics.values.forEach { musicLiveData ->

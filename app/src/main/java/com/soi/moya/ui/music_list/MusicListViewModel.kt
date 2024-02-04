@@ -14,24 +14,17 @@ class MusicListViewModel(
 ) : AndroidViewModel(application) {
 
     private val _musicManager = MusicManager.getInstance()
-
-    // TODO: 현재는 musics지만, 추후 좋아요 등의 정보를 가지고 있는 데이터로 변경이 필요
     private val _teamMusics = mutableStateOf(emptyList<Music>())
     private val _playerMusics = mutableStateOf(emptyList<Music>())
-
-    private val teamMusics: LiveData<List<Music>> get() = _musicManager.getMusics("Doosan") ?: MutableLiveData(emptyList())
-    private val playerMusics: LiveData<List<Music>> get() = _musicManager.getMusics("Doosan") ?: MutableLiveData(emptyList())
+    private val _musics = _musicManager.musics["Doosan"] ?: MutableLiveData(emptyList())
 
     init {
-        updateMusics()
+        filteringMusics()
     }
 
-    private fun updateMusics() {
-        teamMusics.observeForever { musics ->
+    private fun filteringMusics() {
+        _musics.observeForever { musics ->
             _teamMusics.value = musics.filter { it.type }
-        }
-
-        playerMusics.observeForever { musics ->
             _playerMusics.value = musics.filter { !it.type }
         }
     }

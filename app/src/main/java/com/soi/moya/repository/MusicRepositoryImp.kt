@@ -9,7 +9,7 @@ class MusicRepositoryImp(
 ) : MusicRepository {
 
     override fun getMusics(teamName: String, result: (UiState<List<Music>>) -> Unit) {
-        database.collection("Doosan")
+        database.collection(teamName)
             .get()
             .addOnSuccessListener {
                 val musics = arrayListOf<Music>()

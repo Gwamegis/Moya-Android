@@ -86,7 +86,11 @@ fun MusicListScreen(
                     LazyColumn() {
 
                         items(viewModel.getMusicListSize(page = page)) { index ->
-                            MusicListItemView(music = viewModel.getMusicAt(page = page, index = index))
+                            viewModel.getMusicAt(
+                                page = page,
+                                index = index
+                            )
+                                .let { MusicListItemView(music = it) }
                         }
 
                         item {
