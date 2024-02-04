@@ -78,6 +78,8 @@ dependencies {
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.navigation:navigation-runtime-ktx:2.7.6'
+    implementation 'androidx.room:room-common:2.6.1'
+    implementation 'androidx.benchmark:benchmark-common:1.2.3'
     testImplementation 'junit:junit:4.13.2'
 
     // splash

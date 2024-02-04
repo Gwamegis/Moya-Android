@@ -63,4 +63,19 @@ enum class Team {
             kia -> R.drawable.select_team_kia
         }
     }
+
+    fun getFirebaseCollectionName(): String {
+        return when (this) {
+            doosan -> "Doosan"
+            hanwha -> "Hanwha"
+            samsung -> "Samsung"
+            lotte -> "Lotte"
+            lg -> "LG"
+            ssg -> "SSG"
+            ktWiz -> "KtWiz"
+            nc -> "NC"
+            kiwoom -> "Kiwoom"
+            kia -> "Kia"
+        }
+    }
 }
