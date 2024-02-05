@@ -58,7 +58,7 @@ fun getTextStyle(style: MoyaFont): TextStyle {
             baseTextStyle.copy(
                 fontWeight = FontWeight.Medium,
                 fontSize = 16.sp,
-                lineHeight = 16.sp
+                lineHeight = 21.sp
             )
         }
         MoyaFont.CustomCaptionBold -> {
