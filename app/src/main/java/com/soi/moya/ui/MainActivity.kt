@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import com.soi.moya.base.BaseComposeActivity
-import com.soi.moya.data.MusicManager
 import com.soi.moya.data.VersionManager
 import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
@@ -19,7 +18,6 @@ class MainActivity : BaseComposeActivity() {
         val userPreferences = UserPreferences(context)
         val selectedTeam = userPreferences.getSelectedTeam.collectAsState(initial = "doosan").value
         val versionManager = VersionManager.getInstance()
-        MusicManager.getInstance()
 
         MoyaTheme(team = Team.valueOf(selectedTeam ?: "doosan")) {
             if (versionManager.loading.value == true) {

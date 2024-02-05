@@ -26,6 +26,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
+import com.soi.moya.data.MusicManager
 import com.soi.moya.models.Team
 import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_STORAGE
@@ -39,20 +40,13 @@ import com.soi.moya.ui.theme.MoyaTheme
 @Composable
 fun BottomNavScreen() {
     val navController = rememberNavController()
+    MusicManager.getInstance()
     Scaffold(
         bottomBar = { BottomNav(navController = navController) }
     ) {
         Box(Modifier.padding(it)) {
             NavGraph(navController = navController)
         }
-    }
-}
-
-// TODO: 삭제
-@Composable
-fun TestScreen() {
-    Box(modifier = Modifier.fillMaxSize()) {
-        Text("Main Screen", fontSize = 24.sp)
     }
 }
 
