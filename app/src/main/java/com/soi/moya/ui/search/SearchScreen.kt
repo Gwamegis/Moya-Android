@@ -40,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +52,8 @@ import com.soi.moya.R
 import com.soi.moya.models.Music
 import com.soi.moya.models.Team
 import com.soi.moya.ui.AppViewModelProvider
+import com.soi.moya.ui.Utility
+import com.soi.moya.ui.WindowSize
 import com.soi.moya.ui.component.RequestMusicButton
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
@@ -95,6 +98,8 @@ fun ResultView(result: List<Music>, navController: NavHostController) {
 
 @Composable
 fun InfoView() {
+    val context = LocalContext.current
+    val imageSize = if (Utility.getDeviceType(context) == WindowSize.TABLET) 150.dp else 200.dp
     val infoImage = painterResource(id = R.drawable.search_info)
     Box (
         modifier = Modifier
@@ -106,14 +111,16 @@ fun InfoView() {
             painter = infoImage,
             contentDescription = "선수 이름, 응원가 제목으로 검색할 수 있어요.",
             contentScale = ContentScale.Fit,
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(imageSize)
         )
     }
 }
 
 @Composable
 fun EmptyView() {
+    val context = LocalContext.current
     val emptyImage = painterResource(id = R.drawable.search_empty)
+    val imageSize = if (Utility.getDeviceType(context) == WindowSize.TABLET) 100.dp else 200.dp
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -125,7 +132,7 @@ fun EmptyView() {
             painter = emptyImage,
             contentDescription = "검색 결과가 없어요.",
             contentScale = ContentScale.Fit,
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(imageSize)
         )
         RequestMusicButton(color = MoyaColor.mainGreen)
     }
