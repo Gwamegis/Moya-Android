@@ -80,7 +80,6 @@ fun SearchScreen(
                 navController = navController
             )
         }
-
     }
 }
 

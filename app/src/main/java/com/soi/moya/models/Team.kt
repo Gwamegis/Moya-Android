@@ -78,6 +78,20 @@ enum class Team {
             kia -> R.drawable.album_kia
         }
     }
+    fun getPlayerAlbumImageResourceId(): Int {
+        return when (this) {
+            doosan -> R.drawable.player_doosan
+            hanwha -> R.drawable.player_hanwha
+            samsung -> R.drawable.player_samsung
+            lotte -> R.drawable.player_lotte
+            lg -> R.drawable.player_lg
+            ssg -> R.drawable.player_ssg
+            ktWiz -> R.drawable.player_kt
+            nc -> R.drawable.player_nc
+            kiwoom -> R.drawable.player_kiwoom
+            kia -> R.drawable.player_kia
+        }
+    }
     fun getKrTeamName(): String {
         return when (this) {
             doosan -> "두산 베어스"
