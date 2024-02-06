@@ -13,3 +13,16 @@ data class Music(
 val musicList = List(10) {
     Music(title = "test$it", info = "subTitle$it")
 }
+
+fun Music.toStoredMusic(team: Team, order: Int, date: String, playlist: String): StoredMusic = StoredMusic(
+    id = id,
+    team = team.name,
+    title = title,
+    lyrics = lyrics,
+    info = info,
+    type = type,
+    url = url,
+    order = order,
+    date = date,
+    playlist = playlist
+)

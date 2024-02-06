@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.soi.moya.ui.listItem_menu.ListItemMenuViewModel
 import com.soi.moya.ui.music_list.MusicListViewModel
 import com.soi.moya.ui.music_storage.MusicStorageViewModel
 import com.soi.moya.ui.search.SearchViewModel
@@ -27,6 +28,12 @@ object AppViewModelProvider {
         }
         initializer {
             SearchViewModel(application = application)
+        }
+        initializer {
+            ListItemMenuViewModel(
+                moyaApplication().container.itemsRepository,
+                application = application
+            )
         }
     }
 }

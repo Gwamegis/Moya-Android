@@ -1,6 +1,9 @@
 package com.soi.moya.ui
 
 import android.content.Context
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 enum class WindowSize {
     NORMAL, MINI, TABLET
@@ -28,5 +31,9 @@ object Utility {
             }
 
         return deviceType
+    }
+    fun getCurrentTimeString(): String {
+        val dateFormat = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
+        return dateFormat.format(Date())
     }
 }

@@ -5,14 +5,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
@@ -21,11 +24,17 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -48,13 +57,15 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.StoredMusic
-import com.soi.moya.models.toItem
+import com.soi.moya.models.Team
 import com.soi.moya.models.toMusic
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.component.MusicListItem
+import com.soi.moya.ui.listItem_menu.ListItemMenuScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
+import kotlinx.coroutines.launch
 
 enum class SwipingStates {
     EXPANDED,
@@ -155,12 +166,17 @@ fun MusicStorageScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemList(
     storageMusicItems: List<StoredMusic>,
     viewModel: MusicStorageViewModel,
     onClickCell: () -> Unit
 ) {
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -170,10 +186,36 @@ fun ItemList(
                 buttonImageResourceId = R.drawable.ellipse,
                 onClickCell = { onClickCell() },
                 onClickExtraButton = {
-                    //TODO: 추후 bottom sheet 띄우는 동작 추가
-                    viewModel.deleteItem(item.toItem())
+                    showBottomSheet = true
                 }
             )
+            if (showBottomSheet) {
+                //TODO: 팀정보 연결
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        showBottomSheet = false
+                    },
+                    sheetState = sheetState,
+                    shape = RoundedCornerShape(12.dp),
+                    containerColor = MoyaColor.background,
+                    dragHandle = {},
+                    windowInsets = WindowInsets.navigationBars
+                ) {
+                    Box(modifier = Modifier.navigationBarsPadding()) {
+                        ListItemMenuScreen(
+                            music = item.toMusic(),
+                            team = Team.doosan,
+                            onClick = {
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    if (!sheetState.isVisible) {
+                                        showBottomSheet = false
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -303,15 +345,6 @@ fun headerContent(
             .fillMaxWidth()
     )
     Divider(startIndent = 0.dp, thickness = 1.dp, color = MoyaColor.gray)
-
-    //TODO: 추후 삭제
-    //보관함 동작 확인 용도
-    Button(
-        onClick = { viewModel.saveItem() },
-        modifier = Modifier.layoutId("content")
-    ) {
-        Text("add music item to storage")
-    }
 }
 
 @Composable

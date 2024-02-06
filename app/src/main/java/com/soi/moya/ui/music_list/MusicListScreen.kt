@@ -53,6 +53,7 @@ import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.SELECT_TEAM
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
+import com.soi.moya.ui.listItem_menu.ListItemMenuScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -213,6 +214,7 @@ fun MusicListHeaderView(
 @Composable
 fun MusicListItemView(music: Music, navController: NavHostController) {
     val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
     Divider()
     MusicListItem(
@@ -227,7 +229,6 @@ fun MusicListItemView(music: Music, navController: NavHostController) {
         buttonImageResourceId = R.drawable.ellipse
     )
     if (showBottomSheet) {
-        Divider(color = MoyaColor.gray, thickness = 1.dp)
         //TODO: 팀정보 연결
         ModalBottomSheet(
             onDismissRequest = {
@@ -240,7 +241,17 @@ fun MusicListItemView(music: Music, navController: NavHostController) {
             windowInsets = WindowInsets.navigationBars
         ) {
             Box(modifier = Modifier.navigationBarsPadding()) {
-                MainMenuScreen(music = music, team = Team.doosan)
+                ListItemMenuScreen(
+                    music = music,
+                    team = Team.doosan,
+                    onClick = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showBottomSheet = false
+                            }
+                        }
+                    }
+                )
             }
         }
     }
