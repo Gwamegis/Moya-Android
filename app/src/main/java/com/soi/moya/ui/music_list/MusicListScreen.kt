@@ -23,6 +23,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,13 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.models.Music
 import com.soi.moya.models.Team
 import com.soi.moya.ui.AppViewModelProvider
+import com.soi.moya.ui.SELECT_TEAM
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
 import com.soi.moya.ui.theme.MoyaColor
@@ -78,7 +79,8 @@ fun MusicListScreen(
 
             MusicListHeaderView(
                 team = selectedTeam,
-                musicListSize = viewModel.getMusicListSize(page = pagerState.currentPage)
+                musicListSize = viewModel.getMusicListSize(page = pagerState.currentPage),
+                navController = navController
             )
 
             HorizontalPager(state = pagerState) { page ->
@@ -154,8 +156,13 @@ fun SwitchTeamAndPlayerTitleView(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MusicListHeaderView(team: Team, musicListSize: Int) {
+fun MusicListHeaderView(
+    team: Team,
+    musicListSize: Int,
+    navController: NavHostController
+) {
     Column() {
         Box(
             modifier = Modifier
@@ -176,7 +183,9 @@ fun MusicListHeaderView(team: Team, musicListSize: Int) {
                     .fillMaxWidth()
                     .height(120.dp)
                     .padding(horizontal = 20.dp)
-                    .clickable { })
+                    .clickable {
+                        navController.navigate(SELECT_TEAM)
+                    })
         }
 
         Text(

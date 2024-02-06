@@ -31,9 +31,11 @@ import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_PlAYER
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
+import com.soi.moya.ui.SELECT_TEAM
 import com.soi.moya.ui.music_player.MusicPlayerScreen
 import com.soi.moya.ui.music_storage.MusicStorageScreen
 import com.soi.moya.ui.search.SearchScreen
+import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.music_list.MusicListScreen as MusicListScreen
 import com.soi.moya.ui.theme.MoyaTheme
@@ -46,7 +48,7 @@ fun BottomNavScreen() {
 
     Scaffold(
         bottomBar = {
-            if (currentRoute != NavItem.MusicPlayer.route) {
+            if (currentRoute != MUSIC_PlAYER && currentRoute != SELECT_TEAM) {
                 BottomNav(navController = navController)
             }
         }
@@ -135,10 +137,15 @@ fun NavGraph(navController: NavHostController) {
         composable(NavItem.MusicStorage.route) {
             MusicStorageScreen(navController = navController)
         }
-        composable(NavItem.MusicPlayer.route) {backStackEntry ->
+        composable(MUSIC_PlAYER) { backStackEntry ->
             MusicPlayerScreen(
                 navController = navController,
                 songId = backStackEntry.arguments?.getString("songId")
+            )
+        }
+        composable(SELECT_TEAM) {
+            SelectTeamScreen(
+                navController = navController
             )
         }
     }
@@ -148,8 +155,6 @@ sealed class NavItem(@StringRes val labelID: Int, val iconID: Int, val route: St
     object Search : NavItem(R.string.search, R.drawable.navigation_icon_search, SEARCH)
     object MusicStorage :
         NavItem(R.string.music_storage, R.drawable.navigation_icon_storage, MUSIC_STORAGE)
-    object MusicPlayer:
-            NavItem(R.string.music_player, R.drawable.navigation_icon_search, MUSIC_PlAYER)
 }
 
 @Preview
