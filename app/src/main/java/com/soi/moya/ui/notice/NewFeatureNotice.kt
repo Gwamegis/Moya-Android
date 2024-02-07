@@ -1,5 +1,9 @@
 package com.soi.moya.ui.notice
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -13,6 +17,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,8 +32,10 @@ import com.soi.moya.ui.theme.getTextStyle
 
 @Composable
 fun NewFeatureNoticeScreen(
-    version: Version
+    version: Version,
+    onDismissRequest: () -> Unit,
 ) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .background(MoyaColor.white)
@@ -39,7 +46,10 @@ fun NewFeatureNoticeScreen(
         ) {
             NoticeTitleView(type = Notice.NEW_FEATURES)
             FeatureDescriptionsView(descriptions = version.feature)
-            ButtonsView()
+            ButtonsView(
+                onDismissRequest = onDismissRequest,
+                onUpdateRequest = { openPlayStore(context = context) }
+            )
         }
     }
 }
@@ -89,7 +99,10 @@ fun FeatureDescriptionsView(descriptions: List<String>) {
 }
 
 @Composable
-fun ButtonsView() {
+fun ButtonsView(
+    onDismissRequest: () -> Unit,
+    onUpdateRequest: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -102,7 +115,7 @@ fun ButtonsView() {
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 8.dp),
-            onClick = { }
+            onClick = onDismissRequest
         )
 
         ButtonContainer(
@@ -111,7 +124,10 @@ fun ButtonsView() {
             textColor = MoyaColor.white,
             modifier = Modifier
                 .weight(1f),
-            onClick = { }
+            onClick = {
+                onUpdateRequest()
+                onDismissRequest()
+            }
         )
     }
 }
@@ -127,6 +143,25 @@ fun BottomSheetWithMultipleDescriptionsPreview() {
         )
     )
     NewFeatureNoticeScreen(
-        version = version
+        version = version,
+        onDismissRequest = { },
     )
+}
+
+private fun openPlayStore(context: Context) {
+    val appPackageName = context.packageName
+    val marketIntent = Intent(
+        Intent.ACTION_VIEW,
+        Uri.parse("market://details?id=$appPackageName")
+    )
+    val webIntent = Intent(
+        Intent.ACTION_VIEW,
+        Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+    )
+
+    try {
+        context.startActivity(marketIntent)
+    } catch (e: ActivityNotFoundException) {
+        context.startActivity(webIntent)
+    }
 }

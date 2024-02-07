@@ -1,6 +1,5 @@
 package com.soi.moya.ui.bottom_nav
 
-import android.app.Application
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,7 +18,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,7 +63,7 @@ fun BottomNavScreen() {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NoticeBottomSheet(
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val viewModel = NewFeatureNoticeViewModel()
     val version = viewModel.versionState
@@ -87,7 +85,14 @@ fun NoticeBottomSheet(
         sheetState = sheetState,
         sheetContent = {
             version.value?.let {
-                NewFeatureNoticeScreen(version = it)
+                NewFeatureNoticeScreen(
+                    version = it,
+                    onDismissRequest = {
+                        scope.launch {
+                            sheetState.hide()
+                        }
+                    },
+                )
             }
         }
     ) {
@@ -152,10 +157,6 @@ fun BottomNav(navController: NavHostController) {
 @Composable
 fun NavGraph(navController: NavHostController) {
     //TODO: 선언 시점 변경 필요
-    val context = LocalContext.current
-    val application = context.applicationContext as Application
-    val featureViewModel = NewFeatureNoticeViewModel()
-
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         // TODO: Screen 연결
         composable(NavItem.MusicList.route) {
