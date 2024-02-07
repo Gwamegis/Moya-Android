@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.data.MusicManager
 import com.soi.moya.models.Team
+import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
@@ -65,7 +67,8 @@ fun BottomNavScreen() {
 fun NoticeBottomSheet(
     content: @Composable () -> Unit,
 ) {
-    val viewModel = NewFeatureNoticeViewModel()
+    val viewModel: NewFeatureNoticeViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val isNotCheckedVersion = viewModel.isNotCheckedVersion
     val version = viewModel.versionState
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
@@ -73,8 +76,8 @@ fun NoticeBottomSheet(
         skipHalfExpanded = true
     )
 
-    LaunchedEffect(version.value) {
-        if (version.value != null) {
+    LaunchedEffect(isNotCheckedVersion) {
+        if (isNotCheckedVersion.value) {
             scope.launch {
                 sheetState.show()
             }
