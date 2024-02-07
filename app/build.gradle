@@ -81,6 +81,7 @@ dependencies {
     implementation 'androidx.room:room-common:2.6.1'
     implementation 'androidx.benchmark:benchmark-common:1.2.3'
     testImplementation 'junit:junit:4.13.2'
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
 
     // splash
     implementation 'androidx.core:core-splashscreen:1.0.1'

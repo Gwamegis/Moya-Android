@@ -1,6 +1,7 @@
 package com.soi.moya.ui.notice
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.soi.moya.R
+import com.soi.moya.models.Version
 import com.soi.moya.ui.component.ButtonContainer
 import com.soi.moya.ui.component.Notice
 import com.soi.moya.ui.component.NoticeTitleView
@@ -24,24 +26,26 @@ import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
 
 @Composable
-fun NewFeatureNoticeScreen() {
-    val descriptions = arrayOf(
-        "첫 번째 새로운 기능은 뷰를 만들었어요!",
-        "두 번째 새로운 기능은 좀 길어요. 제 말을 들어보시겠어요? 저는 너무 피곤하고 너무 힘들어요",
-        "세 번째 기능은 예 이겁니다."
-    )
-    Column(
+fun NewFeatureNoticeScreen(
+    version: Version
+) {
+    Box(
         modifier = Modifier
-            .padding(horizontal = 20.dp)
+            .background(MoyaColor.white)
     ) {
-        NoticeTitleView(type = Notice.NEW_FEATURES)
-        FeatureDescriptionsView(descriptions = descriptions)
-        ButtonsView()
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+        ) {
+            NoticeTitleView(type = Notice.NEW_FEATURES)
+            FeatureDescriptionsView(descriptions = version.feature)
+            ButtonsView()
+        }
     }
 }
 
 @Composable
-fun FeatureDescriptionsView(descriptions: Array<String>) {
+fun FeatureDescriptionsView(descriptions: List<String>) {
     Column(
         modifier = Modifier
             .padding(bottom = 32.dp)
@@ -115,5 +119,14 @@ fun ButtonsView() {
 @Preview(showBackground = true)
 @Composable
 fun BottomSheetWithMultipleDescriptionsPreview() {
-    NewFeatureNoticeScreen()
+    val version = Version(
+        feature = listOf(
+            "첫 번째 새로운 기능은 뷰를 만들었어요!",
+            "두 번째 새로운 기능은 좀 길어요. 제 말을 들어보시겠어요? 저는 너무 피곤하고 너무 힘들어요",
+            "세 번째 기능은 예 이겁니다."
+        )
+    )
+    NewFeatureNoticeScreen(
+        version = version
+    )
 }

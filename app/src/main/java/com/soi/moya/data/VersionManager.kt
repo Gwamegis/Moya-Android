@@ -10,6 +10,11 @@ import com.soi.moya.util.UiState
 class VersionManager private constructor() {
     private val _firebaseRepository = FirebaseRepository(clazz = Version::class.java)
     private val _loading = MutableLiveData<Boolean>()
+    private val _version = MutableLiveData<Version?>()
+
+    val version: MutableLiveData<Version?>
+        get() = _version
+
     val loading: LiveData<Boolean> get() = _loading
 
     init {
@@ -22,6 +27,7 @@ class VersionManager private constructor() {
             _loading.value = false
             when(result) {
                 is UiState.Success -> {
+                    _version.value = result.data
                     Log.d("test", result.toString())
                 }
                 else -> {

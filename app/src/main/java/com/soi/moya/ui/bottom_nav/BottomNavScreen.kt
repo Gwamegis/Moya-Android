@@ -2,19 +2,25 @@ package com.soi.moya.ui.bottom_nav
 
 import android.app.Application
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,20 +37,49 @@ import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
 import com.soi.moya.ui.music_storage.MusicStorageScreen
+import com.soi.moya.ui.notice.NewFeatureNoticeScreen
+import com.soi.moya.ui.notice.NewFeatureNoticeViewModel
 import com.soi.moya.ui.search.SearchScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.music_list.MusicListScreen as MusicListScreen
 import com.soi.moya.ui.theme.MoyaTheme
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomNavScreen() {
     val navController = rememberNavController()
+    val featureViewModel = NewFeatureNoticeViewModel()
+    val version = featureViewModel.versionState
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true
+    )
+    val scope = rememberCoroutineScope()
+
     MusicManager.getInstance()
-    Scaffold(
-        bottomBar = { BottomNav(navController = navController) }
-    ) {
-        Box(Modifier.padding(it)) {
-            NavGraph(navController = navController)
+
+    LaunchedEffect(version.value) {
+        if (version.value != null) {
+            scope.launch {
+                sheetState.show()
+            }
+        }
+    }
+
+    ModalBottomSheetLayout(
+        sheetState = sheetState,
+        sheetContent = {
+        version.value?.let { version ->
+            NewFeatureNoticeScreen(version = version)
+        }
+    }) {
+        Scaffold(
+            bottomBar = { BottomNav(navController = navController) }
+        ) {
+            Box(Modifier.padding(it)) {
+                NavGraph(navController = navController)
+            }
         }
     }
 }
@@ -108,6 +143,7 @@ fun NavGraph(navController: NavHostController) {
     //TODO: 선언 시점 변경 필요
     val context = LocalContext.current
     val application = context.applicationContext as Application
+    val featureViewModel = NewFeatureNoticeViewModel()
 
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         // TODO: Screen 연결
