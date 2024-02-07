@@ -156,7 +156,6 @@ fun MusicStorageScreen(
                         storageUiState = storageUiState
                     )
                     bodyContent(
-                        viewModel = viewModel,
                         storageUiState = storageUiState,
                         navController = navController
                     )
@@ -166,55 +165,68 @@ fun MusicStorageScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemList(
     storageMusicItems: List<StoredMusic>,
-    viewModel: MusicStorageViewModel,
-    onClickCell: () -> Unit
+    navController: NavHostController
 ) {
-    val sheetState = rememberModalBottomSheetState()
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(false) }
-
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(storageMusicItems) { item ->
-            MusicListItem(
-                music = item.toMusic(),
-                buttonImageResourceId = R.drawable.ellipse,
-                onClickCell = { onClickCell() },
-                onClickExtraButton = {
-                    showBottomSheet = true
-                }
+            ItemView(
+                music = item,
+                navController = navController
             )
-            if (showBottomSheet) {
-                //TODO: 팀정보 연결
-                ModalBottomSheet(
-                    onDismissRequest = {
-                        showBottomSheet = false
-                    },
-                    sheetState = sheetState,
-                    shape = RoundedCornerShape(12.dp),
-                    containerColor = MoyaColor.background,
-                    dragHandle = {},
-                    windowInsets = WindowInsets.navigationBars
-                ) {
-                    Box(modifier = Modifier.navigationBarsPadding()) {
-                        ListItemMenuScreen(
-                            music = item.toMusic(),
-                            team = Team.doosan,
-                            onClick = {
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        showBottomSheet = false
-                                    }
-                                }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ItemView(
+    music: StoredMusic,
+    navController: NavHostController,
+) {
+
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    MusicListItem(
+        music = music.toMusic(),
+        buttonImageResourceId = R.drawable.ellipse,
+        onClickCell = {
+            navController.navigate("MUSIC_PLAYER/123")
+        },
+        onClickExtraButton = {
+            showBottomSheet = true
+        }
+    )
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showBottomSheet = false
+            },
+            sheetState = sheetState,
+            shape = RoundedCornerShape(12.dp),
+            containerColor = MoyaColor.background,
+            dragHandle = {},
+            windowInsets = WindowInsets.navigationBars
+        ) {
+            Box(modifier = Modifier.navigationBarsPadding()) {
+                ListItemMenuScreen(
+                    music = music.toMusic(),
+                    //TODO: 팀정보 연결
+                    team = Team.doosan,
+                    onClick = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showBottomSheet = false
                             }
-                        )
+                        }
                     }
-                }
+                )
             }
         }
     }
@@ -349,7 +361,6 @@ fun headerContent(
 
 @Composable
 fun bodyContent(
-    viewModel: MusicStorageViewModel,
     storageUiState: StorageUiState,
     navController: NavHostController
 ) {
@@ -363,11 +374,7 @@ fun bodyContent(
         if (storageUiState.itemList.isNotEmpty()) {
             ItemList(
                 storageMusicItems = storageUiState.itemList,
-                viewModel = viewModel,
-                onClickCell = {
-                    //TODO: music id 전달 필요
-                    navController.navigate("MUSIC_PLAYER/123")
-                }
+                navController = navController
             )
         } else {
             emptyList()
