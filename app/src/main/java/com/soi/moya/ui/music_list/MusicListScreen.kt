@@ -31,6 +31,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,7 +66,7 @@ fun MusicListScreen(
     viewModel: MusicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
     navController: NavHostController
 ) {
-    val selectedTeam = Team.doosan
+    val selectedTeam by viewModel.selectedTeam.collectAsState()
     val scope = rememberCoroutineScope()
     val tabs = listOf(R.string.team_tab, R.string.player_tab)
     val pagerState = rememberPagerState(pageCount = {
@@ -79,7 +80,7 @@ fun MusicListScreen(
     ) {
         Column {
             SwitchTeamAndPlayerTitleView(
-                team = selectedTeam,
+                team = Team.valueOf(selectedTeam),
                 tabs = tabs,
                 state = pagerState,
                 onTabSelected = { selectedTab ->
@@ -89,7 +90,7 @@ fun MusicListScreen(
                 })
 
             MusicListHeaderView(
-                team = selectedTeam,
+                team = Team.valueOf(selectedTeam),
                 musicListSize = viewModel.getMusicListSize(page = pagerState.currentPage),
                 navController = navController
             )
@@ -108,7 +109,7 @@ fun MusicListScreen(
                         }
 
                         item {
-                            RequestMusicButtonView(color = selectedTeam.getPointColor())
+                            RequestMusicButtonView(color = Team.valueOf(selectedTeam).getPointColor())
                         }
                     }
                 }
@@ -125,7 +126,7 @@ fun SwitchTeamAndPlayerTitleView(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Team.doosan.getSubColor())
+            .background(team.getSubColor())
             .padding(top = 60.dp)
             .padding(horizontal = 20.dp)
     ) {
@@ -167,7 +168,6 @@ fun SwitchTeamAndPlayerTitleView(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MusicListHeaderView(
     team: Team,
@@ -187,7 +187,7 @@ fun MusicListHeaderView(
                     .background(team.getSubColor())
             )
 
-            Image(painter = painterResource(id = R.drawable.main_banner_doosan),
+            Image(painter = painterResource(id = team.getMainBannerImageResourceId()),
                 contentDescription = "",
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -229,7 +229,6 @@ fun MusicListItemView(music: Music, navController: NavHostController) {
         buttonImageResourceId = R.drawable.ellipse
     )
     if (showBottomSheet) {
-        //TODO: 팀정보 연결
         ModalBottomSheet(
             onDismissRequest = {
                 showBottomSheet = false
@@ -243,6 +242,7 @@ fun MusicListItemView(music: Music, navController: NavHostController) {
             Box(modifier = Modifier.navigationBarsPadding()) {
                 ListItemMenuScreen(
                     music = music,
+                    //TODO: 팀정보 연결
                     team = Team.doosan,
                     onClick = {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {

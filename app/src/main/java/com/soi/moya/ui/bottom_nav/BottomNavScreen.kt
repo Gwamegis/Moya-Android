@@ -69,8 +69,6 @@ fun TestScreen() {
 
 @Composable
 fun BottomNav(navController: NavHostController) {
-    // TODO: select_team에서 선택한 값 사용 필요
-    val selectedTeam: Team = Team.doosan
     val color = MoyaColor
 
     val items = listOf(

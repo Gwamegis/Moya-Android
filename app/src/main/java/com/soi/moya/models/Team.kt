@@ -92,6 +92,21 @@ enum class Team {
             kia -> R.drawable.player_kia
         }
     }
+
+    fun getMainBannerImageResourceId(): Int {
+        return when (this) {
+            doosan -> R.drawable.main_banner_doosan
+            hanwha -> R.drawable.main_banner_hanwha
+            samsung -> R.drawable.main_banner_samsung
+            lotte -> R.drawable.main_banner_lotte
+            lg -> R.drawable.main_banner_lg
+            ssg -> R.drawable.main_banner_ssg
+            ktWiz -> R.drawable.main_banner_kt
+            nc -> R.drawable.main_banner_nc
+            kiwoom -> R.drawable.main_banner_kiwoom
+            kia -> R.drawable.main_banner_kia
+        }
+    }
     fun getKrTeamName(): String {
         return when (this) {
             doosan -> "두산 베어스"
