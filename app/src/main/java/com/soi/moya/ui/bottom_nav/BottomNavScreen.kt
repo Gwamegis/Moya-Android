@@ -18,13 +18,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -36,28 +36,44 @@ import com.soi.moya.models.Team
 import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
+import com.soi.moya.ui.music_list.MusicListScreen
 import com.soi.moya.ui.music_storage.MusicStorageScreen
 import com.soi.moya.ui.notice.NewFeatureNoticeScreen
 import com.soi.moya.ui.notice.NewFeatureNoticeViewModel
 import com.soi.moya.ui.search.SearchScreen
 import com.soi.moya.ui.theme.MoyaColor
-import com.soi.moya.ui.music_list.MusicListScreen as MusicListScreen
 import com.soi.moya.ui.theme.MoyaTheme
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomNavScreen() {
     val navController = rememberNavController()
-    val featureViewModel = NewFeatureNoticeViewModel()
-    val version = featureViewModel.versionState
+
+    MusicManager.getInstance()
+
+    NoticeBottomSheet {
+        Scaffold(
+            bottomBar = { BottomNav(navController = navController) }
+        ) {
+            Box(Modifier.padding(it)) {
+                NavGraph(navController = navController)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun NoticeBottomSheet(
+    content: @Composable () -> Unit
+) {
+    val viewModel = NewFeatureNoticeViewModel()
+    val version = viewModel.versionState
+    val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
     )
-    val scope = rememberCoroutineScope()
-
-    MusicManager.getInstance()
 
     LaunchedEffect(version.value) {
         if (version.value != null) {
@@ -70,17 +86,12 @@ fun BottomNavScreen() {
     ModalBottomSheetLayout(
         sheetState = sheetState,
         sheetContent = {
-        version.value?.let { version ->
-            NewFeatureNoticeScreen(version = version)
-        }
-    }) {
-        Scaffold(
-            bottomBar = { BottomNav(navController = navController) }
-        ) {
-            Box(Modifier.padding(it)) {
-                NavGraph(navController = navController)
+            version.value?.let {
+                NewFeatureNoticeScreen(version = it)
             }
         }
+    ) {
+        content()
     }
 }
 
@@ -158,6 +169,7 @@ fun NavGraph(navController: NavHostController) {
         }
     }
 }
+
 sealed class NavItem(val labelID: Int, val iconID: Int, val route: String) {
     object MusicList : NavItem(R.string.music_list, R.drawable.navigation_icon_home, MUSIC_LIST)
     object Search : NavItem(R.string.search, R.drawable.navigation_icon_search, SEARCH)
