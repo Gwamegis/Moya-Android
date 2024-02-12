@@ -39,7 +39,7 @@ import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
 import com.soi.moya.ui.music_list.MusicListScreen
 import com.soi.moya.ui.music_storage.MusicStorageScreen
-import com.soi.moya.ui.notice.NewFeatureNoticeViewModel
+import com.soi.moya.ui.notice.NoticeBottomSheetViewModel
 import com.soi.moya.ui.notice.new_feature.NewFeatureNoticeScreen
 import com.soi.moya.ui.notice.traffic.TrafficNoticeScreen
 import com.soi.moya.ui.search.SearchScreen
@@ -69,7 +69,7 @@ fun BottomNavScreen() {
 private fun NoticeBottomSheet(
     content: @Composable () -> Unit,
 ) {
-    val viewModel: NewFeatureNoticeViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val viewModel: NoticeBottomSheetViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val isNotCheckedVersion = viewModel.isNotCheckedVersion
     val isExistTrafficIssue = viewModel.isExistTrafficIssue
     val version = viewModel.versionState

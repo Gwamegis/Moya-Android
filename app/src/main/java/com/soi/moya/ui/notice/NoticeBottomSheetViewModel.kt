@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 
-class NewFeatureNoticeViewModel(
+class NoticeBottomSheetViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
