@@ -10,18 +10,16 @@ import com.soi.moya.repository.FirebaseRepository
 class MusicManager private constructor() {
     private val _firebaseRepository = FirebaseRepository<Music>(clazz = Music::class.java)
     private val _musics: MutableMap<String, LiveData<List<Music>>> = mutableMapOf()
-    val musics: MutableMap<String, LiveData<List<Music>>>
-        get() = _musics
 
     init {
         Team.values().forEach {
-            loadMusics(it.getFirebaseCollectionName())
+            loadMusics(it)
         }
     }
 
-    private fun loadMusics(team: String) {
+    private fun loadMusics(team: Team) {
         val musicLiveData = MutableLiveData<List<Music>>()
-        _firebaseRepository.getData(team) { result ->
+        _firebaseRepository.getData(team.getFirebaseCollectionName()) { result ->
             when (result) {
                 is UiState.Success -> {
                     musicLiveData.postValue(result.data ?: emptyList())
@@ -31,7 +29,11 @@ class MusicManager private constructor() {
                 }
             }
         }
-        _musics[team] = musicLiveData
+        _musics[team.name] = musicLiveData
+    }
+
+    fun getFilteredSelectedTeamMusic(teamName: String): LiveData<List<Music>> {
+        return _musics[teamName] ?: MutableLiveData(emptyList())
     }
 
     fun getAllMusics(): MutableLiveData<List<Music>> {
