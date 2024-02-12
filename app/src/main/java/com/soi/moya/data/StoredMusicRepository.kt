@@ -8,6 +8,9 @@ interface StoredMusicRepository {
     fun getItemStream(id: Int): Flow<StoredMusic?>
     fun getByStoragePlaylist(playlist: String): Flow<List<StoredMusic>?>
     fun getByDefaultPlaylist(playlist: String): Flow<List<StoredMusic>?>
+    suspend fun doesItemExist(itemId: String): Boolean
+    suspend fun getItemCount(playlist: String): Int
+    suspend fun deleteById(id: String, playlist: String)
     suspend fun insertItem(item: StoredMusic)
     suspend fun insertAll(items: List<StoredMusic>)
     suspend fun deleteItem(item: StoredMusic)

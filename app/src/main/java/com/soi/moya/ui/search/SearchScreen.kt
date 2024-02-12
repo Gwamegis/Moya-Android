@@ -40,22 +40,30 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.models.Music
 import com.soi.moya.models.Team
 import com.soi.moya.ui.AppViewModelProvider
+import com.soi.moya.ui.Utility
+import com.soi.moya.ui.WindowSize
 import com.soi.moya.ui.component.RequestMusicButton
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
 
 @Composable
-fun SearchScreen(viewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory)) {
+fun SearchScreen(
+    viewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    navController: NavHostController
+) {
     val result by viewModel.searchResult.collectAsState()
     val text by viewModel.searchText.collectAsState()
 
@@ -67,18 +75,21 @@ fun SearchScreen(viewModel: SearchViewModel = viewModel(factory = AppViewModelPr
         } else if (result.isEmpty()) {
             EmptyView()
         } else {
-            ResultView(result = result)
+            ResultView(
+                result = result,
+                navController = navController
+            )
         }
-
     }
 }
 
 @Composable
-fun ResultView(result: List<Music>) {
+fun ResultView(result: List<Music>, navController: NavHostController) {
     LazyColumn {
         items(result) { music ->
             listItem(music = music, team = Team.nc) {
                 //TODO: navigation 연결
+                navController.navigate("MUSIC_PLAYER/${music.id}")
             }
         }
     }
@@ -86,6 +97,8 @@ fun ResultView(result: List<Music>) {
 
 @Composable
 fun InfoView() {
+    val context = LocalContext.current
+    val imageSize = if (Utility.getDeviceType(context) == WindowSize.TABLET) 150.dp else 200.dp
     val infoImage = painterResource(id = R.drawable.search_info)
     Box (
         modifier = Modifier
@@ -97,14 +110,16 @@ fun InfoView() {
             painter = infoImage,
             contentDescription = "선수 이름, 응원가 제목으로 검색할 수 있어요.",
             contentScale = ContentScale.Fit,
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(imageSize)
         )
     }
 }
 
 @Composable
 fun EmptyView() {
+    val context = LocalContext.current
     val emptyImage = painterResource(id = R.drawable.search_empty)
+    val imageSize = if (Utility.getDeviceType(context) == WindowSize.TABLET) 100.dp else 200.dp
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -116,7 +131,7 @@ fun EmptyView() {
             painter = emptyImage,
             contentDescription = "검색 결과가 없어요.",
             contentScale = ContentScale.Fit,
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(imageSize)
         )
         RequestMusicButton(color = MoyaColor.mainGreen)
     }
@@ -282,5 +297,10 @@ fun listItem(music: Music, team: Team, onClickEvent: () -> Unit) {
 @Composable
 fun SearchScreenPreview() {
     val viewModel = SearchViewModel(application = Application())
-    SearchScreen(viewModel = viewModel)
+    val navController = rememberNavController()
+
+    SearchScreen(
+        viewModel = viewModel,
+        navController = navController
+    )
 }

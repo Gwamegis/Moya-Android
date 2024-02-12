@@ -1,11 +1,18 @@
 package com.soi.moya.ui.music_player
 
-import android.content.Context
+import android.app.Application
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.navigation.NavHostController
 import com.soi.moya.repository.MusicPlayerManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,8 +20,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
-class MusicPlayerViewModel(context: Context): ViewModel() {
-    private val _musicPlayerManager = mutableStateOf(MusicPlayerManager(context))
+class MusicPlayerViewModel(
+    application: Application,
+    private val savedStateHandle: SavedStateHandle
+): AndroidViewModel(application) {
+    private val _musicPlayerManager = mutableStateOf(MusicPlayerManager(application))
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
@@ -30,6 +40,23 @@ class MusicPlayerViewModel(context: Context): ViewModel() {
         startUpdateCurrentPositionAndDuration()
     }
 
+    companion object {
+        val Factory: ViewModelProvider.Factory= object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(
+                modelCalss: Class<T>,
+                extras: CreationExtras
+            ) : T {
+                val application = checkNotNull(extras[APPLICATION_KEY])
+                val savedStateHandle = extras.createSavedStateHandle()
+
+                return MusicPlayerViewModel(
+                    application,
+                    savedStateHandle
+                ) as T
+            }
+        }
+    }
 
     private fun startUpdateCurrentPositionAndDuration() {
         viewModelScope.launch {
@@ -74,5 +101,9 @@ class MusicPlayerViewModel(context: Context): ViewModel() {
     fun seekTo(position: Int) {
         musicPlayerManager.value.seekTo(position)
     }
-}
 
+    fun popBackStack(navController: NavHostController) {
+        _musicPlayerManager.value.stop()
+        navController.popBackStack()
+    }
+}

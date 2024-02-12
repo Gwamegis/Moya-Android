@@ -1,6 +1,6 @@
 package com.soi.moya.ui.bottom_nav
 
-import android.app.Application
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -13,6 +13,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -27,10 +28,14 @@ import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.models.Team
 import com.soi.moya.ui.MUSIC_LIST
+import com.soi.moya.ui.MUSIC_PlAYER
 import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
+import com.soi.moya.ui.SELECT_TEAM
+import com.soi.moya.ui.music_player.MusicPlayerScreen
 import com.soi.moya.ui.music_storage.MusicStorageScreen
 import com.soi.moya.ui.search.SearchScreen
+import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.music_list.MusicListScreen as MusicListScreen
 import com.soi.moya.ui.theme.MoyaTheme
@@ -38,8 +43,15 @@ import com.soi.moya.ui.theme.MoyaTheme
 @Composable
 fun BottomNavScreen() {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = remember(navBackStackEntry) { navBackStackEntry?.destination?.route }
+
     Scaffold(
-        bottomBar = { BottomNav(navController = navController) }
+        bottomBar = {
+            if (currentRoute != MUSIC_PlAYER && currentRoute != SELECT_TEAM) {
+                BottomNav(navController = navController)
+            }
+        }
     ) {
         Box(Modifier.padding(it)) {
             NavGraph(navController = navController)
@@ -57,8 +69,6 @@ fun TestScreen() {
 
 @Composable
 fun BottomNav(navController: NavHostController) {
-    // TODO: select_team에서 선택한 값 사용 필요
-    val selectedTeam: Team = Team.doosan
     val color = MoyaColor
 
     val items = listOf(
@@ -111,24 +121,34 @@ fun BottomNav(navController: NavHostController) {
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-    //TODO: 선언 시점 변경 필요
-    val context = LocalContext.current
-    val application = context.applicationContext as Application
 
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         // TODO: Screen 연결
         composable(NavItem.MusicList.route) {
-            MusicListScreen()
+            MusicListScreen(
+                navController = navController
+            )
         }
         composable(NavItem.Search.route) {
-            SearchScreen()
+            SearchScreen(navController = navController)
         }
         composable(NavItem.MusicStorage.route) {
-            MusicStorageScreen()
+            MusicStorageScreen(navController = navController)
+        }
+        composable(MUSIC_PlAYER) { backStackEntry ->
+            MusicPlayerScreen(
+                navController = navController,
+                songId = backStackEntry.arguments?.getString("songId")
+            )
+        }
+        composable(SELECT_TEAM) {
+            SelectTeamScreen(
+                navController = navController
+            )
         }
     }
 }
-sealed class NavItem(val labelID: Int, val iconID: Int, val route: String) {
+sealed class NavItem(@StringRes val labelID: Int, val iconID: Int, val route: String) {
     object MusicList : NavItem(R.string.music_list, R.drawable.navigation_icon_home, MUSIC_LIST)
     object Search : NavItem(R.string.search, R.drawable.navigation_icon_search, SEARCH)
     object MusicStorage :

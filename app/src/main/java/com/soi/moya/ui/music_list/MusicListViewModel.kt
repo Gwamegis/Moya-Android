@@ -1,9 +1,19 @@
 package com.soi.moya.ui.music_list
 
 import android.app.Application
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.soi.moya.models.Music
+import com.soi.moya.models.Team
+import com.soi.moya.models.UserPreferences
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class MusicListViewModel(
     // TODO: Repository 연결
@@ -14,13 +24,24 @@ class MusicListViewModel(
     private val _teamMusics = mutableStateOf(emptyList<Music>())
     private val _playerMusics = mutableStateOf(emptyList<Music>())
 
+    private val _selectedTeam = MutableStateFlow("doosan")
+    val selectedTeam: StateFlow<String> = _selectedTeam
+
+    val userPreferences = UserPreferences(application)
+
     init {
         // TODO: 데이터 연결
         _teamMusics.value = List(10) {
-            Music(title = "team music test $it", info = "subTitle $it")
+            Music(id = "$it", title = "team music test $it", info = "subTitle $it")
         }
         _playerMusics.value = List(10) {
-            Music(title = "player music test $it", info = "subTitle $it")
+            Music(id = "$it", title = "player music test $it", info = "subTitle $it")
+        }
+
+        viewModelScope.launch {
+            userPreferences.getSelectedTeam.collect { team ->
+                _selectedTeam.value = team ?: "doosan"
+            }
         }
     }
 

@@ -10,21 +10,32 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,13 +45,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.models.Music
 import com.soi.moya.models.Team
 import com.soi.moya.ui.AppViewModelProvider
+import com.soi.moya.ui.SELECT_TEAM
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
-import com.soi.moya.ui.music_storage.MusicStorageViewModel
+import com.soi.moya.ui.listItem_menu.ListItemMenuScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -49,9 +63,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MusicListScreen(
-    viewModel: MusicListViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: MusicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    navController: NavHostController
 ) {
-    val selectedTeam = Team.doosan
+    val selectedTeam by viewModel.selectedTeam.collectAsState()
     val scope = rememberCoroutineScope()
     val tabs = listOf(R.string.team_tab, R.string.player_tab)
     val pagerState = rememberPagerState(pageCount = {
@@ -65,7 +80,7 @@ fun MusicListScreen(
     ) {
         Column {
             SwitchTeamAndPlayerTitleView(
-                team = selectedTeam,
+                team = Team.valueOf(selectedTeam),
                 tabs = tabs,
                 state = pagerState,
                 onTabSelected = { selectedTab ->
@@ -75,8 +90,9 @@ fun MusicListScreen(
                 })
 
             MusicListHeaderView(
-                team = selectedTeam,
-                musicListSize = viewModel.getMusicListSize(page = pagerState.currentPage)
+                team = Team.valueOf(selectedTeam),
+                musicListSize = viewModel.getMusicListSize(page = pagerState.currentPage),
+                navController = navController
             )
 
             HorizontalPager(state = pagerState) { page ->
@@ -86,11 +102,14 @@ fun MusicListScreen(
                     LazyColumn() {
 
                         items(viewModel.getMusicListSize(page = page)) { index ->
-                            MusicListItemView(music = viewModel.getMusicAt(page = page, index = index))
+                            MusicListItemView(
+                                music = viewModel.getMusicAt(page = page, index = index),
+                                navController = navController
+                            )
                         }
 
                         item {
-                            RequestMusicButtonView(color = selectedTeam.getPointColor())
+                            RequestMusicButtonView(color = Team.valueOf(selectedTeam).getPointColor())
                         }
                     }
                 }
@@ -107,7 +126,7 @@ fun SwitchTeamAndPlayerTitleView(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Team.doosan.getSubColor())
+            .background(team.getSubColor())
             .padding(top = 60.dp)
             .padding(horizontal = 20.dp)
     ) {
@@ -150,7 +169,11 @@ fun SwitchTeamAndPlayerTitleView(
 }
 
 @Composable
-fun MusicListHeaderView(team: Team, musicListSize: Int) {
+fun MusicListHeaderView(
+    team: Team,
+    musicListSize: Int,
+    navController: NavHostController
+) {
     Column() {
         Box(
             modifier = Modifier
@@ -164,14 +187,16 @@ fun MusicListHeaderView(team: Team, musicListSize: Int) {
                     .background(team.getSubColor())
             )
 
-            Image(painter = painterResource(id = R.drawable.main_banner_doosan),
+            Image(painter = painterResource(id = team.getMainBannerImageResourceId()),
                 contentDescription = "",
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .height(120.dp)
                     .padding(horizontal = 20.dp)
-                    .clickable { })
+                    .clickable {
+                        navController.navigate(SELECT_TEAM)
+                    })
         }
 
         Text(
@@ -185,19 +210,51 @@ fun MusicListHeaderView(team: Team, musicListSize: Int) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MusicListItemView(music: Music) {
+fun MusicListItemView(music: Music, navController: NavHostController) {
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    var showBottomSheet by remember { mutableStateOf(false) }
     Divider()
     MusicListItem(
         music = music,
         onClickCell = {
-            Log.d("clicked", "cell")
+            navController.navigate("MUSIC_PLAYER/${music.id}")
         },
         onClickExtraButton = {
             Log.d("clicked", "extra button")
+            showBottomSheet = true
         },
         buttonImageResourceId = R.drawable.ellipse
     )
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showBottomSheet = false
+            },
+            sheetState = sheetState,
+            shape = RoundedCornerShape(12.dp),
+            containerColor = MoyaColor.background,
+            dragHandle = {},
+            windowInsets = WindowInsets.navigationBars
+        ) {
+            Box(modifier = Modifier.navigationBarsPadding()) {
+                ListItemMenuScreen(
+                    music = music,
+                    //TODO: 팀정보 연결
+                    team = Team.doosan,
+                    onClick = {
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) {
+                                showBottomSheet = false
+                            }
+                        }
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -220,5 +277,6 @@ fun RequestMusicButtonView(color: Color) {
 @Composable
 fun MusicListScreenPreview() {
     val viewModel: MusicListViewModel = viewModel()
-    MusicListScreen(viewModel = viewModel)
+    val navController = rememberNavController()
+    MusicListScreen(viewModel = viewModel, navController = navController)
 }
