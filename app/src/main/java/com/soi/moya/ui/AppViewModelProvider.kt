@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.soi.moya.ui.listItem_menu.ListItemMenuViewModel
 import com.soi.moya.ui.music_list.MusicListViewModel
 import com.soi.moya.ui.music_storage.MusicStorageViewModel
+import com.soi.moya.ui.notice.NoticeBottomSheetViewModel
 import com.soi.moya.ui.search.SearchViewModel
 import com.soi.moya.ui.select_team.SelectTeamViewModel
 
@@ -28,6 +29,9 @@ object AppViewModelProvider {
         }
         initializer {
             SearchViewModel(application = application)
+        }
+        initializer {
+            NoticeBottomSheetViewModel(application = application)
         }
         initializer {
             ListItemMenuViewModel(

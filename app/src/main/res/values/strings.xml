@@ -22,6 +22,13 @@
     <string name="count_of_song">총 %d 곡</string>
     <string name="request_music_info">원하는 응원가가 없으신가요?</string>
 
+    <!--    new feature notice screen-->
+    <string name="download_next_launch">다음에 할래요</string>
+    <string name="go_to_play_store">업데이트하러 가기</string>
+
+    <!--    traffic screen-->
+    <string name="confirm">확인</string>
+
     <!--메뉴 아이템 -->
     <string name="favorite">좋아요</string>
     <string name="favorite_cancle">좋아요 취소</string>

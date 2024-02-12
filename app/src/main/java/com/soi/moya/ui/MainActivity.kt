@@ -1,7 +1,9 @@
 package com.soi.moya.ui
 
+import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.soi.moya.base.BaseComposeActivity
 import com.soi.moya.models.Team
@@ -13,7 +15,7 @@ class MainActivity : BaseComposeActivity() {
     @Composable
     override fun Content() {
         val context = LocalContext.current
-        val userPreferences = UserPreferences(context)
+        val userPreferences = remember { UserPreferences(context) }
         val selectedTeam = userPreferences.getSelectedTeam.collectAsState(initial = "doosan").value
 
         MoyaTheme(team = Team.valueOf(selectedTeam ?: "doosan")) {
@@ -21,3 +23,4 @@ class MainActivity : BaseComposeActivity() {
         }
     }
 }
+

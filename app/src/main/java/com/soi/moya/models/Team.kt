@@ -64,6 +64,7 @@ enum class Team {
             kia -> R.drawable.select_team_kia
         }
     }
+
     fun getTeamAlbumImageResourceId(): Int {
         return when (this) {
             doosan -> R.drawable.album_doosan
@@ -119,6 +120,21 @@ enum class Team {
             nc -> "엔씨 다이노스"
             kiwoom -> "키움 히어로즈"
             kia -> "기아 타이거즈"
+        }
+    }
+
+    fun getFirebaseCollectionName(): String {
+        return when (this) {
+            doosan -> "Doosan"
+            hanwha -> "Hanwha"
+            samsung -> "Samsung"
+            lotte -> "Lotte"
+            lg -> "LG"
+            ssg -> "SSG"
+            ktWiz -> "KtWiz"
+            nc -> "NC"
+            kiwoom -> "Kiwoom"
+            kia -> "Kia"
         }
     }
 }
