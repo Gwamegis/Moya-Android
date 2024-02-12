@@ -6,6 +6,8 @@
     <string name="music_list">응원곡</string>
     <string name="search">검색</string>
     <string name="music_storage">보관함</string>
+    <string name="music_player">음악재생</string>
+    <string name="select_team">팀선택</string>
 
 <!--    Components-->
     <string name="request_music">응원가 신청하기</string>
@@ -26,4 +28,8 @@
 
     <!--    traffic screen-->
     <string name="confirm">확인</string>
+
+    <!--메뉴 아이템 -->
+    <string name="favorite">좋아요</string>
+    <string name="favorite_cancle">좋아요 취소</string>
 </resources>

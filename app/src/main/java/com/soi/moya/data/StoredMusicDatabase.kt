@@ -45,6 +45,15 @@ interface StoredMusicDao{
     @Query("SELECT*FROM stored_music WHERE playlist_title LIKE :playlist ORDER BY `order` ASC")
     fun getByDefaultPlaylist(playlist: String = "default"): Flow<List<StoredMusic>>
 
+    @Query("SELECT EXISTS(SELECT 1 FROM stored_music WHERE id = :itemId)")
+    suspend fun doesItemExist(itemId: String): Boolean
+
+    @Query("SELECT COUNT(*) FROM stored_music WHERE playlist_title = :playlist")
+    suspend fun getItemCount(playlist: String): Int
+
+    @Query("DELETE FROM stored_music WHERE id = :id AND playlist_title = :playlist")
+    suspend fun deleteById(id: String, playlist: String)
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(storedMusic: StoredMusic)
 

@@ -3,10 +3,14 @@ package com.soi.moya.ui.music_list
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.soi.moya.data.MusicManager
+import androidx.lifecycle.viewModelScope
 import com.soi.moya.models.Music
+import com.soi.moya.models.UserPreferences
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 class MusicListViewModel(
     // TODO: Repository 연결
@@ -18,6 +22,11 @@ class MusicListViewModel(
     private val _playerMusics = mutableStateOf(emptyList<Music>())
     private val _musics = _musicManager.musics["Doosan"] ?: MutableLiveData(emptyList())
 
+    private val _selectedTeam = MutableStateFlow("doosan")
+    val selectedTeam: StateFlow<String> = _selectedTeam
+
+    val userPreferences = UserPreferences(application)
+
     init {
         filteringMusics()
     }
@@ -26,6 +35,11 @@ class MusicListViewModel(
         _musics.observeForever { musics ->
             _teamMusics.value = musics.filter { it.type }
             _playerMusics.value = musics.filter { !it.type }
+        }
+        viewModelScope.launch {
+            userPreferences.getSelectedTeam.collect { team ->
+                _selectedTeam.value = team ?: "doosan"
+            }
         }
     }
 
