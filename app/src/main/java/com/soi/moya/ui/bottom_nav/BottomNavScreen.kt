@@ -70,7 +70,6 @@ fun BottomNavScreen() {
         }
     }
 }
-
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NoticeBottomSheet(
@@ -92,15 +91,12 @@ fun NoticeBottomSheet(
         skipHalfExpanded = true
     )
 
-    LaunchedEffect(version.value) {
+    LaunchedEffect(version.value, traffic.value) {
         if (isNotCheckedVersion.value) {
             scope.launch {
                 newFeatureSheetState.show()
             }
         }
-    }
-
-    LaunchedEffect(traffic.value) {
         if (isExistTrafficIssue.value) {
             scope.launch {
                 trafficSheetState.show()
@@ -111,43 +107,46 @@ fun NoticeBottomSheet(
     ModalBottomSheetLayout(
         sheetState = newFeatureSheetState,
         sheetContent = {
-            version.value?.let {
-                NewFeatureNoticeScreen(
-                    version = it,
-                    onDismissRequest = {
-                        scope.launch {
-                            val shouldTerminateApp = viewModel.checkRequiredUpdate()
-                            if (shouldTerminateApp) {
-                                activity?.finish()
+            if (isNotCheckedVersion.value) {
+                version.value?.let {
+                    NewFeatureNoticeScreen(
+                        version = it,
+                        onDismissRequest = {
+                            scope.launch {
+                                val shouldTerminateApp = viewModel.checkRequiredUpdate()
+                                if (shouldTerminateApp) {
+                                    activity?.finish()
+                                }
+                                newFeatureSheetState.hide()
                             }
-                            newFeatureSheetState.hide()
-                        }
-                    },
-                )
+                        },
+                    )
+                }
             }
         }
     ) {
-        content()
-    }
-
-    ModalBottomSheetLayout(
-        sheetState = trafficSheetState,
-        sheetContent = {
-            traffic.value?.let {
-                TrafficNoticeScreen(
-                    traffic = it,
-                    onDismissRequest = {
-                        scope.launch {
-                            trafficSheetState.hide()
-                        }
-                    },
-                )
+        ModalBottomSheetLayout(
+            sheetState = trafficSheetState,
+            sheetContent = {
+                if (isExistTrafficIssue.value) {
+                    traffic.value?.let {
+                        TrafficNoticeScreen(
+                            traffic = it,
+                            onDismissRequest = {
+                                scope.launch {
+                                    trafficSheetState.hide()
+                                }
+                            },
+                        )
+                    }
+                }
             }
+        ) {
+            content()
         }
-    ) {
-        content()
     }
 }
+
 
 @Composable
 fun BottomNav(navController: NavHostController) {
