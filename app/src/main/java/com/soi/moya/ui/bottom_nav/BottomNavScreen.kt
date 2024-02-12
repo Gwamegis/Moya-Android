@@ -1,7 +1,9 @@
 package com.soi.moya.ui.bottom_nav
 
 import android.app.Activity
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -44,6 +46,7 @@ import com.soi.moya.ui.music_list.MusicListScreen
 import com.soi.moya.ui.music_storage.MusicStorageScreen
 import com.soi.moya.ui.notice.NewFeatureNoticeScreen
 import com.soi.moya.ui.notice.NewFeatureNoticeViewModel
+import com.soi.moya.ui.notice.traffic.TrafficNoticeScreen
 import com.soi.moya.ui.search.SearchScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaTheme
@@ -75,10 +78,16 @@ fun NoticeBottomSheet(
 ) {
     val viewModel: NewFeatureNoticeViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val isNotCheckedVersion = viewModel.isNotCheckedVersion
+    val isExistTrafficIssue = viewModel.isExistTrafficIssue
     val version = viewModel.versionState
+    val traffic = viewModel.traffic
     val activity = (LocalContext.current as? Activity)
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(
+    val newFeatureSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true
+    )
+    val trafficSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
     )
@@ -86,13 +95,21 @@ fun NoticeBottomSheet(
     LaunchedEffect(version.value) {
         if (isNotCheckedVersion.value) {
             scope.launch {
-                sheetState.show()
+                newFeatureSheetState.show()
+            }
+        }
+    }
+
+    LaunchedEffect(traffic.value) {
+        if (isExistTrafficIssue.value) {
+            scope.launch {
+                trafficSheetState.show()
             }
         }
     }
 
     ModalBottomSheetLayout(
-        sheetState = sheetState,
+        sheetState = newFeatureSheetState,
         sheetContent = {
             version.value?.let {
                 NewFeatureNoticeScreen(
@@ -103,7 +120,25 @@ fun NoticeBottomSheet(
                             if (shouldTerminateApp) {
                                 activity?.finish()
                             }
-                            sheetState.hide()
+                            newFeatureSheetState.hide()
+                        }
+                    },
+                )
+            }
+        }
+    ) {
+        content()
+    }
+
+    ModalBottomSheetLayout(
+        sheetState = trafficSheetState,
+        sheetContent = {
+            traffic.value?.let {
+                TrafficNoticeScreen(
+                    traffic = it,
+                    onDismissRequest = {
+                        scope.launch {
+                            trafficSheetState.hide()
                         }
                     },
                 )
