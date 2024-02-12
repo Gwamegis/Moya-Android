@@ -14,8 +14,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,10 +36,37 @@ import com.soi.moya.ui.notice.FeatureDescriptionsView
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NewFeatureNoticeScreen() {
+fun NewFeatureNoticeScreen(
+    version: Version,
+    onDismissRequest: () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Expanded,
+        skipHalfExpanded = true
+    )
 
+    ModalBottomSheetLayout(
+        sheetState = sheetState,
+        sheetContent = {
+            NewFeatureNoticeView(
+                version = version,
+                onDismissRequest = {
+                    scope.launch {
+                        sheetState.hide()
+                    }
+                    onDismissRequest()
+                }
+            )
+        }
+    ) {
+        content()
+    }
 }
 
 @Composable

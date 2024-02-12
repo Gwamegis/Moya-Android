@@ -3,40 +3,63 @@ package com.soi.moya.ui.notice.traffic
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.soi.moya.models.Traffic
 import com.soi.moya.ui.component.ButtonContainer
 import com.soi.moya.ui.component.Notice
 import com.soi.moya.ui.component.NoticeTitleView
-import com.soi.moya.ui.notice.TrafficDescriptionView
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TrafficNoticeScreen(
-    traffic: Traffic,
-    onDismissRequest: () -> Unit
+    sheetState: ModalBottomSheetState,
+    traffic: Traffic?,
+    content: @Composable () -> Unit,
 ) {
-    TrafficNoticeView(
-        traffic = traffic
-    )
+    val scope = rememberCoroutineScope()
+    ModalBottomSheetLayout(
+        sheetState = sheetState,
+        sheetContent = {
+            traffic?.let {
+                TrafficNoticeView(
+                    traffic = traffic,
+                    onDismissRequest = {
+                        scope.launch {
+                            sheetState.hide()
+                        }
+                    }
+                )
+            }
+        }
+    ) {
+        content()
+    }
 }
 
 @Composable
 private fun TrafficNoticeView(
-    traffic: Traffic
-) {
+    traffic: Traffic,
+    onDismissRequest: () -> Unit) {
     Column(
         modifier = Modifier
             .padding(horizontal = 20.dp)
     ) {
         NoticeTitleView(type = Notice.SERVER_CHECK)
-        TrafficDescriptionView(description = traffic.description)
-        com.soi.moya.ui.notice.ButtonView()
+        DescriptionView(description = traffic.description)
+        ButtonView(
+            onDismissRequest = onDismissRequest
+        )
     }
 }
 
@@ -54,7 +77,9 @@ private fun DescriptionView(
 }
 
 @Composable
-private fun ButtonView() {
+private fun ButtonView(
+    onDismissRequest: () -> Unit
+) {
     ButtonContainer(
         text = "확인",
         bgColor = MoyaColor.mainGreen,
@@ -62,6 +87,7 @@ private fun ButtonView() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 12.dp),
-        onClick = { }
+        onClick =
+            onDismissRequest
     )
 }

@@ -1,9 +1,6 @@
 package com.soi.moya.ui.bottom_nav
 
 import android.app.Activity
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,7 +13,6 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.contentColorFor
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,9 +46,7 @@ import com.soi.moya.ui.notice.traffic.TrafficNoticeScreen
 import com.soi.moya.ui.search.SearchScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaTheme
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun BottomNavScreen() {
@@ -70,6 +64,7 @@ fun BottomNavScreen() {
         }
     }
 }
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NoticeBottomSheet(
@@ -107,43 +102,27 @@ fun NoticeBottomSheet(
     ModalBottomSheetLayout(
         sheetState = newFeatureSheetState,
         sheetContent = {
-            if (isNotCheckedVersion.value) {
-                version.value?.let {
-                    NewFeatureNoticeScreen(
-                        version = it,
-                        onDismissRequest = {
-                            scope.launch {
-                                val shouldTerminateApp = viewModel.checkRequiredUpdate()
-                                if (shouldTerminateApp) {
-                                    activity?.finish()
-                                }
-                                newFeatureSheetState.hide()
-                            }
-                        },
-                    )
-                }
-            }
+//            if (isNotCheckedVersion.value) {
+//                version.value?.let {
+            NewFeatureNoticeScreen(
+                version = version.value ?: return@ModalBottomSheetLayout,
+                onDismissRequest = {
+                    scope.launch {
+                        val shouldTerminateApp = viewModel.checkRequiredUpdate()
+                        if (shouldTerminateApp) {
+                            activity?.finish()
+                        }
+                        newFeatureSheetState.hide()
+                    }
+                },
+            )
         }
     ) {
-        ModalBottomSheetLayout(
+        TrafficNoticeScreen(
             sheetState = trafficSheetState,
-            sheetContent = {
-                if (isExistTrafficIssue.value) {
-                    traffic.value?.let {
-                        TrafficNoticeScreen(
-                            traffic = it,
-                            onDismissRequest = {
-                                scope.launch {
-                                    trafficSheetState.hide()
-                                }
-                            },
-                        )
-                    }
-                }
-            }
-        ) {
-            content()
-        }
+            traffic = traffic.value,
+            content = content
+        )
     }
 }
 

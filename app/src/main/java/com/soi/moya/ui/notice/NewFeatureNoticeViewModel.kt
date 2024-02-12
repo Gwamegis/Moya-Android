@@ -1,9 +1,7 @@
 package com.soi.moya.ui.notice
 
 import android.app.Application
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
@@ -15,9 +13,6 @@ import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.Version
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 
@@ -50,8 +45,6 @@ class NewFeatureNoticeViewModel(
             viewModelScope.launch {
 
                 val savedVersion = _userPreferences.appVersion.first()
-                Log.d("[현재 저장된 버전] version", savedVersion.toString())
-                Log.d("[출시된 버전] version", newVersion?.version.toString())
                 _versionState.value = newVersion
                 _isNotCheckedVersion.value = savedVersion != newVersion?.version
             }
@@ -60,7 +53,6 @@ class NewFeatureNoticeViewModel(
         _trafficManager.traffic.observeForever { newTraffic ->
             viewModelScope.launch {
                 _traffic.value = newTraffic
-                Log.d("version", traffic.toString())
                 _isExistTrafficIssue.value = checkIsExistTrafficIssue()
             }
         }
