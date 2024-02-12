@@ -1,12 +1,14 @@
 package com.soi.moya.models
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.soi.moya.BuildConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -24,7 +26,7 @@ class UserPreferences(private val context: Context) {
 
     val appVersion: Flow<String>
         get() = context.dataStore.data.map { preferences ->
-            preferences[APP_VERSION] ?: "1.0.0"
+            preferences[APP_VERSION] ?: BuildConfig.VERSION_NAME
         }
 
     suspend fun saveSelectedTeam(team: Team) {

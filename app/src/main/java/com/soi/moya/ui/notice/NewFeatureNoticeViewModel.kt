@@ -37,7 +37,17 @@ class NewFeatureNoticeViewModel(
         }
     }
 
-    suspend fun saveCheckVersion() {
+    suspend fun checkRequiredUpdate(): Boolean {
+        val version = versionState.value
+        return if (version?.isRequired == true) {
+            true
+        } else {
+            saveCheckVersion()
+            false
+        }
+    }
+
+    private suspend fun saveCheckVersion() {
         _userPreferences.saveAppVersion(_versionState.value)
     }
 }

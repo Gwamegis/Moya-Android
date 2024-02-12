@@ -1,5 +1,7 @@
 package com.soi.moya.ui.bottom_nav
 
+import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,12 +14,14 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,7 +47,9 @@ import com.soi.moya.ui.notice.NewFeatureNoticeViewModel
 import com.soi.moya.ui.search.SearchScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaTheme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun BottomNavScreen() {
@@ -70,6 +76,7 @@ fun NoticeBottomSheet(
     val viewModel: NewFeatureNoticeViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val isNotCheckedVersion = viewModel.isNotCheckedVersion
     val version = viewModel.versionState
+    val activity = (LocalContext.current as? Activity)
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -92,7 +99,10 @@ fun NoticeBottomSheet(
                     version = it,
                     onDismissRequest = {
                         scope.launch {
-                            viewModel.saveCheckVersion()
+                            val shouldTerminateApp = viewModel.checkRequiredUpdate()
+                            if (shouldTerminateApp) {
+                                activity?.finish()
+                            }
                             sheetState.hide()
                         }
                     },
