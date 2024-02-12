@@ -1,8 +1,6 @@
 package com.soi.moya.models
 
 import android.content.Context
-import android.content.pm.PackageManager
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -39,7 +37,6 @@ class UserPreferences(private val context: Context) {
         if (version != null) {
             context.dataStore.edit {
                 it[APP_VERSION] = version.version
-                Log.d("[저장 완료] version", version.version)
             }
         }
     }

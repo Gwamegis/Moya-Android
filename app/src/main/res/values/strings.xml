@@ -19,4 +19,11 @@
     <string name="player_tab">선수 응원가</string>
     <string name="count_of_song">총 %d 곡</string>
     <string name="request_music_info">원하는 응원가가 없으신가요?</string>
+
+    <!--    new feature notice screen-->
+    <string name="download_next_launch">다음에 할래요</string>
+    <string name="go_to_play_store">업데이트하러 가기</string>
+
+    <!--    traffic screen-->
+    <string name="confirm">확인</string>
 </resources>

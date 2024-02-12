@@ -1,7 +1,6 @@
 package com.soi.moya.ui.notice
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
@@ -72,13 +71,6 @@ class NoticeBottomSheetViewModel(
     private fun checkIsExistTrafficIssue(): Boolean {
         val traffic = _traffic.value
         val trafficDate = traffic?.date
-
-        val today = Date()
-
-        Log.d("check", trafficDate.toString())
-        Log.d("check today", today.toString())
-
-        Log.d("check isToday", isToday(trafficDate).toString())
         return isToday(trafficDate)
     }
 

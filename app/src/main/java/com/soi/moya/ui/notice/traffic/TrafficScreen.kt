@@ -10,7 +10,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.soi.moya.R
 import com.soi.moya.models.Traffic
 import com.soi.moya.ui.component.ButtonContainer
 import com.soi.moya.ui.component.Notice
@@ -81,7 +83,7 @@ private fun ButtonView(
     onDismissRequest: () -> Unit
 ) {
     ButtonContainer(
-        text = "확인",
+        text = stringResource(id = R.string.confirm),
         bgColor = MoyaColor.mainGreen,
         textColor = MoyaColor.white,
         modifier = Modifier

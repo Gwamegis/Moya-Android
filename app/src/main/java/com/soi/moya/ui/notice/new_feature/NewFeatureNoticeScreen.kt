@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -24,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.soi.moya.R
 import com.soi.moya.models.Version
@@ -147,7 +147,7 @@ private fun ButtonView(
             .padding(bottom = 12.dp)
     ) {
         ButtonContainer(
-            text = "다음에 할래요",
+            text = stringResource(id = R.string.download_next_launch),
             bgColor = MoyaColor.gray,
             textColor = MoyaColor.darkGray,
             modifier = Modifier
@@ -155,12 +155,11 @@ private fun ButtonView(
                 .padding(end = 8.dp),
             onClick = {
                 onDismissRequest()
-                Log.d("1.3", "closed bottom sheet")
             }
         )
 
         ButtonContainer(
-            text = "업데이트하러 가기",
+            text = stringResource(id = R.string.go_to_play_store),
             bgColor = MoyaColor.mainGreen,
             textColor = MoyaColor.white,
             modifier = Modifier

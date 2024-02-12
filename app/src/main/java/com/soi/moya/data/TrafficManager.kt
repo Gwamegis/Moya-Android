@@ -1,6 +1,5 @@
 package com.soi.moya.data
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.soi.moya.models.Traffic
 import com.soi.moya.repository.FirebaseRepository
@@ -21,7 +20,6 @@ class TrafficManager private constructor() {
             when(result) {
                 is UiState.Success -> {
                     _traffic.value = result.data
-                    Log.d("test", result.toString())
                 }
                 else -> {
                     // fail 처리
