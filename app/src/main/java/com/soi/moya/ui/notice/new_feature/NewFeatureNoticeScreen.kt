@@ -16,9 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.Text
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -31,8 +30,6 @@ import com.soi.moya.models.Version
 import com.soi.moya.ui.component.ButtonContainer
 import com.soi.moya.ui.component.Notice
 import com.soi.moya.ui.component.NoticeTitleView
-import com.soi.moya.ui.notice.ButtonsView
-import com.soi.moya.ui.notice.FeatureDescriptionsView
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -41,28 +38,27 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NewFeatureNoticeScreen(
-    version: Version,
+    sheetState: ModalBottomSheetState,
+    version: Version?,
     onDismissRequest: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Expanded,
-        skipHalfExpanded = true
-    )
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
         sheetContent = {
-            NewFeatureNoticeView(
-                version = version,
-                onDismissRequest = {
-                    scope.launch {
-                        sheetState.hide()
+            version?.let {
+                NewFeatureNoticeView(
+                    version = version,
+                    onDismissRequest = {
+                        scope.launch {
+                            sheetState.hide()
+                        }
+                        onDismissRequest()
                     }
-                    onDismissRequest()
-                }
-            )
+                )
+            }
         }
     ) {
         content()
@@ -85,8 +81,8 @@ private fun NewFeatureNoticeView(
                 .padding(horizontal = 20.dp)
         ) {
             NoticeTitleView(type = Notice.NEW_FEATURES)
-            FeatureDescriptionsView(descriptions = version.feature)
-            ButtonsView(
+            DescriptionView(descriptions = version.feature)
+            ButtonView(
                 onDismissRequest = onDismissRequest,
                 onUpdateRequest = { openPlayStore(context = context) }
             )

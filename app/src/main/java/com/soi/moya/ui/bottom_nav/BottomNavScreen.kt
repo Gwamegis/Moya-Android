@@ -9,7 +9,6 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
-import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -40,8 +39,8 @@ import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
 import com.soi.moya.ui.music_list.MusicListScreen
 import com.soi.moya.ui.music_storage.MusicStorageScreen
-import com.soi.moya.ui.notice.NewFeatureNoticeScreen
 import com.soi.moya.ui.notice.NewFeatureNoticeViewModel
+import com.soi.moya.ui.notice.new_feature.NewFeatureNoticeScreen
 import com.soi.moya.ui.notice.traffic.TrafficNoticeScreen
 import com.soi.moya.ui.search.SearchScreen
 import com.soi.moya.ui.theme.MoyaColor
@@ -67,7 +66,7 @@ fun BottomNavScreen() {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NoticeBottomSheet(
+private fun NoticeBottomSheet(
     content: @Composable () -> Unit,
 ) {
     val viewModel: NewFeatureNoticeViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -99,25 +98,18 @@ fun NoticeBottomSheet(
         }
     }
 
-    ModalBottomSheetLayout(
+    NewFeatureNoticeScreen(
         sheetState = newFeatureSheetState,
-        sheetContent = {
-//            if (isNotCheckedVersion.value) {
-//                version.value?.let {
-            NewFeatureNoticeScreen(
-                version = version.value ?: return@ModalBottomSheetLayout,
-                onDismissRequest = {
-                    scope.launch {
-                        val shouldTerminateApp = viewModel.checkRequiredUpdate()
-                        if (shouldTerminateApp) {
-                            activity?.finish()
-                        }
-                        newFeatureSheetState.hide()
-                    }
-                },
-            )
-        }
-    ) {
+        version = version.value,
+        onDismissRequest = {
+            scope.launch {
+                val shouldTerminateApp = viewModel.checkRequiredUpdate()
+                if (shouldTerminateApp) {
+                    activity?.finish()
+                }
+                newFeatureSheetState.hide()
+            }
+        }) {
         TrafficNoticeScreen(
             sheetState = trafficSheetState,
             traffic = traffic.value,
