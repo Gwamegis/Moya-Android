@@ -76,7 +76,7 @@ fun NoticeBottomSheet(
         skipHalfExpanded = true
     )
 
-    LaunchedEffect(isNotCheckedVersion) {
+    LaunchedEffect(version.value) {
         if (isNotCheckedVersion.value) {
             scope.launch {
                 sheetState.show()
@@ -92,6 +92,7 @@ fun NoticeBottomSheet(
                     version = it,
                     onDismissRequest = {
                         scope.launch {
+                            viewModel.saveCheckVersion()
                             sheetState.hide()
                         }
                     },

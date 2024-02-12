@@ -1,6 +1,7 @@
 package com.soi.moya.models
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -21,7 +22,7 @@ class UserPreferences(private val context: Context) {
             preferences[SELECTED_TEAM] ?: "doosan"
         }
 
-    val appVersion: Flow<String?>
+    val appVersion: Flow<String>
         get() = context.dataStore.data.map { preferences ->
             preferences[APP_VERSION] ?: "1.0.0"
         }
@@ -32,9 +33,12 @@ class UserPreferences(private val context: Context) {
         }
     }
 
-    suspend fun saveAppVersion(version: Version) {
-        context.dataStore.edit {
-            it[APP_VERSION] = version.version
+    suspend fun saveAppVersion(version: Version?) {
+        if (version != null) {
+            context.dataStore.edit {
+                it[APP_VERSION] = version.version
+                Log.d("[저장 완료] version", version.version)
+            }
         }
     }
 }

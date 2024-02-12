@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -115,7 +116,10 @@ fun ButtonsView(
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 8.dp),
-            onClick = onDismissRequest
+            onClick = {
+                onDismissRequest()
+                Log.d("1.3", "closed bottom sheet")
+            }
         )
 
         ButtonContainer(

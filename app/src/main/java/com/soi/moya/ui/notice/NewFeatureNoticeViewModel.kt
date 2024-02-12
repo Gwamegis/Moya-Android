@@ -1,6 +1,7 @@
 package com.soi.moya.ui.notice
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
@@ -28,11 +29,15 @@ class NewFeatureNoticeViewModel(
             viewModelScope.launch {
 
                 val savedVersion = _userPreferences.appVersion.first()
+                Log.d("[현재 저장된 버전] version", savedVersion.toString())
+                Log.d("[출시된 버전] version", newVersion?.version.toString())
+                _versionState.value = newVersion
                 _isNotCheckedVersion.value = savedVersion != newVersion?.version
-                if (_isNotCheckedVersion.value) {
-                    _versionState.value = newVersion
-                }
             }
         }
+    }
+
+    suspend fun saveCheckVersion() {
+        _userPreferences.saveAppVersion(_versionState.value)
     }
 }
