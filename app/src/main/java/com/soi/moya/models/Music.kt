@@ -9,11 +9,6 @@ data class Music(
     val url: String = ""
 )
 
-// TODO: 삭제 필요
-val musicList = List(10) {
-    Music(title = "test$it", info = "subTitle$it")
-}
-
 fun Music.toStoredMusic(team: Team, order: Int, date: String, playlist: String): StoredMusic = StoredMusic(
     id = id,
     team = team.name,

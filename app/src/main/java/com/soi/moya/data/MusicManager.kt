@@ -39,12 +39,8 @@ class MusicManager private constructor() {
     fun getAllMusics(): MutableLiveData<List<Music>> {
         val allMusicsLiveData = MutableLiveData<List<Music>>()
 
-        _musics.values.forEach { musicLiveData ->
-            musicLiveData.observeForever {
-                val flattenedList = _musics.values.flatMap { it.value.orEmpty() }
-                allMusicsLiveData.postValue(flattenedList)
-            }
-        }
+        val flattenedList = _musics.values.flatMap { it.value.orEmpty() }
+        allMusicsLiveData.postValue(flattenedList)
 
         return allMusicsLiveData
     }
