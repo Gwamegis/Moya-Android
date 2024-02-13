@@ -2,7 +2,10 @@
     <string name="app_name">모두의 야구</string>
     <string name="firebase_config_file_name">google-services.json</string>
 
-<!--    navigation item-->
+    <!-- main activity -->
+    <string name="back_btn_pressed">한 번 더 누르면 종료됩니다.</string>
+
+    <!-- navigation item-->
     <string name="music_list">응원곡</string>
     <string name="search">검색</string>
     <string name="music_storage">보관함</string>
