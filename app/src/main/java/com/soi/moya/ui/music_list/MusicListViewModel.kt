@@ -3,7 +3,6 @@ package com.soi.moya.ui.music_list
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
 import com.soi.moya.data.MusicManager
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.models.Music
@@ -17,28 +16,41 @@ class MusicListViewModel(
     application: Application
 ) : AndroidViewModel(application) {
 
+    private val _userPreferences = UserPreferences(application)
+    private val _selectedTeam = MutableStateFlow<String>("doosan")
+    val selectedTeam: StateFlow<String> = _selectedTeam
     private val _musicManager = MusicManager.getInstance()
     private val _teamMusics = mutableStateOf(emptyList<Music>())
     private val _playerMusics = mutableStateOf(emptyList<Music>())
-    private val _musics = _musicManager.musics["Doosan"] ?: MutableLiveData(emptyList())
-
-    private val _selectedTeam = MutableStateFlow("doosan")
-    val selectedTeam: StateFlow<String> = _selectedTeam
-
-    val userPreferences = UserPreferences(application)
 
     init {
-        filteringMusics()
+        observeUserPreference()
+        observeSelectedTeam()
     }
 
-    private fun filteringMusics() {
-        _musics.observeForever { musics ->
-            _teamMusics.value = musics.filter { it.type }
-            _playerMusics.value = musics.filter { !it.type }
-        }
+    private fun observeUserPreference() {
         viewModelScope.launch {
-            userPreferences.getSelectedTeam.collect { team ->
+            _userPreferences.getSelectedTeam.collect { team ->
                 _selectedTeam.value = team ?: "doosan"
+                updateMusicForSelectedTeam()
+            }
+        }
+    }
+
+    private fun updateMusicForSelectedTeam() {
+
+        val selectedTeam = _selectedTeam.value
+        _musicManager.getFilteredSelectedTeamMusic(selectedTeam).observeForever { musics ->
+            _teamMusics.value = musics?.filter { it.type } ?: emptyList()
+            _playerMusics.value = musics?.filter { !it.type } ?: emptyList()
+        }
+    }
+
+    private fun observeSelectedTeam() {
+        viewModelScope.launch {
+            _userPreferences.getSelectedTeam.collect { team ->
+                _selectedTeam.value = team ?: "doosan"
+                updateMusicForSelectedTeam()
             }
         }
     }
