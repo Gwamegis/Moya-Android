@@ -70,8 +70,4 @@ class MusicListViewModel(
             else -> _teamMusics.value[index]
         }
     }
-
-    fun toggleLike(index: Int) {
-        // TODO
-    }
 }

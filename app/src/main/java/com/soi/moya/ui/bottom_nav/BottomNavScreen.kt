@@ -34,7 +34,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.data.MusicManager
-import com.soi.moya.models.Team
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_PlAYER
@@ -72,6 +71,32 @@ fun BottomNavScreen() {
             Box(Modifier.padding(it)) {
                 NavGraph(navController = navController)
             }
+        }
+    }
+}
+
+@Composable
+fun NavGraph(navController: NavHostController) {
+
+    NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
+        composable(NavItem.MusicList.route) {
+            MusicListScreen(
+                navController = navController
+            )
+        }
+        composable(NavItem.Search.route) {
+            SearchScreen(navController = navController)
+        }
+        composable(NavItem.MusicStorage.route) {
+            MusicStorageScreen(navController = navController)
+        }
+        composable(MUSIC_PlAYER) {
+            MusicPlayerScreen(navController = navController)
+        }
+        composable(SELECT_TEAM) {
+            SelectTeamScreen(
+                navController = navController
+            )
         }
     }
 }
@@ -130,7 +155,6 @@ private fun NoticeBottomSheet(
     }
 }
 
-
 @Composable
 fun BottomNav(navController: NavHostController) {
     val color = MoyaColor
@@ -178,33 +202,6 @@ fun BottomNav(navController: NavHostController) {
                 },
                 selectedContentColor = MoyaTheme.colors.point,
                 unselectedContentColor = color.darkGray
-            )
-        }
-    }
-}
-
-@Composable
-fun NavGraph(navController: NavHostController) {
-
-    NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
-        // TODO: Screen 연결
-        composable(NavItem.MusicList.route) {
-            MusicListScreen(
-                navController = navController
-            )
-        }
-        composable(NavItem.Search.route) {
-            SearchScreen(navController = navController)
-        }
-        composable(NavItem.MusicStorage.route) {
-            MusicStorageScreen(navController = navController)
-        }
-        composable(MUSIC_PlAYER) {
-            MusicPlayerScreen(navController = navController)
-        }
-        composable(SELECT_TEAM) {
-            SelectTeamScreen(
-                navController = navController
             )
         }
     }

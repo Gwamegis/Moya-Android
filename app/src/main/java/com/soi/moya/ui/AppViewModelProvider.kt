@@ -7,7 +7,6 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.soi.moya.ui.listItem_menu.ListItemMenuViewModel
 import com.soi.moya.ui.music_list.MusicListViewModel
-import com.soi.moya.ui.music_player.MusicPlayerViewModel
 import com.soi.moya.ui.music_storage.MusicStorageViewModel
 import com.soi.moya.ui.notice.NoticeBottomSheetViewModel
 import com.soi.moya.ui.search.SearchViewModel

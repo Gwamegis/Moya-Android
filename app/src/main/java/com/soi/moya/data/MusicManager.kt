@@ -1,6 +1,5 @@
 package com.soi.moya.data
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import com.soi.moya.models.Music
 import com.soi.moya.util.UiState
@@ -37,15 +36,6 @@ class MusicManager private constructor() {
 
     fun getFilteredSelectedTeamMusic(teamName: String): LiveData<List<Music>> {
         return _musics[teamName] ?: MutableLiveData(emptyList())
-    }
-
-    fun getAllMusics(): MutableLiveData<List<Music>> {
-        val allMusicsLiveData = MutableLiveData<List<Music>>()
-
-        val flattenedList = _musics.values.flatMap { it.value.orEmpty() }
-        allMusicsLiveData.postValue(flattenedList)
-
-        return allMusicsLiveData
     }
 
     fun getAllMusicInfo(): MutableLiveData<List<MusicInfo>> {
