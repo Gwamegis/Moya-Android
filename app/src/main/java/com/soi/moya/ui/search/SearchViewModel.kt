@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.MusicManager
-import com.soi.moya.models.Music
+import com.soi.moya.models.MusicInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -17,10 +17,10 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText
 
-    private val _musicFlow = MutableStateFlow<List<Music>>(emptyList())
+    private val _musicFlow = MutableStateFlow<List<MusicInfo>>(emptyList())
 
-    private val _searchResult = MutableStateFlow<List<Music>>(emptyList())
-    val searchResult: StateFlow<List<Music>> = _searchResult
+    private val _searchResult = MutableStateFlow<List<MusicInfo>>(emptyList())
+    val searchResult: StateFlow<List<MusicInfo>> = _searchResult
 
 
     init {
@@ -30,7 +30,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun observeMusicList() {
         viewModelScope.launch {
-            _musicManager.getAllMusics().observeForever { musics ->
+            _musicManager.getAllMusicInfo().observeForever { musics ->
                 _musicFlow.value = musics
             }
         }

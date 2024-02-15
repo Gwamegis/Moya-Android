@@ -199,11 +199,8 @@ fun NavGraph(navController: NavHostController) {
         composable(NavItem.MusicStorage.route) {
             MusicStorageScreen(navController = navController)
         }
-        composable(MUSIC_PlAYER) { backStackEntry ->
-            MusicPlayerScreen(
-                navController = navController,
-                songId = backStackEntry.arguments?.getString("songId")
-            )
+        composable(MUSIC_PlAYER) {
+            MusicPlayerScreen(navController = navController)
         }
         composable(SELECT_TEAM) {
             SelectTeamScreen(

@@ -24,13 +24,11 @@ import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.Music
+import com.soi.moya.models.Team
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -50,51 +49,34 @@ import com.soi.moya.ui.theme.getTextStyle
 @Composable
 fun MusicPlayerScreen(
     viewModel: MusicPlayerViewModel = viewModel(factory = MusicPlayerViewModel.Factory),
-    navController: NavHostController,
-    songId: String?
+    navController: NavHostController
 ) {
-
     val currentPosition by rememberUpdatedState(newValue = viewModel.currentPosition.value)
     val duration = viewModel.getDuration()
 
-    val music = Music(
-        title = "Test title",
-        info = "test team name",
-        lyrics = "나는 행복합니다\n나는 행복합니다\n나는 행복합니다\n이글스라 행복합니다\n\n나는 행복합니다\n나는 행복합니다\n나는 행복합니다" +
-                "나는 행복합니다\n" +
-                "나는 행복합니다\n" +
-                "이글스라 행복합니다\n" +
-                "\n" +
-                "나는 행복합니다\n" +
-                "나는 행복합니다\n" +
-                "나는 행복합니다\n" +
-                "한화라서 행복합니다\n" +
-                "나는 행복합니다\n"
-    )
-
     val progress = remember { mutableFloatStateOf(0f) }
-    val isLike = rememberSaveable { mutableStateOf( true ) }
+    val isLike by viewModel.isLike.collectAsState()
 
     Column(
         modifier = Modifier
-            .background(MoyaColor.doosanSub)
+            .background(viewModel.team.getSubColor())
             .fillMaxSize()
             .padding(20.dp)
     ) {
         MusicNavigationBar(
-            music = music,
+            music = viewModel.music,
+            team = viewModel.team,
             isLike = isLike,
             onClickBackButton = {
                 viewModel.popBackStack(navController = navController)
-            },
-            onClickHeartButton = {
-                viewModel.updateLikeMusic(isLike = it)
-                isLike.value = !it
             }
-        )
+        ) {
+            viewModel.updateLikeMusic()
+        }
 
         MusicLylicView(
-            music = music,
+            music = viewModel.music,
+            team = viewModel.team,
             modifier = Modifier.weight(1f)
         )
 
@@ -119,18 +101,19 @@ fun MusicPlayerScreen(
 @Composable
 fun MusicNavigationBar(
     music: Music,
-    isLike: MutableState<Boolean>,
+    team: Team,
+    isLike: Boolean,
     onClickBackButton: () -> Unit,
     onClickHeartButton: (Boolean) -> Unit
 ) {
-    val likeIcon = if (isLike.value) {
+    val likeIcon = if (isLike) {
         R.drawable.heart_fill
     } else {
         R.drawable.heart
     }
 
-    val tintColor = if (isLike.value) {
-        MoyaColor.doosanPoint
+    val tintColor = if (isLike) {
+        team.getPointColor()
     } else {
         MoyaColor.white
     }
@@ -159,7 +142,7 @@ fun MusicNavigationBar(
                 .size(52.dp)
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(10.dp)),
-            painter = painterResource(id = R.drawable.album_doosan),
+            painter = painterResource(id = if (music.type) team.getPlayerAlbumImageResourceId() else team.getTeamAlbumImageResourceId()),
             contentDescription = null,
         )
 
@@ -187,7 +170,7 @@ fun MusicNavigationBar(
                 .size(26.dp),
             onClick = {
                 //TODO: 데이터 추가
-                onClickHeartButton(isLike.value)
+                onClickHeartButton(isLike)
             }) {
             Icon(
                 painterResource(id = likeIcon),
@@ -201,7 +184,8 @@ fun MusicNavigationBar(
 @Composable
 fun MusicLylicView(
     modifier: Modifier,
-    music: Music
+    music: Music,
+    team: Team
 ) {
     val scrollState = rememberScrollState()
     val gradientTopColor = scrollState.value > 10
@@ -213,12 +197,12 @@ fun MusicLylicView(
             .padding(vertical = 20.dp)
     ) {
         Text(
-            text = music.lyrics,
+            text = music.lyrics.replace("\\n", "\n"),
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState),
             style = getTextStyle(style = MoyaFont.CustomHeadlineBold),
-            color = MoyaColor.white
+            color = MoyaColor.white.copy(0.8f)
         )
 
         GradientBox(
@@ -226,8 +210,8 @@ fun MusicLylicView(
                 .align(Alignment.TopCenter),
             isVisible = gradientTopColor,
             gradientColors = listOf(
-                MoyaColor.doosanSub,
-                MoyaColor.doosanSub.copy(0.3f)
+                team.getSubColor(),
+                team.getSubColor().copy(0.3f)
             )
         )
 
@@ -236,8 +220,8 @@ fun MusicLylicView(
                 .align(Alignment.BottomCenter),
             isVisible = gradientBottomColor,
             gradientColors = listOf(
-                MoyaColor.doosanSub.copy(0.3f),
-                MoyaColor.doosanSub
+                team.getSubColor().copy(0.3f),
+                team.getSubColor()
             )
         )
     }
@@ -288,8 +272,8 @@ fun MusicPlayerSlider(
             modifier = Modifier
                 .fillMaxWidth(),
             colors = SliderDefaults.colors(
-                thumbColor = MoyaColor.doosanPoint,
-                activeTrackColor = MoyaColor.doosanPoint,
+                thumbColor = viewModel.team.getPointColor(),
+                activeTrackColor = viewModel.team.getPointColor(),
                 inactiveTrackColor = MoyaColor.gray,
             ),
         )

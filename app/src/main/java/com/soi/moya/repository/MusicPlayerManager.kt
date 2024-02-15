@@ -2,16 +2,22 @@ package com.soi.moya.repository
 
 import android.app.Application
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import com.soi.moya.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.io.IOException
 
 class MusicPlayerManager(application: Application) {
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
 
-    private val mediaPlayer = MediaPlayer.create(application, R.raw.test)
+    private val mediaPlayer = MediaPlayer().apply {
+        setAudioAttributes(
+            AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
+        )
+    }
 
     fun togglePlayPause() {
         _isPlaying.value = !_isPlaying.value
@@ -58,4 +64,16 @@ class MusicPlayerManager(application: Application) {
         }
     }
 
+    fun playMusicFromUrl(url: String) {
+        try {
+            mediaPlayer.apply {
+                reset()
+                setDataSource(url)
+                prepare()
+                play()
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
 }

@@ -195,9 +195,10 @@ fun ItemView(
 
     MusicListItem(
         music = music.toMusic(),
+        team = Team.valueOf(music.team),
         buttonImageResourceId = R.drawable.ellipse,
         onClickCell = {
-            navController.navigate("MUSIC_PLAYER/123")
+            navController.navigate("MUSIC_PLAYER/${music.team}/${music.id}")
         },
         onClickExtraButton = {
             showBottomSheet = true
