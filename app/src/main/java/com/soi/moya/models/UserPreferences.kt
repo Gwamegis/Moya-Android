@@ -19,7 +19,7 @@ class UserPreferences(private val context: Context) {
 
     val getSelectedTeam: Flow<String?> = context.dataStore.data
         .map { preferences ->
-            preferences[SELECTED_TEAM] ?: "doosan"
+            preferences[SELECTED_TEAM]
         }
 
     val appVersion: Flow<String>

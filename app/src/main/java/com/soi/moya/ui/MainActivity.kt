@@ -3,14 +3,19 @@ package com.soi.moya.ui
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.base.BaseComposeActivity
 import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
 import com.soi.moya.ui.bottom_nav.BottomNavScreen
+import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.theme.MoyaTheme
 
 class MainActivity : BaseComposeActivity() {
@@ -23,10 +28,25 @@ class MainActivity : BaseComposeActivity() {
     override fun Content() {
         val context = LocalContext.current
         val userPreferences = remember { UserPreferences(context) }
-        val selectedTeam = userPreferences.getSelectedTeam.collectAsState(initial = "doosan").value
+        val navController = rememberNavController()
+        var selectedTeam by remember { mutableStateOf<String?>(null) }
+        var isLoaded by remember { mutableStateOf(false) }
 
-        MoyaTheme(team = Team.valueOf(selectedTeam ?: "doosan")) {
-            BottomNavScreen()
+        LaunchedEffect(key1 = userPreferences) {
+            userPreferences.getSelectedTeam.collect { team ->
+                selectedTeam = team
+                isLoaded = true
+            }
+        }
+
+        if (isLoaded) {
+            if (selectedTeam != null) {
+                MoyaTheme(team = Team.valueOf(selectedTeam ?: "doosan")) {
+                    BottomNavScreen()
+                }
+            } else {
+                SelectTeamScreen(navController = navController)
+            }
         }
 
         val callback = createOnBackPressedCallback()
