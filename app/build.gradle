@@ -71,23 +71,34 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.activity:activity-compose:1.8.2'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.compose.material:material:1.5.4'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.navigation:navigation-runtime-ktx:2.7.6'
-    implementation 'androidx.room:room-common:2.6.1'
+
     implementation 'androidx.benchmark:benchmark-common:1.2.3'
-    testImplementation 'junit:junit:4.13.2'
+
+    implementation 'androidx.core:core-ktx:1.12.0'
+
+    implementation 'androidx.compose.animation:animation:1.5.4'
+    implementation 'androidx.compose.material:material:1.5.4'
+    implementation 'androidx.compose.ui:ui-tooling:1.5.4'
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.5.4'
+
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
+    implementation 'com.google.android.material:material:1.11.0'
+
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2'
+
+    testImplementation 'junit:junit:4.13.2'
+
 
     // splash
     implementation 'androidx.core:core-splashscreen:1.0.1'
 
     // navigation
     implementation "androidx.navigation:navigation-compose:2.7.6"
+    implementation 'androidx.navigation:navigation-runtime-ktx:2.7.6'
 
     // view Model
     implementation 'androidx.fragment:fragment-ktx:1.6.1'
@@ -112,28 +123,14 @@ dependencies {
     // touch image view TODO: 삭제
     implementation 'com.github.MikeOrtiz:TouchImageView:1.4.1'
 
-    // MARK: compose
-    // Integration with activities
-    implementation 'androidx.activity:activity-compose:1.8.2'
-    // Compose Material Design
-    implementation 'androidx.compose.material:material:1.5.4'
-    // Animations
-    implementation 'androidx.compose.animation:animation:1.5.4'
-    // Tooling support (Previews, etc.)
-    implementation 'androidx.compose.ui:ui-tooling:1.5.4'
-    // Integration with ViewModels
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2'
-    // UI Tests
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.5.4'
-
     implementation "androidx.datastore:datastore-preferences:1.0.0"
     implementation "androidx.constraintlayout:constraintlayout-compose-android:1.1.0-alpha13"
 
     // Room
-    implementation 'androidx.room:room-runtime:2.5.0'
-    implementation 'androidx.core:core-ktx:1.12.0'
-    kapt 'androidx.room:room-compiler:2.5.0'
+    implementation 'androidx.room:room-common:2.6.1'
     implementation 'androidx.room:room-ktx:2.6.1'
+    implementation 'androidx.room:room-runtime:2.5.0'
+    kapt 'androidx.room:room-compiler:2.5.0'
     annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
 
     //Material Icon
