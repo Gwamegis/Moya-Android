@@ -1,5 +1,6 @@
 package com.soi.moya.data
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.soi.moya.models.Music
 import com.soi.moya.util.UiState
@@ -43,6 +44,17 @@ class MusicManager private constructor() {
         allMusicsLiveData.postValue(flattenedList)
 
         return allMusicsLiveData
+    }
+
+    fun getMusicById(songId: String): Music {
+        for ((_, liveData) in _musics) {
+            val musicList = liveData.value ?: continue
+            val music = musicList.find { it.id == songId }
+            if (music != null) {
+                return music
+            }
+        }
+        throw  IllegalArgumentException("Invalid songId: $songId")
     }
 
     companion object {

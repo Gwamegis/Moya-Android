@@ -53,24 +53,8 @@ fun MusicPlayerScreen(
     navController: NavHostController,
     songId: String?
 ) {
-
     val currentPosition by rememberUpdatedState(newValue = viewModel.currentPosition.value)
     val duration = viewModel.getDuration()
-
-    val music = Music(
-        title = "Test title",
-        info = "test team name",
-        lyrics = "나는 행복합니다\n나는 행복합니다\n나는 행복합니다\n이글스라 행복합니다\n\n나는 행복합니다\n나는 행복합니다\n나는 행복합니다" +
-                "나는 행복합니다\n" +
-                "나는 행복합니다\n" +
-                "이글스라 행복합니다\n" +
-                "\n" +
-                "나는 행복합니다\n" +
-                "나는 행복합니다\n" +
-                "나는 행복합니다\n" +
-                "한화라서 행복합니다\n" +
-                "나는 행복합니다\n"
-    )
 
     val progress = remember { mutableFloatStateOf(0f) }
     val isLike = rememberSaveable { mutableStateOf( true ) }
@@ -82,7 +66,7 @@ fun MusicPlayerScreen(
             .padding(20.dp)
     ) {
         MusicNavigationBar(
-            music = music,
+            music = viewModel.music,
             isLike = isLike,
             onClickBackButton = {
                 viewModel.popBackStack(navController = navController)
@@ -94,7 +78,7 @@ fun MusicPlayerScreen(
         )
 
         MusicLylicView(
-            music = music,
+            music = viewModel.music,
             modifier = Modifier.weight(1f)
         )
 
@@ -213,12 +197,12 @@ fun MusicLylicView(
             .padding(vertical = 20.dp)
     ) {
         Text(
-            text = music.lyrics,
+            text = music.lyrics.replace("\\n", "\n"),
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState),
             style = getTextStyle(style = MoyaFont.CustomHeadlineBold),
-            color = MoyaColor.white
+            color = MoyaColor.white.copy(0.8f)
         )
 
         GradientBox(

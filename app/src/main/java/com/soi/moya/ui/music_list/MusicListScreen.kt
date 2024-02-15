@@ -109,6 +109,7 @@ fun MusicListScreen(
                             viewModel.getMusicAt(page = page, index = index)
                             MusicListItemView(
                                 music = viewModel.getMusicAt(page = page, index = index),
+                                team = Team.valueOf(selectedTeam),
                                 navController = navController
                             )
                         }
@@ -219,13 +220,14 @@ fun MusicListHeaderView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MusicListItemView(music: Music, navController: NavHostController) {
+fun MusicListItemView(music: Music, team: Team, navController: NavHostController) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
     Divider()
     MusicListItem(
         music = music,
+        team = team,
         onClickCell = {
             navController.navigate("MUSIC_PLAYER/${music.id}")
         },

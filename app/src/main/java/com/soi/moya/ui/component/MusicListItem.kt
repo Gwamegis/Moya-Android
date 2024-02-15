@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.soi.moya.R
 import com.soi.moya.models.Music
+import com.soi.moya.models.Team
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -29,6 +30,7 @@ import com.soi.moya.ui.theme.getTextStyle
 @Composable
 fun MusicListItem(
     music: Music,
+    team: Team,
     buttonImageResourceId: Int,
     onClickCell: (music: Music) -> Unit,
     onClickExtraButton: (music: Music) -> Unit
@@ -48,7 +50,7 @@ fun MusicListItem(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                MusicInfoView(music = music)
+                MusicInfoView(music = music, team = team)
             }
         }
 
@@ -59,7 +61,7 @@ fun MusicListItem(
 }
 
 @Composable
-fun MusicInfoView(music: Music) {
+fun MusicInfoView(music: Music, team: Team) {
     Image(
         contentScale = ContentScale.Crop,
         modifier = Modifier
@@ -67,7 +69,7 @@ fun MusicInfoView(music: Music) {
             .aspectRatio(1f)
             .clip(RoundedCornerShape(8.dp)),
         // TODO: Music 객체로 팀 확인하는 로직 생각해보기
-        painter = painterResource(id = R.drawable.album_doosan),
+        painter = painterResource(id = if (music.type) team.getTeamAlbumImageResourceId() else team.getPlayerAlbumImageResourceId()),
         contentDescription = null,
     )
     Column(
@@ -105,6 +107,7 @@ fun MusicListExtraButton(modifier: Modifier, resourceId: Int, onClick: () -> Uni
 fun MusicListItemPreview() {
     MusicListItem(
         music = Music(title = "Title", info = "SubTitle"),
+        team = Team.doosan,
         onClickCell = {},
         onClickExtraButton = {},
         buttonImageResourceId = R.drawable.ellipse

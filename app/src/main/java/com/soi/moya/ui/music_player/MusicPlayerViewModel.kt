@@ -1,6 +1,7 @@
 package com.soi.moya.ui.music_player
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -13,17 +14,29 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.NavHostController
+import com.soi.moya.data.MusicManager
+import com.soi.moya.models.Music
 import com.soi.moya.repository.MusicPlayerManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.concurrent.TimeUnit
 
 class MusicPlayerViewModel(
     application: Application,
-    private val savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle
 ): AndroidViewModel(application) {
+    private val songId: String =  checkNotNull(savedStateHandle["songId"])
+    val music: Music = MusicManager.getInstance().getMusicById(songId)
+
     private val _musicPlayerManager = mutableStateOf(MusicPlayerManager(application))
 
     private val _isPlaying = MutableStateFlow(false)
@@ -36,8 +49,8 @@ class MusicPlayerViewModel(
     private val _currentPosition = mutableIntStateOf(0)
 
     init {
-        _musicPlayerManager.value.play()
-        startUpdateCurrentPositionAndDuration()
+        playMusic(filePath = application.filesDir.absolutePath)
+        music?.lyrics?.let { Log.d("_________", it) }
     }
 
     companion object {
@@ -55,6 +68,17 @@ class MusicPlayerViewModel(
                     savedStateHandle
                 ) as T
             }
+        }
+    }
+
+    private fun playMusic(filePath: String) {
+        viewModelScope.launch {
+            val file = File(filePath, "${music.id}-${music.title}.mp3")
+            if(!file.exists()) {
+                downloadFileAsync(music.url, file.absolutePath)
+            }
+            _musicPlayerManager.value.playMusicFromUrl(file.absolutePath)
+            startUpdateCurrentPositionAndDuration()
         }
     }
 
@@ -105,5 +129,36 @@ class MusicPlayerViewModel(
     fun popBackStack(navController: NavHostController) {
         _musicPlayerManager.value.stop()
         navController.popBackStack()
+    }
+
+    //음악 다운로드
+    private suspend fun downloadFileAsync(url: String, filePath: String): File? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val connection = URL(url).openConnection() as HttpURLConnection
+                connection.connect()
+
+                if(connection.responseCode == HttpURLConnection.HTTP_OK) {
+                    val inputStream: InputStream = connection.inputStream
+                    val file = File(filePath)
+                    val fileOutputStream = FileOutputStream(file)
+                    val buffer = ByteArray(1024)
+                    var bytesRead: Int
+
+                    while(inputStream.read(buffer).also { bytesRead = it } != -1) {
+                        fileOutputStream.write(buffer, 0, bytesRead)
+                    }
+
+                    fileOutputStream.close()
+                    inputStream.close()
+
+                    return@withContext file
+                } else {
+                    return@withContext null
+                }
+            } catch (e: Exception) {
+                return@withContext null
+            }
+        }
     }
 }
