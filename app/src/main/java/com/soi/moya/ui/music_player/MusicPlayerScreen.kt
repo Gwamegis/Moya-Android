@@ -24,13 +24,11 @@ import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,7 +55,7 @@ fun MusicPlayerScreen(
     val duration = viewModel.getDuration()
 
     val progress = remember { mutableFloatStateOf(0f) }
-    val isLike = rememberSaveable { mutableStateOf( true ) }
+    val isLike by viewModel.isLike.collectAsState()
 
     Column(
         modifier = Modifier
@@ -71,12 +69,10 @@ fun MusicPlayerScreen(
             isLike = isLike,
             onClickBackButton = {
                 viewModel.popBackStack(navController = navController)
-            },
-            onClickHeartButton = {
-                viewModel.updateLikeMusic(isLike = it)
-                isLike.value = !it
             }
-        )
+        ) {
+            viewModel.updateLikeMusic()
+        }
 
         MusicLylicView(
             music = viewModel.music,
@@ -106,17 +102,17 @@ fun MusicPlayerScreen(
 fun MusicNavigationBar(
     music: Music,
     team: Team,
-    isLike: MutableState<Boolean>,
+    isLike: Boolean,
     onClickBackButton: () -> Unit,
     onClickHeartButton: (Boolean) -> Unit
 ) {
-    val likeIcon = if (isLike.value) {
+    val likeIcon = if (isLike) {
         R.drawable.heart_fill
     } else {
         R.drawable.heart
     }
 
-    val tintColor = if (isLike.value) {
+    val tintColor = if (isLike) {
         team.getPointColor()
     } else {
         MoyaColor.white
@@ -174,7 +170,7 @@ fun MusicNavigationBar(
                 .size(26.dp),
             onClick = {
                 //TODO: 데이터 추가
-                onClickHeartButton(isLike.value)
+                onClickHeartButton(isLike)
             }) {
             Icon(
                 painterResource(id = likeIcon),
