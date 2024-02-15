@@ -41,8 +41,8 @@ class MusicListViewModel(
 
         val selectedTeam = _selectedTeam.value
         _musicManager.getFilteredSelectedTeamMusic(selectedTeam).observeForever { musics ->
-            _teamMusics.value = musics?.filter { it.type } ?: emptyList()
-            _playerMusics.value = musics?.filter { !it.type } ?: emptyList()
+            _teamMusics.value = musics?.filter { !it.type } ?: emptyList()
+            _playerMusics.value = musics?.filter { it.type } ?: emptyList()
         }
     }
 

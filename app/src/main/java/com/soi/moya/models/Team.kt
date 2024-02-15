@@ -131,7 +131,7 @@ enum class Team {
             lotte -> "Lotte"
             lg -> "LG"
             ssg -> "SSG"
-            ktWiz -> "KtWiz"
+            ktWiz -> "Kt"
             nc -> "NC"
             kiwoom -> "Kiwoom"
             kia -> "Kia"
