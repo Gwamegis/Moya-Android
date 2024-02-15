@@ -5,7 +5,9 @@ import androidx.lifecycle.LiveData
 import com.soi.moya.models.Music
 import com.soi.moya.util.UiState
 import androidx.lifecycle.MutableLiveData
+import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
+import com.soi.moya.models.toMusicInfo
 import com.soi.moya.repository.FirebaseRepository
 
 class MusicManager private constructor() {
@@ -44,6 +46,21 @@ class MusicManager private constructor() {
         allMusicsLiveData.postValue(flattenedList)
 
         return allMusicsLiveData
+    }
+
+    fun getAllMusicInfo(): MutableLiveData<List<MusicInfo>> {
+        val allMusicInfoLiveData = MutableLiveData<List<MusicInfo>>()
+
+        val flattenedList = _musics.values.flatMap {
+            it.value.orEmpty()
+        }
+        val musicInfoList = flattenedList.map { music ->
+            music.toMusicInfo(Team.valueOf(_musics.entries.first { it.value.value?.contains(music) == true }.key))
+        }
+
+        allMusicInfoLiveData.postValue(musicInfoList)
+
+        return allMusicInfoLiveData
     }
 
     fun getMusicById(songId: String): Music {

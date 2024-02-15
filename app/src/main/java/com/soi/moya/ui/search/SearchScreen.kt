@@ -49,8 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
-import com.soi.moya.models.Music
-import com.soi.moya.models.Team
+import com.soi.moya.models.MusicInfo
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.Utility
 import com.soi.moya.ui.WindowSize
@@ -84,12 +83,11 @@ fun SearchScreen(
 }
 
 @Composable
-fun ResultView(result: List<Music>, navController: NavHostController) {
+fun ResultView(result: List<MusicInfo>, navController: NavHostController) {
     LazyColumn {
         items(result) { music ->
-            listItem(music = music, team = Team.nc) {
-                //TODO: navigation 연결
-                navController.navigate("MUSIC_PLAYER/${music.id}")
+            listItem(music = music) {
+                navController.navigate("MUSIC_PLAYER/${music.team.name}/${music.id}")
             }
         }
     }
@@ -244,7 +242,7 @@ fun SearchBar(viewModel: SearchViewModel) {
 }
 
 @Composable
-fun listItem(music: Music, team: Team, onClickEvent: () -> Unit) {
+fun listItem(music: MusicInfo, onClickEvent: () -> Unit) {
     Row(
         modifier = Modifier
             .background(MoyaColor.white)
@@ -264,7 +262,7 @@ fun listItem(music: Music, team: Team, onClickEvent: () -> Unit) {
                         .size(40.dp)
                         .aspectRatio(1f)
                         .clip(RoundedCornerShape(8.dp)),
-                    painter = painterResource(id = team.getTeamAlbumImageResourceId()),
+                    painter = painterResource(id = music.team.getTeamAlbumImageResourceId()),
                     contentDescription = null,
                 )
                 Column(
@@ -277,7 +275,7 @@ fun listItem(music: Music, team: Team, onClickEvent: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.size(6.dp))
                     Text(
-                        text = team.getKrTeamName(),
+                        text = music.team.getKrTeamName(),
                         color = MoyaColor.darkGray,
                         style = getTextStyle(style = MoyaFont.CustomCaptionMedium)
                     )
