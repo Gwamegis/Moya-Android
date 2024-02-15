@@ -69,7 +69,7 @@ fun MusicInfoView(music: Music, team: Team) {
             .aspectRatio(1f)
             .clip(RoundedCornerShape(8.dp)),
         // TODO: Music 객체로 팀 확인하는 로직 생각해보기
-        painter = painterResource(id = if (music.type) team.getTeamAlbumImageResourceId() else team.getPlayerAlbumImageResourceId()),
+        painter = painterResource(id = if (music.type) team.getPlayerAlbumImageResourceId() else team.getTeamAlbumImageResourceId()),
         contentDescription = null,
     )
     Column(

@@ -229,7 +229,7 @@ fun MusicListItemView(music: Music, team: Team, navController: NavHostController
         music = music,
         team = team,
         onClickCell = {
-            navController.navigate("MUSIC_PLAYER/${music.id}")
+            navController.navigate("MUSIC_PLAYER/${team.name}/${music.id}")
         },
         onClickExtraButton = {
             Log.d("clicked", "extra button")

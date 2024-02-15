@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.NavHostController
 import com.soi.moya.data.MusicManager
 import com.soi.moya.models.Music
+import com.soi.moya.models.Team
 import com.soi.moya.repository.MusicPlayerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -34,8 +35,11 @@ class MusicPlayerViewModel(
     application: Application,
     savedStateHandle: SavedStateHandle
 ): AndroidViewModel(application) {
-    private val songId: String =  checkNotNull(savedStateHandle["songId"])
-    val music: Music = MusicManager.getInstance().getMusicById(songId)
+    private val _songId: String =  checkNotNull(savedStateHandle["songId"])
+    val music: Music = MusicManager.getInstance().getMusicById(_songId)
+
+    private val _teamName: String = checkNotNull(savedStateHandle["team"])
+    val team: Team = Team.valueOf(_teamName)
 
     private val _musicPlayerManager = mutableStateOf(MusicPlayerManager(application))
 

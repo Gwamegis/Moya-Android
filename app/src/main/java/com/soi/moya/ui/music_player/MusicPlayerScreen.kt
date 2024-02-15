@@ -42,6 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.Music
+import com.soi.moya.models.Team
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -50,8 +51,7 @@ import com.soi.moya.ui.theme.getTextStyle
 @Composable
 fun MusicPlayerScreen(
     viewModel: MusicPlayerViewModel = viewModel(factory = MusicPlayerViewModel.Factory),
-    navController: NavHostController,
-    songId: String?
+    navController: NavHostController
 ) {
     val currentPosition by rememberUpdatedState(newValue = viewModel.currentPosition.value)
     val duration = viewModel.getDuration()
@@ -61,12 +61,13 @@ fun MusicPlayerScreen(
 
     Column(
         modifier = Modifier
-            .background(MoyaColor.doosanSub)
+            .background(viewModel.team.getSubColor())
             .fillMaxSize()
             .padding(20.dp)
     ) {
         MusicNavigationBar(
             music = viewModel.music,
+            team = viewModel.team,
             isLike = isLike,
             onClickBackButton = {
                 viewModel.popBackStack(navController = navController)
@@ -79,6 +80,7 @@ fun MusicPlayerScreen(
 
         MusicLylicView(
             music = viewModel.music,
+            team = viewModel.team,
             modifier = Modifier.weight(1f)
         )
 
@@ -103,6 +105,7 @@ fun MusicPlayerScreen(
 @Composable
 fun MusicNavigationBar(
     music: Music,
+    team: Team,
     isLike: MutableState<Boolean>,
     onClickBackButton: () -> Unit,
     onClickHeartButton: (Boolean) -> Unit
@@ -114,7 +117,7 @@ fun MusicNavigationBar(
     }
 
     val tintColor = if (isLike.value) {
-        MoyaColor.doosanPoint
+        team.getPointColor()
     } else {
         MoyaColor.white
     }
@@ -143,7 +146,7 @@ fun MusicNavigationBar(
                 .size(52.dp)
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(10.dp)),
-            painter = painterResource(id = R.drawable.album_doosan),
+            painter = painterResource(id = if (music.type) team.getPlayerAlbumImageResourceId() else team.getTeamAlbumImageResourceId()),
             contentDescription = null,
         )
 
@@ -185,7 +188,8 @@ fun MusicNavigationBar(
 @Composable
 fun MusicLylicView(
     modifier: Modifier,
-    music: Music
+    music: Music,
+    team: Team
 ) {
     val scrollState = rememberScrollState()
     val gradientTopColor = scrollState.value > 10
@@ -210,8 +214,8 @@ fun MusicLylicView(
                 .align(Alignment.TopCenter),
             isVisible = gradientTopColor,
             gradientColors = listOf(
-                MoyaColor.doosanSub,
-                MoyaColor.doosanSub.copy(0.3f)
+                team.getSubColor(),
+                team.getSubColor().copy(0.3f)
             )
         )
 
@@ -220,8 +224,8 @@ fun MusicLylicView(
                 .align(Alignment.BottomCenter),
             isVisible = gradientBottomColor,
             gradientColors = listOf(
-                MoyaColor.doosanSub.copy(0.3f),
-                MoyaColor.doosanSub
+                team.getSubColor().copy(0.3f),
+                team.getSubColor()
             )
         )
     }
@@ -272,8 +276,8 @@ fun MusicPlayerSlider(
             modifier = Modifier
                 .fillMaxWidth(),
             colors = SliderDefaults.colors(
-                thumbColor = MoyaColor.doosanPoint,
-                activeTrackColor = MoyaColor.doosanPoint,
+                thumbColor = viewModel.team.getPointColor(),
+                activeTrackColor = viewModel.team.getPointColor(),
                 inactiveTrackColor = MoyaColor.gray,
             ),
         )
