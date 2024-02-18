@@ -1,10 +1,8 @@
 package com.soi.moya.repository
 
 import android.app.Application
-import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
-import com.soi.moya.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
