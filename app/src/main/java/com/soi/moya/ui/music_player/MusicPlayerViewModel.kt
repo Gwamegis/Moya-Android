@@ -46,7 +46,7 @@ class MusicPlayerViewModel(
     private val _teamName: String = checkNotNull(savedStateHandle["team"])
     val team: Team = Team.valueOf(_teamName)
 
-    private val _musicPlayerManager = mutableStateOf(MusicPlayerManager(application))
+    private val _musicPlayerManager = mutableStateOf(MusicPlayerManager.getInstance())
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
@@ -125,7 +125,6 @@ class MusicPlayerViewModel(
     }
 
     fun popBackStack(navController: NavHostController) {
-        _musicPlayerManager.value.stop()
         navController.popBackStack()
     }
 
