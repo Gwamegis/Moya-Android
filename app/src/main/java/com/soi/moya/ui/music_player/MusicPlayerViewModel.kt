@@ -125,7 +125,12 @@ class MusicPlayerViewModel(
     }
 
     fun popBackStack(navController: NavHostController) {
+        stopMusic()
         navController.popBackStack()
+    }
+
+    fun stopMusic() {
+        _musicPlayerManager.value.stop()
     }
 
     //음악 다운로드

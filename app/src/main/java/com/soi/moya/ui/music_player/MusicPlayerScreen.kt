@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.Music
@@ -56,6 +57,7 @@ fun MusicPlayerScreen(
 
     val progress = remember { mutableFloatStateOf(0f) }
     val isLike by viewModel.isLike.collectAsState()
+    var previousDestination: NavBackStackEntry? = null
 
     Column(
         modifier = Modifier
@@ -95,6 +97,14 @@ fun MusicPlayerScreen(
                 viewModel.togglePlayPause()
             }
         )
+    }
+
+    navController.addOnDestinationChangedListener { _, _, _->
+        val currentDestination = navController.previousBackStackEntry
+        if (currentDestination == previousDestination) {
+            viewModel.stopMusic()
+        }
+        previousDestination = navController.currentBackStackEntry
     }
 }
 
