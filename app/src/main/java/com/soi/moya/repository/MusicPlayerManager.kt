@@ -1,13 +1,22 @@
 package com.soi.moya.repository
 
-import android.app.Application
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.IOException
 
-class MusicPlayerManager(application: Application) {
+class MusicPlayerManager private constructor() {
+    companion object {
+        @Volatile
+        private var instance: MusicPlayerManager? = null
+
+        fun getInstance() =
+            instance ?: synchronized(this) {
+                instance ?: MusicPlayerManager().also { instance = it }
+            }
+    }
+
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
 
