@@ -1,9 +1,6 @@
 package com.soi.moya.ui
 
 import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -40,8 +37,4 @@ object Utility {
         return dateFormat.format(Date())
     }
 
-    @Composable
-    fun dpToSp(dp: Dp) = with(LocalDensity.current) {
-        dp.toSp()
-    }
 }

@@ -1,14 +1,15 @@
 package com.soi.moya.ui.theme
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.soi.moya.R
-import com.soi.moya.ui.Utility.dpToSp
 
 private val pretendard = FontFamily(
     Font(R.font.pretendard_medium, FontWeight.Medium, FontStyle.Normal),
@@ -99,4 +100,9 @@ fun getTextStyle(style: MoyaFont): TextStyle {
             )
         }
     }
+}
+
+@Composable
+private fun dpToSp(dp: Dp) = with(LocalDensity.current) {
+    dp.toSp()
 }
