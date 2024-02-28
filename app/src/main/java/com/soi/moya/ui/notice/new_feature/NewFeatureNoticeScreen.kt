@@ -54,6 +54,8 @@ fun NewFeatureNoticeScreen(
         }
     }
 
+    BackHandler { }
+
     ModalBottomSheetLayout(
         sheetState = sheetState,
         sheetContent = {
