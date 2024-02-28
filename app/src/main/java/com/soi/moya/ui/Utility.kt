@@ -36,4 +36,5 @@ object Utility {
         val dateFormat = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
         return dateFormat.format(Date())
     }
+
 }

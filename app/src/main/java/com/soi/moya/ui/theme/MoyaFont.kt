@@ -1,12 +1,14 @@
 package com.soi.moya.ui.theme
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.soi.moya.R
 
 private val pretendard = FontFamily(
@@ -36,66 +38,71 @@ fun getTextStyle(style: MoyaFont): TextStyle {
         MoyaFont.CustomTitleBold -> {
             baseTextStyle.copy(
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                lineHeight = 20.sp
+                fontSize = dpToSp(20.dp),
+                lineHeight = dpToSp(20.dp)
             )
         }
         MoyaFont.CustomTitleMedium -> {
             baseTextStyle.copy(
                 fontWeight = FontWeight.Medium,
-                fontSize = 20.sp,
-                lineHeight = 20.sp
+                fontSize = dpToSp(20.dp),
+                lineHeight = dpToSp(20.dp)
             )
         }
         MoyaFont.CustomBodyBold -> {
             baseTextStyle.copy(
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                lineHeight = 16.sp
+                fontSize = dpToSp(16.dp),
+                lineHeight = dpToSp(16.dp)
             )
         }
         MoyaFont.CustomBodyMedium -> {
             baseTextStyle.copy(
                 fontWeight = FontWeight.Medium,
-                fontSize = 16.sp,
-                lineHeight = 21.sp
+                fontSize = dpToSp(16.dp),
+                lineHeight = dpToSp(21.dp)
             )
         }
         MoyaFont.CustomCaptionBold -> {
             baseTextStyle.copy(
                 fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
-                lineHeight = 12.sp
+                fontSize = dpToSp(12.dp),
+                lineHeight = dpToSp(12.dp)
             )
         }
         MoyaFont.CustomCaptionMedium -> {
             baseTextStyle.copy(
                 fontWeight = FontWeight.Medium,
-                fontSize = 10.sp,
-                lineHeight = 10.sp
+                fontSize = dpToSp(10.dp),
+                lineHeight = dpToSp(10.dp)
             )
         }
         MoyaFont.CustomHeadline -> {
             baseTextStyle.copy(
                 fontWeight = FontWeight.Medium,
-                fontSize = 26.sp,
-                lineHeight = 50.sp
+                fontSize = dpToSp(26.dp),
+                lineHeight = dpToSp(50.dp)
             )
         }
         MoyaFont.CustomHeadlineBold -> {
             baseTextStyle.copy(
                 fontWeight = FontWeight.Bold,
-                fontSize = 26.sp,
-                lineHeight = 45.sp
+                fontSize = dpToSp(26.dp),
+                lineHeight = dpToSp(45.dp)
             )
         }
 
         MoyaFont.CustomStorageHeaderTitle -> {
             baseTextStyle.copy(
                 fontWeight = FontWeight.Bold,
-                fontSize = 40.sp,
-                lineHeight = 40.sp
+                fontSize = dpToSp(40.dp),
+                lineHeight = dpToSp(40.dp)
             )
         }
     }
+}
+
+@Composable
+private fun dpToSp(dp: Dp) = with(LocalDensity.current) {
+    dp.toSp()
 }
