@@ -159,7 +159,8 @@ fun MusicNavigationBar(
         Column(
             modifier = Modifier
                 .padding(vertical = 6.dp)
-                .weight(1f)
+                .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
 
             Text(
@@ -204,7 +205,7 @@ fun MusicLylicView(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 20.dp)
+            .padding(vertical = 20.dp, horizontal = 20.dp)
     ) {
         Text(
             text = music.lyrics.replace("\\n", "\n"),
@@ -291,15 +292,17 @@ fun MusicPlayerSlider(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp),
+                .padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = viewModel.formatTime(currentPosition),
+                style = getTextStyle(style = MoyaFont.CustomCaptionMedium),
                 color = MoyaColor.white
             )
             Text(
                 text = viewModel.formatTime(duration),
+                style = getTextStyle(style = MoyaFont.CustomCaptionMedium),
                 color = MoyaColor.white
             )
         }
@@ -318,7 +321,7 @@ fun MusicPlayerBottomButtonView(
     ) {
         Image(
             modifier = Modifier
-                .size(50.dp)
+                .size(60.dp)
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(25.dp))
                 .clickable { onClickPlayButton() },
