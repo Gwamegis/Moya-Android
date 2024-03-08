@@ -218,8 +218,7 @@ fun ItemView(
             Box(modifier = Modifier.navigationBarsPadding()) {
                 ListItemMenuScreen(
                     music = music.toMusic(),
-                    //TODO: 팀정보 연결
-                    team = Team.doosan,
+                    team = Team.valueOf(music.team),
                     onClick = {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {

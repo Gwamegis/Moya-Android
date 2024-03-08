@@ -251,8 +251,7 @@ fun MusicListItemView(music: Music, team: Team, navController: NavHostController
             Box(modifier = Modifier.navigationBarsPadding()) {
                 ListItemMenuScreen(
                     music = music,
-                    //TODO: 팀정보 연결
-                    team = Team.doosan,
+                    team = team,
                     onClick = {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
