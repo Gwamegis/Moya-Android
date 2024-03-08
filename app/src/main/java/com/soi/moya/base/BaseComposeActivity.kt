@@ -24,8 +24,8 @@ abstract class BaseComposeActivity: ComponentActivity() {
                 darkScrim = Color.TRANSPARENT
             ),
             navigationBarStyle = SystemBarStyle.light(
-                scrim = MoyaColor.tabBarGray.toArgb(),
-                darkScrim = MoyaColor.tabBarGray.toArgb()
+                scrim = Color.TRANSPARENT,
+                darkScrim = Color.TRANSPARENT
             )
         )
         setContent {
