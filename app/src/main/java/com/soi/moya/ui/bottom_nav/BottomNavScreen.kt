@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.BottomNavigation
@@ -167,6 +168,8 @@ fun BottomNav(navController: NavHostController) {
 
     BottomNavigation(
         backgroundColor = color.tabBarGray,
+        modifier = Modifier.navigationBarsPadding(),
+        elevation = 0.dp
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -192,7 +195,8 @@ fun BottomNav(navController: NavHostController) {
                             .height(26.dp)
                     )
                 },
-                modifier = Modifier.padding(horizontal = 8.dp),
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
                 label = {
                     Text(
                         stringResource(id = item.labelID),
