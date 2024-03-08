@@ -79,11 +79,14 @@ fun MusicInfoView(music: Music, team: Team) {
             music.title, color = MoyaColor.black,
             style = getTextStyle(style = MoyaFont.CustomBodyMedium)
         )
-        Spacer(modifier = Modifier.size(6.dp))
-        Text(
-            music.info, color = MoyaColor.darkGray,
-            style = getTextStyle(style = MoyaFont.CustomCaptionMedium)
-        )
+
+        if (music.info.isNotEmpty()) {
+            Spacer(modifier = Modifier.size(6.dp))
+            Text(
+                music.info, color = MoyaColor.darkGray,
+                style = getTextStyle(style = MoyaFont.CustomCaptionMedium)
+            )
+        }
     }
 }
 
