@@ -46,14 +46,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
-import com.soi.moya.models.Team
 import com.soi.moya.models.toMusic
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.Utility
 import com.soi.moya.ui.WindowSize
+import com.soi.moya.ui.component.CellType
+import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
-import com.soi.moya.ui.component.music_list_item.CellType
-import com.soi.moya.ui.component.music_list_item.MusicListItem
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle

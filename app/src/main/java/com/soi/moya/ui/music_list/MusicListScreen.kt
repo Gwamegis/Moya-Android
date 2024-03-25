@@ -53,9 +53,9 @@ import com.soi.moya.models.Music
 import com.soi.moya.models.Team
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.SELECT_TEAM
-import com.soi.moya.ui.component.music_list_item.MusicListItem
+import com.soi.moya.ui.component.CellType
+import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
-import com.soi.moya.ui.component.music_list_item.CellType
 import com.soi.moya.ui.listItem_menu.ListItemMenuScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont

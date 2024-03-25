@@ -12,22 +12,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowRight
-import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.soi.moya.R
 import com.soi.moya.models.Music
 import com.soi.moya.models.Team
-import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -35,10 +30,10 @@ import com.soi.moya.ui.theme.getTextStyle
 enum class CellType {
     List, Search;
 
-    fun getExtraButtonImageVector(): ImageVector {
+    fun getExtraButtonImageResourceId(): Int {
         return when (this) {
-            List -> Icons.Rounded.MoreVert
-            Search -> Icons.Rounded.KeyboardArrowRight
+            List -> R.drawable.ellipse
+            Search -> R.drawable.chevron_right
         }
     }
 }
@@ -102,12 +97,24 @@ fun MusicInfoView(
             music.title, color = MoyaColor.black,
             style = getTextStyle(style = MoyaFont.CustomBodyMedium)
         )
-        Spacer(modifier = Modifier.size(6.dp))
-        Text(
-            if (cellType == CellType.List) music.info else team.getKrTeamName(),
-            color = MoyaColor.darkGray,
-            style = getTextStyle(style = MoyaFont.CustomCaptionMedium)
-        )
+
+        if (cellType == CellType.List) {
+            if (music.info.isNotEmpty()) {
+                Spacer(modifier = Modifier.size(6.dp))
+                Text(
+                    music.info,
+                    color = MoyaColor.darkGray,
+                    style = getTextStyle(style = MoyaFont.CustomCaptionMedium)
+                )
+            }
+        } else {
+            Spacer(modifier = Modifier.size(6.dp))
+            Text(
+                team.getKrTeamName(),
+                color = MoyaColor.darkGray,
+                style = getTextStyle(style = MoyaFont.CustomCaptionMedium)
+            )
+        }
     }
 }
 
@@ -120,9 +127,9 @@ fun MusicListExtraButton(modifier: Modifier, cellType: CellType, onClick: () -> 
             .clickable {
                 onClick()
             },
-        imageVector = cellType.getExtraButtonImageVector(),
-        contentDescription = "arrow right",
-        tint = MoyaColor.darkGray,
+        painter = painterResource(id = cellType.getExtraButtonImageResourceId()),
+        contentDescription = "extra button",
+        tint = MoyaColor.darkGray
     )
 }
 
