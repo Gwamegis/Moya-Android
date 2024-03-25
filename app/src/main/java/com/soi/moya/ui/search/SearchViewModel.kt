@@ -2,9 +2,13 @@ package com.soi.moya.ui.search
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.MusicManager
+import com.soi.moya.data.SeasonSongManager
+import com.soi.moya.models.Music
 import com.soi.moya.models.MusicInfo
+import com.soi.moya.models.Team
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -22,6 +26,8 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     private val _searchResult = MutableStateFlow<List<MusicInfo>>(emptyList())
     val searchResult: StateFlow<List<MusicInfo>> = _searchResult
 
+    private val _seasonSongManager = SeasonSongManager.getInstance()
+    private val seasonSongs: Map<String, LiveData<List<String>>> get() = _seasonSongManager.getSeasonSongs()
 
     init {
         observeMusicList()
@@ -54,5 +60,17 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
 
     fun setSearchText(newText: String) {
         _searchText.value = newText
+    }
+
+    fun fetchAlbumImageResourceId(music: Music, team: Team): Int {
+        return if (seasonSongs[team.name]?.value?.contains(music.title) == true) {
+            team.getSeasonSongAlbumImageResourceId()
+        } else {
+            if(music.type) {
+                team.getPlayerAlbumImageResourceId()
+            } else {
+                team.getTeamImageResourceId()
+            }
+        }
     }
 }

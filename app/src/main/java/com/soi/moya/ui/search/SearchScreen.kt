@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,7 +25,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material.icons.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,7 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.ContentScale
@@ -50,10 +46,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
+import com.soi.moya.models.Team
+import com.soi.moya.models.toMusic
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.Utility
 import com.soi.moya.ui.WindowSize
 import com.soi.moya.ui.component.RequestMusicButton
+import com.soi.moya.ui.component.music_list_item.CellType
+import com.soi.moya.ui.component.music_list_item.MusicListItem
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -83,12 +83,26 @@ fun SearchScreen(
 }
 
 @Composable
-fun ResultView(result: List<MusicInfo>, navController: NavHostController) {
+fun ResultView(
+    result: List<MusicInfo>,
+    navController: NavHostController,
+    viewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory)
+) {
     LazyColumn {
         items(result) { music ->
-            listItem(music = music) {
-                navController.navigate("MUSIC_PLAYER/${music.team.name}/${music.id}")
-            }
+            val image = viewModel.fetchAlbumImageResourceId(music.toMusic(), music.team)
+            MusicListItem(
+                music = music.toMusic(),
+                team = music.team,
+                cellType = CellType.Search,
+                image = image,
+                onClickCell = {
+                    navController.navigate("MUSIC_PLAYER/${music.team.name}/${music.id}")
+                },
+                onClickExtraButton = {
+                    navController.navigate("MUSIC_PLAYER/${music.team.name}/${music.id}")
+                }
+            )
         }
     }
 }
@@ -239,56 +253,6 @@ fun SearchBar(viewModel: SearchViewModel) {
         )
     }
 
-}
-
-@Composable
-fun listItem(music: MusicInfo, onClickEvent: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .background(MoyaColor.white)
-            .clickable(onClick = onClickEvent),
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 20.dp, vertical = 10.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Image(
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(8.dp)),
-                    painter = painterResource(id = music.team.getTeamAlbumImageResourceId()),
-                    contentDescription = null,
-                )
-                Column(
-                    modifier = Modifier.padding(start = 10.dp)
-                ) {
-                    Text(
-                        text = music.title,
-                        color = MoyaColor.black,
-                        style = getTextStyle(style = MoyaFont.CustomBodyMedium)
-                    )
-                    Spacer(modifier = Modifier.size(6.dp))
-                    Text(
-                        text = music.team.getKrTeamName(),
-                        color = MoyaColor.darkGray,
-                        style = getTextStyle(style = MoyaFont.CustomCaptionMedium)
-                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    imageVector = Icons.Rounded.KeyboardArrowRight,
-                    contentDescription = "arrow right",
-                    tint = MoyaColor.darkGray,
-                )
-            }
-        }
-    }
 }
 
 @Preview

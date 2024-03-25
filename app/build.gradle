@@ -140,4 +140,7 @@ dependencies {
 
     //window size
     implementation "androidx.window:window:1.0.0"
+
+    //리플렉션
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
