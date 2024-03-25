@@ -1,6 +1,8 @@
 package com.soi.moya.ui.music_player
 
 import android.annotation.SuppressLint
+import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -60,6 +62,10 @@ fun MusicPlayerScreen(
     val isLike by viewModel.isLike.collectAsState()
     var previousDestination: NavBackStackEntry? = null
 
+    BackHandler {
+        viewModel.popBackStack(navController)
+    }
+
     Column(
         modifier = Modifier
             .background(viewModel.team.getSubColor())
@@ -98,14 +104,6 @@ fun MusicPlayerScreen(
                 viewModel.togglePlayPause()
             }
         )
-    }
-
-    navController.addOnDestinationChangedListener { _, _, _->
-        val currentDestination = navController.previousBackStackEntry
-        if (currentDestination == previousDestination) {
-            viewModel.stopMusic()
-        }
-        previousDestination = navController.currentBackStackEntry
     }
 }
 
