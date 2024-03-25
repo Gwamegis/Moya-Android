@@ -56,7 +56,7 @@ fun ListItemMenuScreen(
         MenuItem(
             doesExist.value,
             favorite = {
-                viewModel.saveItem(music = music, team = Team.doosan)
+                viewModel.saveItem(music = music, team = team)
                 onClick()
             },
             favoriteCancle = {

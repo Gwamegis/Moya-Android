@@ -9,6 +9,7 @@ class FirebaseRepository<T>(
 ) {
     fun getData(collection: String, result: (UiState<List<T>>) -> Unit) {
         database.collection(collection)
+            .orderBy("title")
             .get()
             .addOnSuccessListener {
                 val data = it.toObjects(clazz)

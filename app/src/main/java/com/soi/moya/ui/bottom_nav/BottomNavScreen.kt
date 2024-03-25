@@ -2,8 +2,10 @@ package com.soi.moya.ui.bottom_nav
 
 import android.app.Activity
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.BottomNavigation
@@ -21,6 +23,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -167,6 +170,10 @@ fun BottomNav(navController: NavHostController) {
 
     BottomNavigation(
         backgroundColor = color.tabBarGray,
+        modifier = Modifier
+            .background(color = color.tabBarGray)
+            .navigationBarsPadding(),
+        elevation = 0.dp
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
@@ -192,7 +199,8 @@ fun BottomNav(navController: NavHostController) {
                             .height(26.dp)
                     )
                 },
-                modifier = Modifier.padding(horizontal = 8.dp),
+                modifier = Modifier
+                    .padding(horizontal = 8.dp),
                 label = {
                     Text(
                         stringResource(id = item.labelID),
