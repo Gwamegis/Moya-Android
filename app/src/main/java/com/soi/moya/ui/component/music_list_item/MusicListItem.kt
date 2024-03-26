@@ -27,14 +27,26 @@ import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
 
+enum class CellType {
+    List, Search;
+
+    fun getExtraButtonImageResourceId(): Int {
+        return when (this) {
+            List -> R.drawable.ellipse
+            Search -> R.drawable.chevron_right
+        }
+    }
+}
+
 @Composable
 fun MusicListItem(
     music: Music,
     team: Team,
-    buttonImageResourceId: Int,
+    cellType: CellType,
+    image: Int,
     onClickCell: (music: Music) -> Unit,
-    onClickExtraButton: (music: Music) -> Unit
-) {
+    onClickExtraButton: (music: Music) -> Unit,
+    ) {
     Row(
         modifier = Modifier
             .background(MoyaColor.white)
@@ -50,18 +62,24 @@ fun MusicListItem(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                MusicInfoView(music = music, team = team)
+                MusicInfoView(music = music, team = team, cellType = cellType, image = image)
             }
         }
 
-        MusicListExtraButton(modifier = Modifier.align(Alignment.CenterVertically),
-            resourceId = buttonImageResourceId,
+        MusicListExtraButton(
+            modifier = Modifier.align(Alignment.CenterVertically),
+            cellType = cellType,
             onClick = { onClickExtraButton(music) })
     }
 }
 
 @Composable
-fun MusicInfoView(music: Music, team: Team) {
+fun MusicInfoView(
+    music: Music,
+    team: Team,
+    cellType: CellType,
+    image: Int,
+    ) {
     Image(
         contentScale = ContentScale.Crop,
         modifier = Modifier
@@ -69,7 +87,7 @@ fun MusicInfoView(music: Music, team: Team) {
             .aspectRatio(1f)
             .clip(RoundedCornerShape(8.dp)),
         // TODO: Music 객체로 팀 확인하는 로직 생각해보기
-        painter = painterResource(id = if (music.type) team.getPlayerAlbumImageResourceId() else team.getTeamAlbumImageResourceId()),
+        painter = painterResource(id = image),
         contentDescription = null,
     )
     Column(
@@ -80,10 +98,20 @@ fun MusicInfoView(music: Music, team: Team) {
             style = getTextStyle(style = MoyaFont.CustomBodyMedium)
         )
 
-        if (music.info.isNotEmpty()) {
+        if (cellType == CellType.List) {
+            if (music.info.isNotEmpty()) {
+                Spacer(modifier = Modifier.size(6.dp))
+                Text(
+                    music.info,
+                    color = MoyaColor.darkGray,
+                    style = getTextStyle(style = MoyaFont.CustomCaptionMedium)
+                )
+            }
+        } else {
             Spacer(modifier = Modifier.size(6.dp))
             Text(
-                music.info, color = MoyaColor.darkGray,
+                team.getKrTeamName(),
+                color = MoyaColor.darkGray,
                 style = getTextStyle(style = MoyaFont.CustomCaptionMedium)
             )
         }
@@ -91,7 +119,7 @@ fun MusicInfoView(music: Music, team: Team) {
 }
 
 @Composable
-fun MusicListExtraButton(modifier: Modifier, resourceId: Int, onClick: () -> Unit) {
+fun MusicListExtraButton(modifier: Modifier, cellType: CellType, onClick: () -> Unit) {
     Icon(
         modifier = modifier
             .padding(end = 20.dp)
@@ -99,8 +127,8 @@ fun MusicListExtraButton(modifier: Modifier, resourceId: Int, onClick: () -> Uni
             .clickable {
                 onClick()
             },
-        painter = painterResource(id = resourceId),
-        contentDescription = null,
+        painter = painterResource(id = cellType.getExtraButtonImageResourceId()),
+        contentDescription = "extra button",
         tint = MoyaColor.darkGray
     )
 }
@@ -111,8 +139,9 @@ fun MusicListItemPreview() {
     MusicListItem(
         music = Music(title = "Title", info = "SubTitle"),
         team = Team.doosan,
+        cellType = CellType.List,
+        image = Team.doosan.getPlayerAlbumImageResourceId(),
         onClickCell = {},
-        onClickExtraButton = {},
-        buttonImageResourceId = R.drawable.ellipse
+        onClickExtraButton = {}
     )
 }

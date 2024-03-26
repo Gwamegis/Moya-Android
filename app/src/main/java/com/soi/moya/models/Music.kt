@@ -41,3 +41,12 @@ fun Music.toStoredMusic(team: Team, order: Int, date: String, playlist: String):
     date = date,
     playlist = playlist
 )
+
+fun MusicInfo.toMusic(): Music = Music(
+    id = id,
+    title = title,
+    lyrics = lyrics,
+    info = info,
+    type = type,
+    url = url
+)

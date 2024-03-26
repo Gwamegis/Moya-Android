@@ -60,6 +60,7 @@ import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.Team
 import com.soi.moya.models.toMusic
 import com.soi.moya.ui.AppViewModelProvider
+import com.soi.moya.ui.component.CellType
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.listItem_menu.ListItemMenuScreen
 import com.soi.moya.ui.theme.MoyaColor
@@ -187,6 +188,7 @@ fun ItemList(
 fun ItemView(
     music: StoredMusic,
     navController: NavHostController,
+    viewModel: MusicStorageViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
 
     val sheetState = rememberModalBottomSheetState()
@@ -196,7 +198,8 @@ fun ItemView(
     MusicListItem(
         music = music.toMusic(),
         team = Team.valueOf(music.team),
-        buttonImageResourceId = R.drawable.ellipse,
+        cellType = CellType.List,
+        image = viewModel.fetchAlbumImageResourceId(music.toMusic(), Team.valueOf(music.team)),
         onClickCell = {
             navController.navigate("MUSIC_PLAYER/${music.team}/${music.id}")
         },

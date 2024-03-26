@@ -1,5 +1,6 @@
 package com.soi.moya.ui.music_list
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -52,6 +53,7 @@ import com.soi.moya.models.Music
 import com.soi.moya.models.Team
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.SELECT_TEAM
+import com.soi.moya.ui.component.CellType
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
 import com.soi.moya.ui.listItem_menu.ListItemMenuScreen
@@ -60,6 +62,7 @@ import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
 import kotlinx.coroutines.launch
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MusicListScreen(
@@ -72,6 +75,7 @@ fun MusicListScreen(
     val pagerState = rememberPagerState(pageCount = {
         tabs.size
     })
+    val team = Team.valueOf(selectedTeam)
 
     Box(
         modifier = Modifier
@@ -80,7 +84,7 @@ fun MusicListScreen(
     ) {
         Column {
             SwitchTeamAndPlayerTitleView(
-                team = Team.valueOf(selectedTeam),
+                team = team,
                 tabs = tabs,
                 state = pagerState,
                 onTabSelected = { selectedTab ->
@@ -90,7 +94,7 @@ fun MusicListScreen(
                 })
 
             MusicListHeaderView(
-                team = Team.valueOf(selectedTeam),
+                team = team,
                 musicListSize = viewModel.getMusicListSize(page = pagerState.currentPage),
                 navController = navController
             )
@@ -106,17 +110,20 @@ fun MusicListScreen(
                                 page = page,
                                 index = index
                             )
-                            viewModel.getMusicAt(page = page, index = index)
+                            val music = viewModel.getMusicAt(page = page, index = index)
+                            val albumImageResourceId = viewModel.fetchAlbumImageResourceId(music, team)
+
                             MusicListItemView(
-                                music = viewModel.getMusicAt(page = page, index = index),
-                                team = Team.valueOf(selectedTeam),
+                                music = music,
+                                team = team,
+                                image = albumImageResourceId,
                                 navController = navController
                             )
                         }
 
                         item {
                             RequestMusicButtonView(
-                                color = Team.valueOf(selectedTeam).getPointColor()
+                                color = team.getPointColor()
                             )
                         }
                     }
@@ -220,7 +227,7 @@ fun MusicListHeaderView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MusicListItemView(music: Music, team: Team, navController: NavHostController) {
+fun MusicListItemView(music: Music, team: Team, image: Int, navController: NavHostController) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -228,14 +235,15 @@ fun MusicListItemView(music: Music, team: Team, navController: NavHostController
     MusicListItem(
         music = music,
         team = team,
+        cellType = CellType.List,
+        image = image,
         onClickCell = {
             navController.navigate("MUSIC_PLAYER/${team.name}/${music.id}")
         },
         onClickExtraButton = {
             Log.d("clicked", "extra button")
             showBottomSheet = true
-        },
-        buttonImageResourceId = R.drawable.ellipse
+        }
     )
     if (showBottomSheet) {
         ModalBottomSheet(

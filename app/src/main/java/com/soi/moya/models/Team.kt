@@ -94,6 +94,21 @@ enum class Team {
         }
     }
 
+    fun getSeasonSongAlbumImageResourceId(): Int {
+        return when (this) {
+            doosan -> R.drawable.doosan24
+            hanwha -> R.drawable.hanwha24
+            samsung -> R.drawable.samsung24
+            lotte -> R.drawable.lotte24
+            lg -> R.drawable.lg24
+            ssg -> R.drawable.ssg24
+            ktWiz -> R.drawable.kt24
+            nc -> R.drawable.nc24
+            kiwoom -> R.drawable.kiwoom24
+            kia -> R.drawable.kia24
+        }
+    }
+
     fun getMainBannerImageResourceId(): Int {
         return when (this) {
             doosan -> R.drawable.main_banner_doosan
