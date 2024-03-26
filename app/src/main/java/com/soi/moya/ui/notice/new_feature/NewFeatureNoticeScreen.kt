@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -16,8 +17,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +48,14 @@ fun NewFeatureNoticeScreen(
 ) {
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(sheetState.currentValue) {
+        if (sheetState.currentValue == ModalBottomSheetValue.Hidden) {
+            onDismissRequest()
+        }
+    }
+
+    BackHandler { }
+
     ModalBottomSheetLayout(
         sheetState = sheetState,
         sheetContent = {
@@ -55,7 +66,6 @@ fun NewFeatureNoticeScreen(
                         scope.launch {
                             sheetState.hide()
                         }
-                        onDismissRequest()
                     }
                 )
             }

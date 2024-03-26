@@ -54,6 +54,7 @@ import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaTheme
 import kotlinx.coroutines.launch
+import kotlin.system.exitProcess
 
 @Composable
 fun BottomNavScreen() {
@@ -145,7 +146,7 @@ private fun NoticeBottomSheet(
             scope.launch {
                 val shouldTerminateApp = viewModel.checkRequiredUpdate()
                 if (shouldTerminateApp) {
-                    activity?.finish()
+                    exitProcess(0)
                 }
                 newFeatureSheetState.hide()
             }
