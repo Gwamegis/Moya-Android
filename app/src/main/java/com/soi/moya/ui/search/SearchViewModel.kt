@@ -35,7 +35,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     private fun observeMusicList() {
-        viewModelScope.launch {
+        _musicManager.observeMusics {
             _musicManager.getAllMusicInfo().observeForever { musics ->
                 _musicFlow.value = musics
             }
