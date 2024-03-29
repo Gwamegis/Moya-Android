@@ -45,7 +45,7 @@ class NoticeBottomSheetViewModel(
 
                 val savedVersion = _userPreferences.appVersion.first()
                 _versionState.value = newVersion
-                _isNotCheckedVersion.value = savedVersion != newVersion?.version
+                _isNotCheckedVersion.value = savedVersion < newVersion?.version.toString()
             }
         }
 
