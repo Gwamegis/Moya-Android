@@ -4,14 +4,14 @@ import androidx.lifecycle.LiveData
 import com.soi.moya.models.Music
 import com.soi.moya.util.UiState
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.models.toMusicInfo
 import com.soi.moya.repository.FirebaseRepository
-
 class MusicManager private constructor() {
     private val _firebaseRepository = FirebaseRepository<Music>(clazz = Music::class.java)
-    private val _musics: MutableMap<String, LiveData<List<Music>>> = mutableMapOf()
+    private val _musics: MutableMap<String, MutableLiveData<List<Music>>> = mutableMapOf()
 
     init {
         Team.values().forEach {
@@ -32,6 +32,12 @@ class MusicManager private constructor() {
             }
         }
         _musics[team.name] = musicLiveData
+    }
+
+    fun observeMusics(observer: Observer<in List<Music>?>) {
+        _musics.forEach { (_, liveData) ->
+            liveData.observeForever(observer)
+        }
     }
 
     fun getFilteredSelectedTeamMusic(teamName: String): LiveData<List<Music>> {
@@ -61,7 +67,7 @@ class MusicManager private constructor() {
                 return music
             }
         }
-        throw  IllegalArgumentException("Invalid songId: $songId")
+        throw IllegalArgumentException("Invalid songId: $songId")
     }
 
     companion object {
