@@ -167,12 +167,14 @@ fun MusicNavigationBar(
                 style = getTextStyle(style = MoyaFont.CustomBodyBold),
                 color = MoyaColor.white
             )
+            if (music.info.isNotEmpty()) {
+                Text(
+                    text = music.info,
+                    style = getTextStyle(style = MoyaFont.CustomCaptionMedium),
+                    color = MoyaColor.gray
+                )
+            }
 
-            Text(
-                text = music.info,
-                style = getTextStyle(style = MoyaFont.CustomCaptionMedium),
-                color = MoyaColor.gray
-            )
         }
 
         IconButton(
