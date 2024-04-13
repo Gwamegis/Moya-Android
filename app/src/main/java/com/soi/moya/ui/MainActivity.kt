@@ -1,7 +1,9 @@
 package com.soi.moya.ui
 
+import android.util.DisplayMetrics
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -10,11 +12,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
+import androidx.window.layout.WindowMetricsCalculator
 import com.soi.moya.R
 import com.soi.moya.base.BaseComposeActivity
 import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
 import com.soi.moya.ui.bottom_nav.BottomNavScreen
+import com.soi.moya.ui.mini_player.MiniPlayerScreen
 import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.theme.MoyaTheme
 
@@ -43,6 +47,9 @@ class MainActivity : BaseComposeActivity() {
             if (selectedTeam != null) {
                 MoyaTheme(team = Team.valueOf(selectedTeam ?: "doosan")) {
                     BottomNavScreen()
+                    MiniPlayerScreen(
+                        maxHeight = computeWindowSizeClasses(),
+                        navController = navController)
                 }
             } else {
                 SelectTeamScreen(navController = navController)
@@ -65,6 +72,14 @@ class MainActivity : BaseComposeActivity() {
                 backPressedTime = System.currentTimeMillis()
             }
         }
+    }
+
+    private fun computeWindowSizeClasses(): Float{
+        val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(this)
+        val height = metrics.bounds.height()
+        val density = resources.displayMetrics.density
+
+        return height/density
     }
 }
 

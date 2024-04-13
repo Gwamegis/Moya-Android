@@ -19,6 +19,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.sp
@@ -44,6 +45,7 @@ import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
 import com.soi.moya.ui.music_list.MusicListScreen
 import com.soi.moya.ui.SELECT_TEAM
+import com.soi.moya.ui.mini_player.MiniPlayerScreen
 import com.soi.moya.ui.music_player.MusicPlayerScreen
 import com.soi.moya.ui.music_storage.MusicStorageScreen
 import com.soi.moya.ui.notice.NoticeBottomSheetViewModel
