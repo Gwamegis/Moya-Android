@@ -33,6 +33,12 @@ class MusicListViewModel(
         observeSelectedTeam()
     }
 
+    fun onSongSelected() {
+        viewModelScope.launch {
+            _userPreferences.showingMiniPlayer()
+        }
+    }
+
     private fun observeUserPreference() {
         viewModelScope.launch {
             _userPreferences.getSelectedTeam.collect { team ->

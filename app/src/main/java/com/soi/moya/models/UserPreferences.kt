@@ -3,6 +3,7 @@ package com.soi.moya.models
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -15,6 +16,7 @@ class UserPreferences(private val context: Context) {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("selected_team")
         val SELECTED_TEAM = stringPreferencesKey("selected_team")
         val APP_VERSION = stringPreferencesKey("app_version")
+        val SHOW_MINI_PLAYER = booleanPreferencesKey("show_mini_player")
     }
 
     val getSelectedTeam: Flow<String?> = context.dataStore.data
@@ -25,6 +27,11 @@ class UserPreferences(private val context: Context) {
     val appVersion: Flow<String>
         get() = context.dataStore.data.map { preferences ->
             preferences[APP_VERSION] ?: BuildConfig.VERSION_NAME
+        }
+
+    val showMiniPlayer: Flow<Boolean> = context.dataStore.data
+        .map { preference ->
+            preference[SHOW_MINI_PLAYER] ?: true
         }
 
     suspend fun saveSelectedTeam(team: Team) {
@@ -38,6 +45,12 @@ class UserPreferences(private val context: Context) {
             context.dataStore.edit {
                 it[APP_VERSION] = version.version
             }
+        }
+    }
+
+    suspend fun showingMiniPlayer() {
+        context.dataStore.edit { preference ->
+            preference[SHOW_MINI_PLAYER] = true
         }
     }
 }

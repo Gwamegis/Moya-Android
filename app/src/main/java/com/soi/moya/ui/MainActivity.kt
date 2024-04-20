@@ -1,11 +1,10 @@
 package com.soi.moya.ui
 
-import android.util.DisplayMetrics
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +34,7 @@ class MainActivity : BaseComposeActivity() {
         val navController = rememberNavController()
         var selectedTeam by remember { mutableStateOf<String?>(null) }
         var isLoaded by remember { mutableStateOf(false) }
+        val showingMiniPlayer = userPreferences.showMiniPlayer.collectAsState(initial = false)
 
         LaunchedEffect(key1 = userPreferences) {
             userPreferences.getSelectedTeam.collect { team ->
@@ -47,9 +47,12 @@ class MainActivity : BaseComposeActivity() {
             if (selectedTeam != null) {
                 MoyaTheme(team = Team.valueOf(selectedTeam ?: "doosan")) {
                     BottomNavScreen()
-                    MiniPlayerScreen(
-                        maxHeight = computeWindowSizeClasses(),
-                        navController = navController)
+                    if (showingMiniPlayer.value) {
+                        MiniPlayerScreen(
+                            maxHeight = computeWindowSizeClasses(),
+                            navController = navController
+                        )
+                    }
                 }
             } else {
                 SelectTeamScreen(navController = navController)

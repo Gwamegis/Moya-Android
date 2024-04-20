@@ -117,7 +117,8 @@ fun MusicListScreen(
                                 music = music,
                                 team = team,
                                 image = albumImageResourceId,
-                                navController = navController
+                                navController = navController,
+                                viewModel = viewModel
                             )
                         }
 
@@ -227,7 +228,13 @@ fun MusicListHeaderView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MusicListItemView(music: Music, team: Team, image: Int, navController: NavHostController) {
+fun MusicListItemView(
+    music: Music,
+    team: Team,
+    image: Int,
+    navController: NavHostController,
+    viewModel: MusicListViewModel
+) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -238,7 +245,7 @@ fun MusicListItemView(music: Music, team: Team, image: Int, navController: NavHo
         cellType = CellType.List,
         image = image,
         onClickCell = {
-            navController.navigate("MUSIC_PLAYER/${team.name}/${music.id}")
+            viewModel.onSongSelected()
         },
         onClickExtraButton = {
             Log.d("clicked", "extra button")
