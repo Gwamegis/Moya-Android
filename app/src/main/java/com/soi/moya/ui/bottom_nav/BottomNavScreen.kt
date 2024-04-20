@@ -43,6 +43,7 @@ import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
 import com.soi.moya.ui.music_list.MusicListScreen
 import com.soi.moya.ui.SELECT_TEAM
+import com.soi.moya.ui.main_activity.MusicViewModel
 import com.soi.moya.ui.music_player.MusicPlayerScreen
 import com.soi.moya.ui.music_storage.MusicStorageScreen
 import com.soi.moya.ui.notice.NoticeBottomSheetViewModel
@@ -56,7 +57,9 @@ import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 @Composable
-fun BottomNavScreen() {
+fun BottomNavScreen(
+    musicViewModel: MusicViewModel
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = remember(navBackStackEntry) { navBackStackEntry?.destination?.route }
@@ -72,19 +75,26 @@ fun BottomNavScreen() {
             }
         ) {
             Box(Modifier.padding(it)) {
-                NavGraph(navController = navController)
+                NavGraph(
+                    navController = navController,
+                    musicViewModel = musicViewModel
+                )
             }
         }
     }
 }
 
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(
+    navController: NavHostController,
+    musicViewModel: MusicViewModel
+) {
 
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         composable(NavItem.MusicList.route) {
             MusicListScreen(
-                navController = navController
+                navController = navController,
+                musicViewModel = musicViewModel
             )
         }
         composable(NavItem.Search.route) {
@@ -220,10 +230,4 @@ sealed class NavItem(@StringRes val labelID: Int, val iconID: Int, val route: St
     object Search : NavItem(R.string.search, R.drawable.navigation_icon_search, SEARCH)
     object MusicStorage :
         NavItem(R.string.music_storage, R.drawable.navigation_icon_storage, MUSIC_STORAGE)
-}
-
-@Preview
-@Composable
-fun BottomNavScreenPreview() {
-    BottomNavScreen()
 }

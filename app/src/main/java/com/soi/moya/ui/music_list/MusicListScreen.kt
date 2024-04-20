@@ -56,6 +56,7 @@ import com.soi.moya.ui.component.CellType
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
 import com.soi.moya.ui.listItem_menu.ListItemMenuScreen
+import com.soi.moya.ui.main_activity.MusicViewModel
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -65,6 +66,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MusicListScreen(
+    musicViewModel: MusicViewModel,
     viewModel: MusicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
     navController: NavHostController
 ) {
@@ -117,7 +119,8 @@ fun MusicListScreen(
                                 team = team,
                                 image = albumImageResourceId,
                                 navController = navController,
-                                viewModel = viewModel
+                                viewModel = viewModel,
+                                musicViewModel = musicViewModel
                             )
                         }
 
@@ -232,7 +235,8 @@ fun MusicListItemView(
     team: Team,
     image: Int,
     navController: NavHostController,
-    viewModel: MusicListViewModel
+    viewModel: MusicListViewModel,
+    musicViewModel: MusicViewModel
 ) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -244,6 +248,7 @@ fun MusicListItemView(
         cellType = CellType.List,
         image = image,
         onClickCell = {
+            musicViewModel.setSelectedMusic(music = music)
             viewModel.onSongSelected(music = music)
         },
         onClickExtraButton = {
@@ -292,12 +297,4 @@ fun RequestMusicButtonView(color: Color) {
     )
     RequestMusicButton(color = color)
     Spacer(modifier = Modifier.size(80.dp))
-}
-
-@Preview
-@Composable
-fun MusicListScreenPreview() {
-    val viewModel: MusicListViewModel = viewModel()
-    val navController = rememberNavController()
-    MusicListScreen(viewModel = viewModel, navController = navController)
 }

@@ -27,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soi.moya.R
+import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.ui.music_player.MusicPlayerScreen
 import com.soi.moya.ui.theme.MoyaColor
@@ -39,6 +40,7 @@ import kotlin.math.max
 fun MiniPlayerScreen(
     maxHeight: Float,
     navController: NavHostController,
+    music: MusicInfo,
 ) {
     val minHeight = 55f
     val height = remember { Animatable(minHeight) } // Animatable을 사용하여 높이를 관리
@@ -78,7 +80,7 @@ fun MiniPlayerScreen(
                         bottomEnd = if (height.value == maxHeight) 0.dp else 12.dp
                     )
                 )
-                .background(color = Team.lotte.getSubColor())
+                .background(color = music.team.getSubColor())
                 .pointerInput(Unit) {
                     var dragStarted = false
                     var dragDirection = 0f
@@ -125,14 +127,18 @@ fun MiniPlayerScreen(
                     navController = navController
                 )
             } else {
-                MiniPlayer()
+                MiniPlayer(
+                    music = music,
+                )
             }
         }
     }
 }
 
 @Composable
-fun MiniPlayer() {
+fun MiniPlayer(
+    music: MusicInfo,
+) {
     Row(
         modifier = Modifier
             .padding(horizontal = 20.dp)
@@ -145,13 +151,13 @@ fun MiniPlayer() {
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "힘차게 외쳐보자",
+                text = music.title,
                 color = MoyaColor.background,
                 style = getTextStyle(style = MoyaFont.CustomBodyBold),
                 modifier = Modifier.align(Alignment.Start)
             )
             Text(
-                text = "롯데 자이언츠",
+                text = music.team.getKrTeamName(),
                 color = MoyaColor.gray.copy(alpha = 0.6f),
                 style = getTextStyle(style = MoyaFont.CustomCaptionMedium),
                 modifier = Modifier.align(Alignment.Start)
