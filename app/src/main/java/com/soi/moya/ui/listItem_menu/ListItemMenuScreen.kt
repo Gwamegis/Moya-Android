@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.soi.moya.R
-import com.soi.moya.models.Music
+import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.theme.MoyaColor
@@ -36,7 +36,7 @@ import com.soi.moya.ui.theme.getTextStyle
 
 @Composable
 fun ListItemMenuScreen(
-    music: Music,
+    music: MusicInfo,
     team: Team,
     onClick: ()->Unit,
     viewModel: ListItemMenuViewModel = viewModel(factory = AppViewModelProvider.Factory)
@@ -99,7 +99,7 @@ fun MenuItem(doesItemExist: Boolean, favorite: () -> Unit, favoriteCancle: () ->
 }
 
 @Composable
-fun MenuHeader(music: Music, team: Team) {
+fun MenuHeader(music: MusicInfo, team: Team) {
     val image = if (music.type) team.getPlayerAlbumImageResourceId() else team.getTeamAlbumImageResourceId()
     Row (
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -139,7 +139,7 @@ fun MenuHeader(music: Music, team: Team) {
 @Preview
 @Composable
 fun MainMenuScreenPreview() {
-    val music = Music(id="", info="", lyrics = "", title = "정훈", type = true, url="")
+    val music = MusicInfo(id="", info="", lyrics = "", title = "정훈", type = true, url="")
     val team = Team.doosan
     ListItemMenuScreen(music, team, onClick = {})
 }

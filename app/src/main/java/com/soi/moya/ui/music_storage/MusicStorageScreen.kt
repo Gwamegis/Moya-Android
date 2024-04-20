@@ -58,7 +58,7 @@ import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.Team
-import com.soi.moya.models.toMusic
+import com.soi.moya.models.toMusicInfo
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.component.CellType
 import com.soi.moya.ui.component.MusicListItem
@@ -196,10 +196,10 @@ fun ItemView(
     var showBottomSheet by remember { mutableStateOf(false) }
 
     MusicListItem(
-        music = music.toMusic(),
+        music = music.toMusicInfo(),
         team = Team.valueOf(music.team),
         cellType = CellType.List,
-        image = viewModel.fetchAlbumImageResourceId(music.toMusic(), Team.valueOf(music.team)),
+        image = viewModel.fetchAlbumImageResourceId(music.toMusicInfo(), Team.valueOf(music.team)),
         onClickCell = {
             navController.navigate("MUSIC_PLAYER/${music.team}/${music.id}")
         },
@@ -220,7 +220,7 @@ fun ItemView(
         ) {
             Box(modifier = Modifier.navigationBarsPadding()) {
                 ListItemMenuScreen(
-                    music = music.toMusic(),
+                    music = music.toMusicInfo(),
                     team = Team.valueOf(music.team),
                     onClick = {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {

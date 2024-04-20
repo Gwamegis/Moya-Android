@@ -46,7 +46,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
-import com.soi.moya.models.toMusic
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.Utility
 import com.soi.moya.ui.WindowSize
@@ -89,9 +88,9 @@ fun ResultView(
 ) {
     LazyColumn {
         items(result) { music ->
-            val image = viewModel.fetchAlbumImageResourceId(music.toMusic(), music.team)
+            val image = viewModel.fetchAlbumImageResourceId(music, music.team)
             MusicListItem(
-                music = music.toMusic(),
+                music = music,
                 team = music.team,
                 cellType = CellType.Search,
                 image = image,

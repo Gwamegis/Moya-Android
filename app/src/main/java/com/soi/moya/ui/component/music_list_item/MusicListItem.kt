@@ -21,7 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.soi.moya.R
-import com.soi.moya.models.Music
+import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
@@ -40,12 +40,12 @@ enum class CellType {
 
 @Composable
 fun MusicListItem(
-    music: Music,
+    music: MusicInfo,
     team: Team,
     cellType: CellType,
     image: Int,
-    onClickCell: (music: Music) -> Unit,
-    onClickExtraButton: (music: Music) -> Unit,
+    onClickCell: (music: MusicInfo) -> Unit,
+    onClickExtraButton: (music: MusicInfo) -> Unit,
     ) {
     Row(
         modifier = Modifier
@@ -75,7 +75,7 @@ fun MusicListItem(
 
 @Composable
 fun MusicInfoView(
-    music: Music,
+    music: MusicInfo,
     team: Team,
     cellType: CellType,
     image: Int,
@@ -137,7 +137,7 @@ fun MusicListExtraButton(modifier: Modifier, cellType: CellType, onClick: () -> 
 @Composable
 fun MusicListItemPreview() {
     MusicListItem(
-        music = Music(title = "Title", info = "SubTitle"),
+        music = MusicInfo(title = "Title", info = "SubTitle"),
         team = Team.doosan,
         cellType = CellType.List,
         image = Team.doosan.getPlayerAlbumImageResourceId(),

@@ -1,7 +1,6 @@
 package com.soi.moya.ui.music_list
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -49,7 +48,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
-import com.soi.moya.models.Music
+import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.SELECT_TEAM
@@ -229,7 +228,7 @@ fun MusicListHeaderView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MusicListItemView(
-    music: Music,
+    music: MusicInfo,
     team: Team,
     image: Int,
     navController: NavHostController,
@@ -245,10 +244,9 @@ fun MusicListItemView(
         cellType = CellType.List,
         image = image,
         onClickCell = {
-            viewModel.onSongSelected()
+            viewModel.onSongSelected(music = music)
         },
         onClickExtraButton = {
-            Log.d("clicked", "extra button")
             showBottomSheet = true
         }
     )

@@ -152,4 +152,10 @@ enum class Team {
             kia -> "Kia"
         }
     }
+
+    companion object {
+        fun fromString(teamName: String): Team? {
+            return values().find { teamName.equals(teamName, ignoreCase = true) }
+        }
+    }
 }

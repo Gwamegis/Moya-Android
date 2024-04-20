@@ -11,7 +11,7 @@ import com.soi.moya.models.toMusicInfo
 import com.soi.moya.repository.FirebaseRepository
 class MusicManager private constructor() {
     private val _firebaseRepository = FirebaseRepository<Music>(clazz = Music::class.java)
-    private val _musics: MutableMap<String, MutableLiveData<List<Music>>> = mutableMapOf()
+    private val _musics: MutableMap<String, MutableLiveData<List<MusicInfo>>> = mutableMapOf()
 
     init {
         Team.values().forEach {
@@ -20,11 +20,15 @@ class MusicManager private constructor() {
     }
 
     private fun loadMusics(team: Team) {
-        val musicLiveData = MutableLiveData<List<Music>>()
+        val musicLiveData = MutableLiveData<List<MusicInfo>>()
         _firebaseRepository.getData(team.getFirebaseCollectionName()) { result ->
             when (result) {
                 is UiState.Success -> {
-                    musicLiveData.postValue(result.data ?: emptyList())
+                    val musicList = result.data ?: emptyList()
+                    val musicInfoList = musicList.map { music ->
+                        music.toMusicInfo(team)
+                    }
+                    musicLiveData.postValue(musicInfoList ?: emptyList())
                 }
                 else -> {
                     // fail 처리
@@ -34,13 +38,13 @@ class MusicManager private constructor() {
         _musics[team.name] = musicLiveData
     }
 
-    fun observeMusics(observer: Observer<in List<Music>?>) {
+    fun observeMusics(observer: Observer<in List<MusicInfo>?>) {
         _musics.forEach { (_, liveData) ->
             liveData.observeForever(observer)
         }
     }
 
-    fun getFilteredSelectedTeamMusic(teamName: String): LiveData<List<Music>> {
+    fun getFilteredSelectedTeamMusic(teamName: String): LiveData<List<MusicInfo>> {
         return _musics[teamName] ?: MutableLiveData(emptyList())
     }
 
@@ -50,16 +54,13 @@ class MusicManager private constructor() {
         val flattenedList = _musics.values.flatMap {
             it.value.orEmpty()
         }
-        val musicInfoList = flattenedList.map { music ->
-            music.toMusicInfo(Team.valueOf(_musics.entries.first { it.value.value?.contains(music) == true }.key))
-        }
 
-        allMusicInfoLiveData.postValue(musicInfoList)
+        allMusicInfoLiveData.postValue(flattenedList)
 
         return allMusicInfoLiveData
     }
 
-    fun getMusicById(songId: String): Music {
+    fun getMusicById(songId: String): MusicInfo? {
         for ((_, liveData) in _musics) {
             val musicList = liveData.value ?: continue
             val music = musicList.find { it.id == songId }
@@ -67,7 +68,7 @@ class MusicManager private constructor() {
                 return music
             }
         }
-        throw IllegalArgumentException("Invalid songId: $songId")
+        return null
     }
 
     companion object {

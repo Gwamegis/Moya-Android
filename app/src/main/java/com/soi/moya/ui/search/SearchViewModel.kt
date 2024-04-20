@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.MusicManager
 import com.soi.moya.data.SeasonSongManager
-import com.soi.moya.models.Music
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,7 +61,7 @@ class SearchViewModel(application: Application) : AndroidViewModel(application) 
         _searchText.value = newText
     }
 
-    fun fetchAlbumImageResourceId(music: Music, team: Team): Int {
+    fun fetchAlbumImageResourceId(music: MusicInfo, team: Team): Int {
         return if (seasonSongs[team.name]?.value?.contains(music.title) == true) {
             team.getSeasonSongAlbumImageResourceId()
         } else {

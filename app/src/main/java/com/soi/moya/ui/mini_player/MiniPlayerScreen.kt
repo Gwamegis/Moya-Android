@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.Team
+import com.soi.moya.ui.music_player.MusicPlayerScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -37,7 +38,7 @@ import kotlin.math.max
 @Composable
 fun MiniPlayerScreen(
     maxHeight: Float,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     val minHeight = 55f
     val height = remember { Animatable(minHeight) } // Animatable을 사용하여 높이를 관리
@@ -119,7 +120,13 @@ fun MiniPlayerScreen(
                         Modifier
                 )
         ) {
-            MiniPlayer()
+            if (height.value == maxHeight) {
+                MusicPlayerScreen(
+                    navController = navController
+                )
+            } else {
+                MiniPlayer()
+            }
         }
     }
 }

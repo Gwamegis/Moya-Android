@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.StoredMusicRepository
-import com.soi.moya.models.Music
+import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
@@ -21,7 +21,7 @@ class ListItemMenuViewModel(
         return storedMusicRepository.doesItemExist(itemId = itemId)
     }
 
-    fun saveItem(music: Music, team: Team) {
+    fun saveItem(music: MusicInfo, team: Team) {
         viewModelScope.launch {
             val order = storedMusicRepository.getItemCount(playlist = "favorite")
             val music = music.toStoredMusic(
@@ -36,7 +36,7 @@ class ListItemMenuViewModel(
             }
         }
     }
-    fun deleteItem(music: Music) {
+    fun deleteItem(music: MusicInfo) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 storedMusicRepository.deleteById(id = music.id, playlist = "favorite")

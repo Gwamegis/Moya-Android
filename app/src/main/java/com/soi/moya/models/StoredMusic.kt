@@ -32,8 +32,9 @@ fun StoredMusic.toItem(): StoredMusic = StoredMusic(
     playlist = playlist
 )
 
-fun StoredMusic.toMusic(): Music = Music(
+fun StoredMusic.toMusicInfo(): MusicInfo = MusicInfo(
     id = id,
+    team = Team.fromString(team) ?: Team.doosan,
     info = info,
     lyrics = lyrics,
     title = title,

@@ -1,7 +1,6 @@
 package com.soi.moya.ui.music_player
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,8 +42,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.soi.moya.R
-import com.soi.moya.models.Music
-import com.soi.moya.models.Team
+import com.soi.moya.models.MusicInfo
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -66,28 +64,33 @@ fun MusicPlayerScreen(
         viewModel.popBackStack(navController)
     }
 
-    Column(
-        modifier = Modifier
-            .background(viewModel.team.getSubColor())
+    viewModel.music?.team?.let {
+        Modifier
+            .background(it.getSubColor())
             .fillMaxSize()
             .padding(20.dp)
+    }?.let {
+        Column(
+        modifier = it
     ) {
-        MusicNavigationBar(
-            music = viewModel.music,
-            team = viewModel.team,
-            isLike = isLike,
-            onClickBackButton = {
-                viewModel.popBackStack(navController = navController)
+        viewModel.music?.let {
+            MusicNavigationBar(
+                music = it,
+                isLike = isLike,
+                onClickBackButton = {
+                    viewModel.popBackStack(navController = navController)
+                }
+            ) {
+                viewModel.updateLikeMusic()
             }
-        ) {
-            viewModel.updateLikeMusic()
         }
 
-        MusicLylicView(
-            music = viewModel.music,
-            team = viewModel.team,
-            modifier = Modifier.weight(1f)
-        )
+        viewModel.music?.let {
+            MusicLylicView(
+                music = it,
+                modifier = Modifier.weight(1f)
+            )
+        }
 
         MusicPlayerSlider(
             currentPosition = currentPosition ?: 0,
@@ -105,12 +108,12 @@ fun MusicPlayerScreen(
             }
         )
     }
+    }
 }
 
 @Composable
 fun MusicNavigationBar(
-    music: Music,
-    team: Team,
+    music: MusicInfo,
     isLike: Boolean,
     onClickBackButton: () -> Unit,
     onClickHeartButton: (Boolean) -> Unit
@@ -122,7 +125,7 @@ fun MusicNavigationBar(
     }
 
     val tintColor = if (isLike) {
-        team.getPointColor()
+        music.team.getPointColor()
     } else {
         MoyaColor.white
     }
@@ -151,7 +154,7 @@ fun MusicNavigationBar(
                 .size(52.dp)
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(10.dp)),
-            painter = painterResource(id = if (music.type) team.getPlayerAlbumImageResourceId() else team.getTeamAlbumImageResourceId()),
+            painter = painterResource(id = if (music.type) music.team.getPlayerAlbumImageResourceId() else music.team.getTeamAlbumImageResourceId()),
             contentDescription = null,
         )
 
@@ -196,8 +199,7 @@ fun MusicNavigationBar(
 @Composable
 fun MusicLylicView(
     modifier: Modifier,
-    music: Music,
-    team: Team
+    music: MusicInfo,
 ) {
     val scrollState = rememberScrollState()
     val gradientTopColor = scrollState.value > 10
@@ -222,8 +224,8 @@ fun MusicLylicView(
                 .align(Alignment.TopCenter),
             isVisible = gradientTopColor,
             gradientColors = listOf(
-                team.getSubColor(),
-                team.getSubColor().copy(0.3f)
+                music.team.getSubColor(),
+                music.team.getSubColor().copy(0.3f)
             )
         )
 
@@ -232,8 +234,8 @@ fun MusicLylicView(
                 .align(Alignment.BottomCenter),
             isVisible = gradientBottomColor,
             gradientColors = listOf(
-                team.getSubColor().copy(0.3f),
-                team.getSubColor()
+                music.team.getSubColor().copy(0.3f),
+                music.team.getSubColor()
             )
         )
     }

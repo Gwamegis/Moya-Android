@@ -17,6 +17,7 @@ class UserPreferences(private val context: Context) {
         val SELECTED_TEAM = stringPreferencesKey("selected_team")
         val APP_VERSION = stringPreferencesKey("app_version")
         val SHOW_MINI_PLAYER = booleanPreferencesKey("show_mini_player")
+        val CURRENT_PLAY_SONG_ID = stringPreferencesKey("song_Id")
     }
 
     val getSelectedTeam: Flow<String?> = context.dataStore.data
@@ -32,6 +33,10 @@ class UserPreferences(private val context: Context) {
     val showMiniPlayer: Flow<Boolean> = context.dataStore.data
         .map { preference ->
             preference[SHOW_MINI_PLAYER] ?: true
+        }
+    val currentPlaySongId: Flow<String?> = context.dataStore.data
+        .map {
+            it[CURRENT_PLAY_SONG_ID]
         }
 
     suspend fun saveSelectedTeam(team: Team) {
@@ -51,6 +56,12 @@ class UserPreferences(private val context: Context) {
     suspend fun showingMiniPlayer() {
         context.dataStore.edit { preference ->
             preference[SHOW_MINI_PLAYER] = true
+        }
+    }
+
+    suspend fun setSongId(music: MusicInfo) {
+        context.dataStore.edit {preference ->
+            preference[CURRENT_PLAY_SONG_ID] = music.id
         }
     }
 }
