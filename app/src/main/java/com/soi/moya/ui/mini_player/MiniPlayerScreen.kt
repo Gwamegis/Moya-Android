@@ -107,6 +107,17 @@ fun MiniPlayerScreen(
                         }
                     )
                 }
+                .then(
+                    if (height.value == minHeight)
+                        Modifier
+                            .clickable {
+                                coroutineScope.launch {
+                                    height.animateTo(maxHeight)
+                                }
+                            }
+                    else
+                        Modifier
+                )
         ) {
             MiniPlayer()
         }
