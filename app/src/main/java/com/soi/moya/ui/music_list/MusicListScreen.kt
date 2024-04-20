@@ -118,8 +118,6 @@ fun MusicListScreen(
                                 music = music,
                                 team = team,
                                 image = albumImageResourceId,
-                                navController = navController,
-                                viewModel = viewModel,
                                 musicViewModel = musicViewModel
                             )
                         }
@@ -234,8 +232,6 @@ fun MusicListItemView(
     music: MusicInfo,
     team: Team,
     image: Int,
-    navController: NavHostController,
-    viewModel: MusicListViewModel,
     musicViewModel: MusicViewModel
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -249,7 +245,6 @@ fun MusicListItemView(
         image = image,
         onClickCell = {
             musicViewModel.setSelectedMusic(music = music)
-            viewModel.onSongSelected(music = music)
         },
         onClickExtraButton = {
             showBottomSheet = true

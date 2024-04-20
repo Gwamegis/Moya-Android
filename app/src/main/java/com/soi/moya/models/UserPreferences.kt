@@ -30,10 +30,6 @@ class UserPreferences(private val context: Context) {
             preferences[APP_VERSION] ?: BuildConfig.VERSION_NAME
         }
 
-    val showMiniPlayer: Flow<Boolean> = context.dataStore.data
-        .map { preference ->
-            preference[SHOW_MINI_PLAYER] ?: true
-        }
     val currentPlaySongId: Flow<String?> = context.dataStore.data
         .map {
             it[CURRENT_PLAY_SONG_ID]
@@ -50,18 +46,6 @@ class UserPreferences(private val context: Context) {
             context.dataStore.edit {
                 it[APP_VERSION] = version.version
             }
-        }
-    }
-
-    suspend fun showingMiniPlayer() {
-        context.dataStore.edit { preference ->
-            preference[SHOW_MINI_PLAYER] = true
-        }
-    }
-
-    suspend fun setSongId(music: MusicInfo) {
-        context.dataStore.edit {preference ->
-            preference[CURRENT_PLAY_SONG_ID] = music.id
         }
     }
 }
