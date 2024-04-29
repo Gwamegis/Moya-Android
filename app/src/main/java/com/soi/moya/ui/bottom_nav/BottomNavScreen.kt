@@ -57,14 +57,10 @@ import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 @Composable
-fun BottomNavScreen(
-    musicViewModel: MusicViewModel
-) {
+fun BottomNavScreen() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = remember(navBackStackEntry) { navBackStackEntry?.destination?.route }
-
-    MusicManager.getInstance()
 
     NoticeBottomSheet {
         Scaffold(
@@ -76,8 +72,7 @@ fun BottomNavScreen(
         ) {
             Box(Modifier.padding(it)) {
                 NavGraph(
-                    navController = navController,
-                    musicViewModel = musicViewModel
+                    navController = navController
                 )
             }
         }
@@ -86,15 +81,13 @@ fun BottomNavScreen(
 
 @Composable
 fun NavGraph(
-    navController: NavHostController,
-    musicViewModel: MusicViewModel
+    navController: NavHostController
 ) {
 
     NavHost(navController = navController, startDestination = NavItem.MusicList.route) {
         composable(NavItem.MusicList.route) {
             MusicListScreen(
-                navController = navController,
-                musicViewModel = musicViewModel
+                navController = navController
             )
         }
         composable(NavItem.Search.route) {
@@ -102,9 +95,6 @@ fun NavGraph(
         }
         composable(NavItem.MusicStorage.route) {
             MusicStorageScreen(navController = navController)
-        }
-        composable(MUSIC_PlAYER) {
-            MusicPlayerScreen(navController = navController)
         }
         composable(SELECT_TEAM) {
             SelectTeamScreen(

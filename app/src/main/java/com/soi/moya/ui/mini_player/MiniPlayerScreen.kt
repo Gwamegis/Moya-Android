@@ -1,10 +1,12 @@
 package com.soi.moya.ui.mini_player
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,38 +19,43 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
-import com.soi.moya.models.Team
+import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.music_player.MusicPlayerScreen
+import com.soi.moya.ui.music_player.MusicPlayerViewModel
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun MiniPlayerScreen(
+    viewModel: MiniPlayerViewModel = viewModel(factory = AppViewModelProvider.Factory),
     maxHeight: Float,
     navController: NavHostController,
     music: MusicInfo,
 ) {
-    val minHeight = 55f
-    val height = remember { Animatable(minHeight) } // Animatable을 사용하여 높이를 관리
+    val height = remember { Animatable(viewModel.height.value) }
     val coroutineScope = rememberCoroutineScope()
-    val threshold = maxHeight / 2 // 임계값 설정
-    val scalingFactor = 0.7f
-    val bottomPadding = 100f
-    val horizontalPadding = 10f
+    val heightFraction = ((height.value - viewModel.minHeight) / (maxHeight - viewModel.minHeight)).coerceIn(0f, 1f)
+
+    viewModel.setMaxHeight(maxHeight)
 
     Box(
         modifier = Modifier
@@ -60,13 +67,13 @@ fun MiniPlayerScreen(
                 .padding(
                     bottom = max(
                         0f,
-                        (bottomPadding - ((height.value - minHeight) / (maxHeight - minHeight)) * bottomPadding)
+                        (viewModel.bottomPadding - ((height.value - viewModel.minHeight) / (maxHeight - viewModel.minHeight)) * viewModel.bottomPadding)
                     ).dp
                 )
                 .padding(
                     horizontal = max(
                         0f,
-                        (horizontalPadding - ((height.value - minHeight) / (maxHeight - minHeight)) * horizontalPadding)
+                        (viewModel.horizontalPadding - ((height.value - viewModel.minHeight) / (maxHeight - viewModel.minHeight)) * viewModel.horizontalPadding)
                     ).dp
                 )
                 .align(Alignment.BottomStart)
@@ -92,18 +99,20 @@ fun MiniPlayerScreen(
                                 dragStarted = false
                             }
                             val newHeight =
-                                max(minHeight, height.value - dragAmount * scalingFactor)
+                                max(viewModel.minHeight, height.value - dragAmount * viewModel.scalingFactor)
                             coroutineScope.launch { height.snapTo(newHeight) }
+                            viewModel.setHeight(newHeight)
                             change.consume()
                         },
                         onDragEnd = {
                             val targetHeight = when {
-                                dragDirection < 0 && height.value > threshold -> maxHeight
-                                dragDirection > 0 && height.value < threshold -> minHeight
-                                dragDirection < 0 && height.value <= threshold -> minHeight
-                                dragDirection > 0 && height.value >= threshold -> maxHeight
+                                dragDirection < 0 && height.value > viewModel.threshold.value -> maxHeight
+                                dragDirection > 0 && height.value < viewModel.threshold.value -> viewModel.minHeight
+                                dragDirection < 0 && height.value <= viewModel.threshold.value -> viewModel.minHeight
+                                dragDirection > 0 && height.value >= viewModel.threshold.value -> maxHeight
                                 else -> height.value
                             }
+                            viewModel.setHeight(targetHeight)
                             coroutineScope.launch {
                                 height.animateTo(targetHeight)
                             }
@@ -111,9 +120,10 @@ fun MiniPlayerScreen(
                     )
                 }
                 .then(
-                    if (height.value == minHeight)
+                    if (height.value == viewModel.minHeight)
                         Modifier
                             .clickable {
+                                viewModel.setHeight(maxHeight)
                                 coroutineScope.launch {
                                     height.animateTo(maxHeight)
                                 }
@@ -122,25 +132,43 @@ fun MiniPlayerScreen(
                         Modifier
                 )
         ) {
-            if (height.value == maxHeight) {
-                MusicPlayerScreen(
-                    navController = navController
-                )
-            } else {
-                MiniPlayer(
-                    music = music,
-                )
-            }
+
+            MusicPlayerScreen(
+                navController = navController,
+                music = music,
+                modifier = Modifier
+                    .alpha(heightFraction)
+                    .pointerInput(Unit) {
+                        if (heightFraction <= 0f) {
+                            detectTapGestures(onPress = { })
+                        }
+                    }
+
+            )
+
+            MiniPlayer(
+                music = music,
+                modifier = Modifier
+                    .alpha(1f - heightFraction)
+                    .pointerInput(Unit) {
+                        if (1f - heightFraction <= 0f) {
+                            detectTapGestures(onPress = { })
+                        }
+                    }
+            )
         }
     }
 }
 
 @Composable
 fun MiniPlayer(
+    viewModel: MusicPlayerViewModel = viewModel(factory = AppViewModelProvider.Factory),
     music: MusicInfo,
+    modifier: Modifier = Modifier,
 ) {
+    val isPlaying by viewModel.isPlaying.collectAsState()
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 20.dp)
             .fillMaxWidth()
             .height(80.dp),
@@ -168,9 +196,11 @@ fun MiniPlayer(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(R.drawable.play_arrow),
+                painter = painterResource(id = if (isPlaying) R.drawable.pause_fill else {R.drawable.play_arrow }),
                 contentDescription = "play/Pause",
-                modifier = Modifier.clickable { Log.d("test", "test") }
+                modifier = Modifier
+                    .clickable { viewModel.togglePlayPause() }
+                    .height(20.dp)
             )
             Image(
                 painter = painterResource(R.drawable.play_next),

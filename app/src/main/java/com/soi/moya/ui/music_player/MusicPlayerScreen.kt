@@ -43,6 +43,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
+import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -50,44 +51,43 @@ import com.soi.moya.ui.theme.getTextStyle
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun MusicPlayerScreen(
-    viewModel: MusicPlayerViewModel = viewModel(factory = MusicPlayerViewModel.Factory),
-    navController: NavHostController
+    viewModel: MusicPlayerViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    navController: NavHostController,
+    music: MusicInfo,
+    modifier: Modifier = Modifier,
 ) {
     val currentPosition by rememberUpdatedState(newValue = viewModel.currentPosition.value)
     val duration = viewModel.getDuration()
 
     val progress = remember { mutableFloatStateOf(0f) }
     val isLike by viewModel.isLike.collectAsState()
-    var previousDestination: NavBackStackEntry? = null
 
     BackHandler {
         viewModel.popBackStack(navController)
     }
 
-    viewModel.music?.team?.let {
+    music?.team?.let {
         Modifier
             .background(it.getSubColor())
             .fillMaxSize()
             .padding(20.dp)
     }?.let {
         Column(
-        modifier = it
+        modifier = modifier.then(it)
     ) {
-        viewModel.music?.let {
+        music?.let { music ->
             MusicNavigationBar(
-                music = it,
+                music = music,
                 isLike = isLike,
                 onClickBackButton = {
-                    viewModel.popBackStack(navController = navController)
+
                 }
             ) {
-                viewModel.updateLikeMusic()
+                viewModel.updateLikeMusic(music)
             }
-        }
 
-        viewModel.music?.let {
             MusicLylicView(
-                music = it,
+                music = music,
                 modifier = Modifier.weight(1f)
             )
         }

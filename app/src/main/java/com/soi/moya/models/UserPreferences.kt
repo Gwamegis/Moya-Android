@@ -1,6 +1,7 @@
 package com.soi.moya.models
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -16,8 +17,8 @@ class UserPreferences(private val context: Context) {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("selected_team")
         val SELECTED_TEAM = stringPreferencesKey("selected_team")
         val APP_VERSION = stringPreferencesKey("app_version")
-        val SHOW_MINI_PLAYER = booleanPreferencesKey("show_mini_player")
         val CURRENT_PLAY_SONG_ID = stringPreferencesKey("song_Id")
+        val IS_MiNIPLAYER_ACTIVATED = booleanPreferencesKey("is_miniplayer_activated")
     }
 
     val getSelectedTeam: Flow<String?> = context.dataStore.data
@@ -35,9 +36,19 @@ class UserPreferences(private val context: Context) {
             it[CURRENT_PLAY_SONG_ID]
         }
 
+    val isMiniPlayerActivated: Flow<Boolean> = context.dataStore.data
+        .map {
+            it[IS_MiNIPLAYER_ACTIVATED] ?: true
+        }
     suspend fun saveSelectedTeam(team: Team) {
         context.dataStore.edit { preferences ->
             preferences[SELECTED_TEAM] = team.name
+        }
+    }
+
+    suspend fun saveCurrentSongId(songId: String) {
+        context.dataStore.edit { preferences ->
+            preferences[CURRENT_PLAY_SONG_ID] = songId
         }
     }
 
@@ -46,6 +57,12 @@ class UserPreferences(private val context: Context) {
             context.dataStore.edit {
                 it[APP_VERSION] = version.version
             }
+        }
+    }
+
+    suspend fun saveIsMiniplayerActivated(isActivated: Boolean) {
+        context.dataStore.edit {
+            it[IS_MiNIPLAYER_ACTIVATED] = isActivated
         }
     }
 }

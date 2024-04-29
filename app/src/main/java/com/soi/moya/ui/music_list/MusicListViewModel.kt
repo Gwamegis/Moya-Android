@@ -41,6 +41,14 @@ class MusicListViewModel(
         }
     }
 
+    fun saveCurrentSongId(songId: String) {
+        viewModelScope.launch {
+            _userPreferences.saveCurrentSongId(songId)
+            _userPreferences.saveIsMiniplayerActivated(false)
+        }
+    }
+
+
     private fun updateMusicForSelectedTeam() {
 
         val selectedTeam = _selectedTeam.value

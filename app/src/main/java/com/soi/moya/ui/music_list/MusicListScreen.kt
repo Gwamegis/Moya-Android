@@ -42,11 +42,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
@@ -56,7 +54,6 @@ import com.soi.moya.ui.component.CellType
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.component.RequestMusicButton
 import com.soi.moya.ui.listItem_menu.ListItemMenuScreen
-import com.soi.moya.ui.main_activity.MusicViewModel
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -66,7 +63,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MusicListScreen(
-    musicViewModel: MusicViewModel,
     viewModel: MusicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
     navController: NavHostController
 ) {
@@ -118,7 +114,9 @@ fun MusicListScreen(
                                 music = music,
                                 team = team,
                                 image = albumImageResourceId,
-                                musicViewModel = musicViewModel
+                                onClickCell = {
+                                    viewModel.saveCurrentSongId(music.id)
+                                }
                             )
                         }
 
@@ -232,7 +230,7 @@ fun MusicListItemView(
     music: MusicInfo,
     team: Team,
     image: Int,
-    musicViewModel: MusicViewModel
+    onClickCell: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -244,7 +242,7 @@ fun MusicListItemView(
         cellType = CellType.List,
         image = image,
         onClickCell = {
-            musicViewModel.setSelectedMusic(music = music)
+            onClickCell()
         },
         onClickExtraButton = {
             showBottomSheet = true

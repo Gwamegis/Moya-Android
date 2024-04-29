@@ -1,21 +1,34 @@
 package com.soi.moya.repository
 
+import android.app.Application
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import com.soi.moya.models.MusicInfo
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
-class MusicPlayerManager private constructor() {
+class MusicPlayerManager private constructor(private val application: Application) {
     companion object {
         @Volatile
         private var instance: MusicPlayerManager? = null
 
-        fun getInstance() =
+        fun getInstance(application: Application) =
             instance ?: synchronized(this) {
-                instance ?: MusicPlayerManager().also { instance = it }
+                instance ?: MusicPlayerManager(application).also { instance = it }
             }
     }
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
@@ -71,7 +84,7 @@ class MusicPlayerManager private constructor() {
         }
     }
 
-    fun playMusicFromUrl(url: String) {
+    private fun playMusicFromUrl(url: String) {
         try {
             mediaPlayer.apply {
                 reset()
@@ -81,6 +94,48 @@ class MusicPlayerManager private constructor() {
             }
         } catch (e: IOException) {
             e.printStackTrace()
+        }
+    }
+
+    fun playMusic(currentMusic: MusicInfo) {
+        val filePath = application.filesDir.absolutePath
+        coroutineScope.launch {
+            val music = currentMusic
+            val file = File(filePath, "${music.id}-${music.title}.mp3")
+            if(!file.exists()) {
+                downloadFileAsync(music.url, file.absolutePath)
+            }
+            playMusicFromUrl(file.absolutePath)
+        }
+    }
+
+    private suspend fun downloadFileAsync(url: String, filePath: String): File? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val connection = URL(url).openConnection() as HttpURLConnection
+                connection.connect()
+
+                if(connection.responseCode == HttpURLConnection.HTTP_OK) {
+                    val inputStream: InputStream = connection.inputStream
+                    val file = File(filePath)
+                    val fileOutputStream = FileOutputStream(file)
+                    val buffer = ByteArray(1024)
+                    var bytesRead: Int
+
+                    while(inputStream.read(buffer).also { bytesRead = it } != -1) {
+                        fileOutputStream.write(buffer, 0, bytesRead)
+                    }
+
+                    fileOutputStream.close()
+                    inputStream.close()
+
+                    return@withContext file
+                } else {
+                    return@withContext null
+                }
+            } catch (e: Exception) {
+                return@withContext null
+            }
         }
     }
 }
