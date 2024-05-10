@@ -1,6 +1,7 @@
 package com.soi.moya.ui.music_player
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,6 +27,9 @@ import androidx.compose.material.Slider
 import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -55,11 +59,19 @@ fun MusicPlayerScreen(
     music: MusicInfo,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     val currentPosition by rememberUpdatedState(newValue = viewModel.currentPosition.value)
     val duration = viewModel.getDuration()
-
     val progress = remember { mutableFloatStateOf(0f) }
     val isLike by viewModel.isLike.collectAsState()
+
+    LaunchedEffect(viewModel.toastMessageResourceId) {
+        viewModel.toastMessageResourceId.collect { resourceId ->
+            if (resourceId != 0) {
+                Toast.makeText(context, resourceId, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     BackHandler {
         viewModel.popBackStack(navController)

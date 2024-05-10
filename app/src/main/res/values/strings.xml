@@ -35,4 +35,7 @@
     <!--메뉴 아이템 -->
     <string name="favorite">좋아요</string>
     <string name="favorite_cancle">좋아요 취소</string>
+
+    <!--    music Player-->
+    <string name="go_to_first_music">재생 목록의 처음으로 돌아갑니다.</string>
 </resources>

@@ -1,12 +1,10 @@
 package com.soi.moya.ui.music_player
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -22,9 +20,10 @@ import com.soi.moya.repository.MusicPlayerManager
 import com.soi.moya.ui.Utility
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
@@ -35,14 +34,9 @@ class MusicPlayerViewModel(
     private val storedMusicRepository: StoredMusicRepository,
     private var playListViewModel: PlayListViewModel
 ) : AndroidViewModel(application) {
-    private val _allItems: MutableLiveData<List<MusicInfo>> = MutableLiveData()
-    val allItems: LiveData<List<MusicInfo>> = _allItems
 
     private val _items = MutableStateFlow<List<MusicInfo>>(emptyList())
-    val items: StateFlow<List<MusicInfo>> = _items.asStateFlow()
-
     private val _currentSongId = MutableLiveData<String?>()
-    var music: MusicInfo? = null
 
     private val _songId: String
         get() = _currentSongId.value ?: ""
@@ -59,36 +53,30 @@ class MusicPlayerViewModel(
     private val _isLike = MutableStateFlow(false)
     val isLike: StateFlow<Boolean> = _isLike
 
-    private val musicPlayerManager: State<MusicPlayerManager>
-        get() = _musicPlayerManager
-
     val currentPosition: State<Int> get() = _currentPosition
     private val _currentPosition = mutableIntStateOf(0)
+
+    private val _toastMessageResourceId = MutableSharedFlow<Int>()
+    val toastMessageResourceId = _toastMessageResourceId.asSharedFlow()
 
     private val _userPreferences = UserPreferences(application)
 
     init {
         checkItemExistence(_songId)
         startUpdateCurrentPositionAndDuration()
-
-        viewModelScope.launch {
-            _musicPlayerManager.value.isPlaybackCompleted.collect { isPlaybackCompleted ->
-                if (isPlaybackCompleted) {
-                    handlePlaybackCompletion()
-                }
-            }
-        }
-        viewModelScope.launch {
-            playListViewModel.allItems.observeForever { listOfItems ->
-                _items.value = listOfItems
-            }
-        }
+        collectIsPlayBackCompleted()
+        observePlayListSongs()
     }
 
     private fun handlePlaybackCompletion() {
-        val music = _musicPlayerManager.value.currentPlayingMusic.value
-        music?.let {
-            playNextMusic(it)
+        _musicPlayerManager.value.currentPlayingMusic.value?.let { music ->
+            playNextMusic(music)
+        }
+    }
+
+    fun sendMessage(message: Int) {
+        viewModelScope.launch {
+            _toastMessageResourceId.emit(message)
         }
     }
 
@@ -103,7 +91,7 @@ class MusicPlayerViewModel(
     }
 
     fun togglePlayPause() {
-        musicPlayerManager.value.togglePlayPause()
+        _musicPlayerManager.value.togglePlayPause()
     }
 
     private fun saveCurrentSongId(songId: String) {
@@ -132,9 +120,22 @@ class MusicPlayerViewModel(
                 nextMusic?.let { music ->
                     _musicPlayerManager.value.playMusic(music)
                     saveCurrentSongId(songId = music.id)
+                } ?: run {
+                    playFirstMusic()
                 }
             }
 
+        }
+    }
+
+    private fun playFirstMusic() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                playListViewModel.getFirstMusic()?.let { firstMusic ->
+                    _musicPlayerManager.value.playMusic(firstMusic)
+                    saveCurrentSongId(songId = firstMusic.id)
+                }
+            }
         }
     }
 
@@ -205,6 +206,24 @@ class MusicPlayerViewModel(
     private fun checkItemExistence(itemId: String) {
         viewModelScope.launch {
             _isLike.value = doesItemExist(_songId) ?: false
+        }
+    }
+
+    private fun collectIsPlayBackCompleted() {
+        viewModelScope.launch {
+            _musicPlayerManager.value.isPlaybackCompleted.collect { isPlaybackCompleted ->
+                if (isPlaybackCompleted) {
+                    handlePlaybackCompletion()
+                }
+            }
+        }
+    }
+
+    private fun observePlayListSongs() {
+        viewModelScope.launch {
+            playListViewModel.allItems.observeForever { listOfItems ->
+                _items.value = listOfItems
+            }
         }
     }
 }

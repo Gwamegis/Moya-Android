@@ -36,9 +36,11 @@ class PlayListViewModel @Inject constructor(private val itemRepository: PlayList
 
     fun getNextMusic(currentMusic: MusicInfo): MusicInfo? {
         val currentIndex = _allItems.value?.indexOfFirst { it.id == currentMusic.id } ?: -1
-        // TODO: 처음으로 이동한다는 toast message 출력 필요
-        if (currentIndex == -1 || currentIndex == _allItems.value?.size?.minus(1)) { return _allItems.value?.first() }
+        if (currentIndex == -1 || currentIndex == _allItems.value?.size?.minus(1)) { return null }
+        return _allItems.value?.getOrNull(currentIndex + 1)
+    }
 
-        return _allItems.value?.getOrNull(currentIndex + 1) // 현재 음악의 다음 음악을 반환합니다.
+    fun getFirstMusic(): MusicInfo? {
+        return _allItems.value?.first()
     }
 }
