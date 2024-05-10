@@ -6,6 +6,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.soi.moya.data.PlayListViewModel
 import com.soi.moya.ui.listItem_menu.ListItemMenuViewModel
 import com.soi.moya.ui.main_activity.MusicViewModel
 import com.soi.moya.ui.mini_player.MiniPlayerViewModel
@@ -18,9 +19,14 @@ import com.soi.moya.ui.select_team.SelectTeamViewModel
 
 object AppViewModelProvider {
     private val application = Application()
+
     val Factory = viewModelFactory {
+
         initializer {
-            MusicListViewModel(application = application)
+            MusicListViewModel(
+                moyaApplication().container.playListRepository,
+                application = application
+            )
         }
         initializer {
             MusicStorageViewModel(
@@ -53,7 +59,8 @@ object AppViewModelProvider {
             MusicPlayerViewModel(
                 application,
                 this.createSavedStateHandle(),
-                moyaApplication().container.itemsRepository
+                moyaApplication().container.itemsRepository,
+                PlayListViewModel(moyaApplication().container.playListRepository)
             )
         }
     }

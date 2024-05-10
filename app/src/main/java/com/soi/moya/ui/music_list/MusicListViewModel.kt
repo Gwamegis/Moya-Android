@@ -6,16 +6,19 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.soi.moya.data.MusicManager
 import androidx.lifecycle.viewModelScope
+import com.soi.moya.data.PlayListRepository
 import com.soi.moya.data.SeasonSongManager
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MusicListViewModel(
-    // TODO: Repository 연결
+    private val repository: PlayListRepository,
     application: Application
 ) : AndroidViewModel(application) {
 
@@ -30,6 +33,18 @@ class MusicListViewModel(
     init {
         observeUserPreference()
         observeSelectedTeam()
+    }
+
+    fun addMusicInfoToDatabase(musicInfo: MusicInfo) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val existingMusic = repository.getMusicById(musicInfo.id)
+                if (existingMusic != null) {
+                    repository.deleteMusic(existingMusic)
+                }
+                repository.addMusic(musicInfo)
+            }
+        }
     }
 
     private fun observeUserPreference() {

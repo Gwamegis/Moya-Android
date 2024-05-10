@@ -39,7 +39,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
@@ -103,9 +102,15 @@ fun MusicPlayerScreen(
 
         MusicPlayerBottomButtonView(
             isPlaying = viewModel.isPlaying.value,
+            onClickPrevButton = {
+                viewModel.playPrevMusic(music)
+            },
             onClickPlayButton = {
                 viewModel.togglePlayPause()
-            }
+            },
+            onClickNextButton = {
+                viewModel.playNextMusic(music)
+            },
         )
     }
     }
@@ -315,7 +320,9 @@ fun MusicPlayerSlider(
 @Composable
 fun MusicPlayerBottomButtonView(
     isPlaying: Boolean,
-    onClickPlayButton: () -> Unit
+    onClickPrevButton: () -> Unit,
+    onClickPlayButton: () -> Unit,
+    onClickNextButton: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -323,18 +330,48 @@ fun MusicPlayerBottomButtonView(
             .navigationBarsPadding(),
         contentAlignment = Alignment.Center,
     ) {
-        Image(
+        Row(
             modifier = Modifier
-                .size(60.dp)
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(25.dp))
-                .clickable { onClickPlayButton() },
-            painter = painterResource(
-                id = if (isPlaying) R.drawable.baseline_pause_circle_24 else {
-                    R.drawable.baseline_play_circle_24
-                }
-            ),
-            contentDescription = null
-        )
+                .padding(horizontal = 20.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Image(
+                modifier = Modifier
+                    .size(50.dp)
+                    .aspectRatio(1f)
+                    .clickable { onClickPrevButton() },
+                painter = painterResource(
+                    id = R.drawable.baseline_skip_previous_24
+                ),
+                contentDescription = null
+            )
+
+            Image(
+                modifier = Modifier
+                    .size(60.dp)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(25.dp))
+                    .clickable { onClickPlayButton() },
+                painter = painterResource(
+                    id = if (isPlaying) R.drawable.baseline_pause_circle_24 else {
+                        R.drawable.baseline_play_circle_24
+                    }
+                ),
+                contentDescription = null
+            )
+
+            Image(
+                modifier = Modifier
+                    .size(50.dp)
+                    .aspectRatio(1f)
+                    .clickable { onClickNextButton() },
+                painter = painterResource(
+                    R.drawable.baseline_skip_next_24
+                ),
+                contentDescription = null
+            )
+        }
     }
 }

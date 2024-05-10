@@ -1,7 +1,6 @@
 package com.soi.moya.ui.mini_player
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -205,7 +204,9 @@ fun MiniPlayer(
             Image(
                 painter = painterResource(R.drawable.play_next),
                 contentDescription = "play next",
-                modifier = Modifier.clickable {  })
+                modifier = Modifier.clickable {
+                    viewModel.playNextMusic(music)
+                })
         }
     }
 }

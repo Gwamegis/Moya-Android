@@ -9,6 +9,7 @@ import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.models.toMusicInfo
 import com.soi.moya.repository.FirebaseRepository
+
 class MusicManager private constructor() {
     private val _firebaseRepository = FirebaseRepository<Music>(clazz = Music::class.java)
     private val _musics: MutableMap<String, MutableLiveData<List<MusicInfo>>> = mutableMapOf()

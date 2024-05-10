@@ -1,7 +1,6 @@
 package com.soi.moya.ui.mini_player
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope

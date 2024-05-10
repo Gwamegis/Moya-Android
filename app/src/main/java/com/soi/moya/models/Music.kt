@@ -1,5 +1,8 @@
 package com.soi.moya.models
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 data class Music(
     val id: String = "",
     val info: String = "",
@@ -9,8 +12,9 @@ data class Music(
     val url: String = ""
 )
 
+@Entity(tableName = "music_info")
 data class MusicInfo(
-    val id: String = "",
+    @PrimaryKey val id: String = "",
     val info: String = "",
     val lyrics: String = "",
     val title: String = "",

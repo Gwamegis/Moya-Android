@@ -33,10 +33,20 @@ class MusicPlayerManager private constructor(private val application: Applicatio
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
 
+    private val _isPlaybackCompleted = MutableStateFlow(false)
+    val isPlaybackCompleted: StateFlow<Boolean> = _isPlaybackCompleted
+
+    private val _currentPlayingMusic = MutableStateFlow<MusicInfo?>(null)
+    val currentPlayingMusic: StateFlow<MusicInfo?> = _currentPlayingMusic
+
     private val mediaPlayer = MediaPlayer().apply {
         setAudioAttributes(
             AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
         )
+
+        setOnCompletionListener {
+            _isPlaybackCompleted.value = true
+        }
     }
 
     fun togglePlayPause() {
@@ -98,6 +108,7 @@ class MusicPlayerManager private constructor(private val application: Applicatio
     }
 
     fun playMusic(currentMusic: MusicInfo) {
+        _currentPlayingMusic.value = currentMusic
         val filePath = application.filesDir.absolutePath
         coroutineScope.launch {
             val music = currentMusic

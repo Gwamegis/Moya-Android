@@ -116,6 +116,7 @@ fun MusicListScreen(
                                 image = albumImageResourceId,
                                 onClickCell = {
                                     viewModel.saveCurrentSongId(music.id)
+                                    viewModel.addMusicInfoToDatabase(musicInfo = music)
                                 }
                             )
                         }
