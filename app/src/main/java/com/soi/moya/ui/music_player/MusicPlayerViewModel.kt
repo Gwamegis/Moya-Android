@@ -1,7 +1,6 @@
 package com.soi.moya.ui.music_player
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +39,12 @@ class MusicPlayerViewModel(
     private val _teamName: String = savedStateHandle["team"] ?: "doosan"
     val team: Team = Team.valueOf(_teamName)
 
-    private val _musicPlayerManager = mutableStateOf(MusicPlayerManager.getInstance(application = application))
+    private val _musicPlayerManager = mutableStateOf(
+        MusicPlayerManager.getInstance(
+            application = application,
+            storedMusicRepository = storedMusicRepository
+            )
+    )
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
@@ -55,7 +59,7 @@ class MusicPlayerViewModel(
     private val _currentPosition = mutableIntStateOf(0)
 
     init {
-        checkItemExistence(_songId)
+        checkItemExistence()
         startUpdateCurrentPositionAndDuration()
     }
 
@@ -71,6 +75,10 @@ class MusicPlayerViewModel(
 
     fun togglePlayPause() {
         musicPlayerManager.value.togglePlayPause()
+    }
+
+    fun playNextSong(increment: Int) {
+        musicPlayerManager.value.playNextSong(increment)
     }
 
     fun formatTime(time: Int): String {
@@ -111,7 +119,7 @@ class MusicPlayerViewModel(
     private fun likeMusic(music: MusicInfo) {
         viewModelScope.launch {
             val order = storedMusicRepository.getItemCount(playlist = "favorite")
-            val music = music!!.toStoredMusic(
+            val music = music.toStoredMusic(
                 team = team,
                 order = order,
                 date = Utility.getCurrentTimeString(),
@@ -127,16 +135,16 @@ class MusicPlayerViewModel(
     private fun unlikeMusic(music: MusicInfo) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                storedMusicRepository.deleteById(id = music!!.id, playlist = "favorite")
+                storedMusicRepository.deleteById(id = music.id, playlist = "favorite")
             }
         }
     }
-    suspend fun doesItemExist(itemId: String): Boolean {
-        return storedMusicRepository.doesItemExist(itemId = itemId)
+    private suspend fun doesItemExist(itemId: String): Boolean {
+        return storedMusicRepository.doesItemExist(itemId = itemId, playlist = "favorite")
     }
-    private fun checkItemExistence(itemId: String) {
+    private fun checkItemExistence() {
         viewModelScope.launch {
-            _isLike.value = doesItemExist(_songId) ?: false
+            _isLike.value = doesItemExist(_songId)
         }
     }
 }

@@ -30,7 +30,8 @@ fun Music.toMusicInfo(team: Team): MusicInfo = MusicInfo(
 )
 
 fun MusicInfo.toStoredMusic(team: Team, order: Int, date: String, playlist: String): StoredMusic = StoredMusic(
-    id = id,
+    id = id+"_"+playlist,
+    songId = id,
     team = team.name,
     title = title,
     lyrics = lyrics,

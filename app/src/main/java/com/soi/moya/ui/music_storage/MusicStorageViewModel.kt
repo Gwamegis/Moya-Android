@@ -19,7 +19,7 @@ class MusicStorageViewModel(
     application: Application
 ): AndroidViewModel(application = application) {
     val storageUiState: StateFlow<StorageUiState> =
-        storedMusicRepository.getAllItemsStream().map { StorageUiState(it) }
+        storedMusicRepository.getByDefaultPlaylist().map { StorageUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
@@ -31,7 +31,7 @@ class MusicStorageViewModel(
     private val seasonSongs: Map<String, LiveData<List<String>>> get() = _seasonSongManager.getSeasonSongs()
 
     companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
+        const val TIMEOUT_MILLIS = 5_000L
     }
 
     fun fetchAlbumImageResourceId(music: MusicInfo, team: Team): Int {

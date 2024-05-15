@@ -36,7 +36,7 @@ interface StoredMusicDao{
     @Query("SELECT*FROM stored_music")
     fun getAllItems(): Flow<List<StoredMusic>>
 
-    @Query("SELECT * from stored_music WHERE id = :id")
+    @Query("SELECT * from stored_music WHERE songId = :id")
     fun getItem(id: Int): Flow<StoredMusic>
 
     @Query("SELECT*FROM stored_music WHERE playlist_title LIKE :playlist ORDER BY date ASC")
@@ -45,13 +45,16 @@ interface StoredMusicDao{
     @Query("SELECT*FROM stored_music WHERE playlist_title LIKE :playlist ORDER BY `order` ASC")
     fun getByDefaultPlaylist(playlist: String = "default"): Flow<List<StoredMusic>>
 
-    @Query("SELECT EXISTS(SELECT 1 FROM stored_music WHERE id = :itemId)")
-    suspend fun doesItemExist(itemId: String): Boolean
+    @Query("SELECT*FROM stored_music WHERE playlist_title LIKE :playlist ORDER BY `order` ASC")
+    fun getByPlaylist(playlist: String): Flow<List<StoredMusic>>
+
+    @Query("SELECT EXISTS(SELECT 1 FROM stored_music WHERE songId = :itemId AND playlist_title = :playlist)")
+    suspend fun doesItemExist(itemId: String, playlist: String): Boolean
 
     @Query("SELECT COUNT(*) FROM stored_music WHERE playlist_title = :playlist")
     suspend fun getItemCount(playlist: String): Int
 
-    @Query("DELETE FROM stored_music WHERE id = :id AND playlist_title = :playlist")
+    @Query("DELETE FROM stored_music WHERE songId = :id AND playlist_title = :playlist")
     suspend fun deleteById(id: String, playlist: String)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -68,4 +71,12 @@ interface StoredMusicDao{
 
     @Query("DELETE FROM stored_music")
     fun deleteAll()
+    @Query("SELECT * from stored_music WHERE songId = :id AND playlist_title = :playlist")
+    fun getItemById(id: String, playlist: String): StoredMusic
+
+    @Query("UPDATE stored_music SET `order` = `order` + :increment WHERE playlist_title = 'default' AND `order` >= :start AND `order` < :end")
+    fun updateOrder(start: Int, end: Int, increment: Int)
+
+    @Query("UPDATE stored_music SET `order` = :order WHERE playlist_title = 'default' AND songId = :id")
+    fun updateOrder(id: String, order: Int)
 }

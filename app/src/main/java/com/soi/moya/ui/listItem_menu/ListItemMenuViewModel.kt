@@ -1,6 +1,7 @@
 package com.soi.moya.ui.listItem_menu
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.StoredMusicRepository
@@ -18,7 +19,7 @@ class ListItemMenuViewModel(
     application: Application
 ): AndroidViewModel(application = application) {
     suspend fun doesItemExist(itemId: String): Boolean {
-        return storedMusicRepository.doesItemExist(itemId = itemId)
+        return storedMusicRepository.doesItemExist(itemId = itemId, playlist = "favorite")
     }
 
     fun saveItem(music: MusicInfo, team: Team) {
@@ -30,7 +31,6 @@ class ListItemMenuViewModel(
                 date = Utility.getCurrentTimeString(),
                 playlist = "favorite"
             )
-
             withContext(Dispatchers.IO) {
                 storedMusicRepository.insertItem(music.toItem())
             }

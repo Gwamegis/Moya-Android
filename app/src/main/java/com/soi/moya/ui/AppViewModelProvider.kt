@@ -17,41 +17,43 @@ import com.soi.moya.ui.search.SearchViewModel
 import com.soi.moya.ui.select_team.SelectTeamViewModel
 
 object AppViewModelProvider {
-    private val application = Application()
     val Factory = viewModelFactory {
         initializer {
-            MusicListViewModel(application = application)
+            MusicListViewModel(
+                application = moyaApplication(),
+                storedMusicRepository = moyaApplication().container.itemsRepository
+            )
         }
         initializer {
             MusicStorageViewModel(
                 moyaApplication().container.itemsRepository,
-                application = application
+                application = moyaApplication()
             )
         }
         initializer {
-            SelectTeamViewModel(application = application)
+            SelectTeamViewModel(application = moyaApplication())
         }
         initializer {
-            SearchViewModel(application = application)
+            SearchViewModel(application = moyaApplication())
         }
         initializer {
-            NoticeBottomSheetViewModel(application = application)
+            NoticeBottomSheetViewModel(application = moyaApplication())
         }
         initializer {
             ListItemMenuViewModel(
                 moyaApplication().container.itemsRepository,
-                application = application
+                application = moyaApplication()
             )
         }
         initializer {
-            MusicViewModel(application)
+            MusicViewModel(moyaApplication())
         }
         initializer {
-            MiniPlayerViewModel(application)
+            MiniPlayerViewModel(moyaApplication())
         }
         initializer {
             MusicPlayerViewModel(
-                application,
+                moyaApplication(),
                 this.createSavedStateHandle(),
                 moyaApplication().container.itemsRepository
             )

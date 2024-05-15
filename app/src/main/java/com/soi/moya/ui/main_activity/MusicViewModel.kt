@@ -15,8 +15,8 @@ import kotlinx.coroutines.launch
 class MusicViewModel(
     application: Application
 ) : AndroidViewModel(application) {
-    private val musicManager = MusicManager.getInstance()
-    private val musicPlayerManager = MusicPlayerManager.getInstance(application = application)
+//    private val musicManager = MusicManager.getInstance()
+//    private val musicPlayerManager = MusicPlayerManager.getInstance(application = application)
 
     private val _userPreferences = UserPreferences(application)
 
@@ -24,24 +24,24 @@ class MusicViewModel(
     val selectedMusic: LiveData<MusicInfo?> = _selectedMusic
 
     init {
-        observeCurrentSongId()
+//        observeCurrentSongId()
     }
 
-    private fun observeCurrentSongId() {
-        viewModelScope.launch {
-            // ...songId 변경 시 작업 작성
-            _userPreferences.currentPlaySongId.collect{ songId ->
-                if (songId != null) {
-                    musicManager.getMusicById(songId)?.let { musicInfo ->
-                        if (_selectedMusic.value != musicInfo) {
-                            _selectedMusic.value = musicInfo
-                            musicPlayerManager.playMusic(musicInfo)
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    private fun observeCurrentSongId() {
+//        viewModelScope.launch {
+//            // ...songId 변경 시 작업 작성
+//            _userPreferences.currentPlaySongId.collect{ songId ->
+//                if (songId != null) {
+//                    musicManager.getMusicById(songId)?.let { musicInfo ->
+//                        if (_selectedMusic.value != musicInfo) {
+//                            _selectedMusic.value = musicInfo
+//                            musicPlayerManager.playMusic(musicInfo)
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     companion object {
         @Volatile

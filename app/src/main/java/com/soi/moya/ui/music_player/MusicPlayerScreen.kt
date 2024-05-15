@@ -1,6 +1,7 @@
 package com.soi.moya.ui.music_player
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -73,7 +74,7 @@ fun MusicPlayerScreen(
             .padding(20.dp)
     }?.let {
         Column(
-        modifier = modifier.then(it)
+            modifier = modifier.then(it)
     ) {
         music?.let { music ->
             MusicNavigationBar(
@@ -105,6 +106,10 @@ fun MusicPlayerScreen(
             isPlaying = viewModel.isPlaying.value,
             onClickPlayButton = {
                 viewModel.togglePlayPause()
+            },
+            onClickSkipButton = {increment ->
+                viewModel.playNextSong(increment)
+                Log.d("MusicPlayerViewModel", "$increment- skip button")
             }
         )
     }
@@ -315,14 +320,27 @@ fun MusicPlayerSlider(
 @Composable
 fun MusicPlayerBottomButtonView(
     isPlaying: Boolean,
-    onClickPlayButton: () -> Unit
+    onClickPlayButton: () -> Unit,
+    onClickSkipButton: (increment: Int) -> Unit
 ) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding(),
-        contentAlignment = Alignment.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(54.dp, Alignment.CenterHorizontally),
     ) {
+        Image(
+            modifier = Modifier
+                .size(25.dp)
+                .aspectRatio(1f)
+                .clickable { onClickSkipButton(-1) },
+            painter = painterResource(
+                id = R.drawable.skip_previous
+            ),
+            contentDescription = "skip previous"
+        )
+
         Image(
             modifier = Modifier
                 .size(60.dp)
@@ -335,6 +353,17 @@ fun MusicPlayerBottomButtonView(
                 }
             ),
             contentDescription = null
+        )
+
+        Image(
+            modifier = Modifier
+                .size(25.dp)
+                .aspectRatio(1f)
+                .clickable { onClickSkipButton(1) },
+            painter = painterResource(
+                id = R.drawable.skip_next
+            ),
+            contentDescription = "skip next"
         )
     }
 }

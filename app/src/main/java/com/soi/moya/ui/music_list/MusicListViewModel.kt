@@ -1,22 +1,33 @@
 package com.soi.moya.ui.music_list
 
 import android.app.Application
+import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.soi.moya.data.MusicManager
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.SeasonSongManager
+import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
+import com.soi.moya.models.copy
+import com.soi.moya.models.toItem
+import com.soi.moya.models.toStoredMusic
+import com.soi.moya.repository.MusicPlayerManager
+import com.soi.moya.ui.Utility
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MusicListViewModel(
-    // TODO: Repository 연결
-    application: Application
+    private val application: Application,
+    private val storedMusicRepository: StoredMusicRepository
 ) : AndroidViewModel(application) {
 
     private val _userPreferences = UserPreferences(application)
@@ -27,6 +38,16 @@ class MusicListViewModel(
     private val seasonSongs: LiveData<List<String>> get() = _seasonSongManager.getSeasonSongsForTeam(_selectedTeam.value)
     private val _teamMusics = mutableStateOf(emptyList<MusicInfo>())
     private val _playerMusics = mutableStateOf(emptyList<MusicInfo>())
+
+    private val _musicPlayerManager = mutableStateOf(
+        MusicPlayerManager.getInstance(
+            application = application,
+            storedMusicRepository = storedMusicRepository
+        )
+    )
+    private val musicPlayerManager: State<MusicPlayerManager>
+        get() = _musicPlayerManager
+
     init {
         observeUserPreference()
         observeSelectedTeam()
@@ -41,10 +62,61 @@ class MusicListViewModel(
         }
     }
 
-    fun saveCurrentSongId(songId: String) {
+    fun onTapListItem(music: MusicInfo, team: Team) {
+        saveItem(music, team)
+        playMusic(music)
+    }
+
+
+    private fun saveCurrentSongId(songId: String) {
         viewModelScope.launch {
             _userPreferences.saveCurrentSongId(songId)
             _userPreferences.saveIsMiniplayerActivated(false)
+
+            _userPreferences.currentPlaySongId.collect { id ->
+                if (id != null) {
+                    Log.d("MusicPlayer-ListViewModel-id", id)
+                    Log.d("MusicPlayer-ListViewModel-songId", songId)
+
+                }
+            }
+
+        }
+    }
+
+    private fun saveItem(music: MusicInfo, team: Team) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val existingMusic = storedMusicRepository.getItemById(music.id, "default")
+
+                if (existingMusic != null) {
+                    // 이미 저장된 음악 정보가 있을 때
+                    storedMusicRepository.updateOrder(
+                        start = 0,
+                        end = existingMusic.order,
+                        increment = 1
+                    )
+                    storedMusicRepository.updateOrder(existingMusic.songId, 0)
+                } else {
+                    // 새로운 음악 정보를 추가할 때
+                    val order = storedMusicRepository.getItemCount(playlist = "default")
+                    storedMusicRepository.updateOrder(
+                        start = 0,
+                        end = order,
+                        increment = 1
+                    )
+
+                    val newMusic = music.toStoredMusic(
+                        team = team,
+                        order = 0,
+                        date = Utility.getCurrentTimeString(),
+                        playlist = "default"
+                    )
+                    storedMusicRepository.insertItem(newMusic.toItem())
+                }
+
+                saveCurrentSongId(music.id)
+            }
         }
     }
 
@@ -92,6 +164,18 @@ class MusicListViewModel(
             } else {
                 team.getTeamImageResourceId()
             }
+        }
+    }
+
+
+    fun togglePlayPause() {
+        musicPlayerManager.value.togglePlayPause()
+    }
+
+    private fun playMusic(music: MusicInfo) {
+        viewModelScope.launch {
+            Log.d("MusicList-file", application.filesDir.toString())
+            musicPlayerManager.value.playMusic(music)
         }
     }
 }

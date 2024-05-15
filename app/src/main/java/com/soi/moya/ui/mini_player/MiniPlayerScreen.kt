@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -56,6 +57,10 @@ fun MiniPlayerScreen(
     val heightFraction = ((height.value - viewModel.minHeight) / (maxHeight - viewModel.minHeight)).coerceIn(0f, 1f)
 
     viewModel.setMaxHeight(maxHeight)
+
+    LaunchedEffect(viewModel.height.value) {
+        height.animateTo(viewModel.height.value)
+    }
 
     Box(
         modifier = Modifier
@@ -205,7 +210,7 @@ fun MiniPlayer(
             Image(
                 painter = painterResource(R.drawable.play_next),
                 contentDescription = "play next",
-                modifier = Modifier.clickable {  })
+                modifier = Modifier.clickable { viewModel.playNextSong(1) })
         }
     }
 }
