@@ -109,7 +109,6 @@ fun MusicPlayerScreen(
             },
             onClickSkipButton = {increment ->
                 viewModel.playNextSong(increment)
-                Log.d("MusicPlayerViewModel", "$increment- skip button")
             }
         )
     }

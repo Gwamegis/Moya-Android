@@ -3,6 +3,7 @@ package com.soi.moya.ui.music_list
 import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -22,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -64,27 +66,25 @@ class MusicListViewModel(
 
     fun onTapListItem(music: MusicInfo, team: Team) {
         saveItem(music, team)
-        playMusic(music)
     }
 
+    private fun saveIsMiniplayerActivated() {
+        viewModelScope.launch {
+            _userPreferences.saveIsMiniplayerActivated(false)
+        }
+    }
 
     private fun saveCurrentSongId(songId: String) {
         viewModelScope.launch {
             _userPreferences.saveCurrentSongId(songId)
             _userPreferences.saveIsMiniplayerActivated(false)
-
-            _userPreferences.currentPlaySongId.collect { id ->
-                if (id != null) {
-                    Log.d("MusicPlayer-ListViewModel-id", id)
-                    Log.d("MusicPlayer-ListViewModel-songId", songId)
-
-                }
-            }
-
         }
     }
 
     private fun saveItem(music: MusicInfo, team: Team) {
+
+        //만약 이미 default에 있으면 전체화면 + 음악재생
+        //defuault에 업스면 추가하고 전체화면 + 음악재생
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val existingMusic = storedMusicRepository.getItemById(music.id, "default")
@@ -116,6 +116,15 @@ class MusicListViewModel(
                 }
 
                 saveCurrentSongId(music.id)
+                saveIsMiniplayerActivated()
+
+                val currentSongId = _userPreferences.currentPlaySongId.firstOrNull()
+
+                if (currentSongId != music.id) {
+                    // 현재 재생 중인 음악과 선택한 음악이 같을 때의 작업 수행
+                    // 최초 실행 시 current == music.id 가 같은 경우 존재 예외 처리 필요
+                    playMusic(music)
+                }
             }
         }
     }
@@ -167,14 +176,8 @@ class MusicListViewModel(
         }
     }
 
-
-    fun togglePlayPause() {
-        musicPlayerManager.value.togglePlayPause()
-    }
-
     private fun playMusic(music: MusicInfo) {
         viewModelScope.launch {
-            Log.d("MusicList-file", application.filesDir.toString())
             musicPlayerManager.value.playMusic(music)
         }
     }

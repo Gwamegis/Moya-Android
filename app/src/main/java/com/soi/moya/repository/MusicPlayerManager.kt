@@ -5,25 +5,17 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.MusicManager
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.StoredMusic
-import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.toMusicInfo
-import com.soi.moya.ui.music_storage.MusicStorageViewModel
-import com.soi.moya.ui.music_storage.StorageUiState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -89,21 +81,9 @@ class MusicPlayerManager private constructor(
     private fun observeCurrentSongId() {
         coroutineScope.launch {
             _userPreferences.currentPlaySongId.collectLatest { songId ->
-                // currentPlaySongId 값이 변경될 때 실행할 함수를 여기에 추가합니다.
-                // 예를 들어, 다음과 같이 현재 곡의 ID를 로그에 출력하는 함수를 호출할 수 있습니다.
-                Log.d("MusicPlayerManager", "Current Song ID: $songId")
-                // 여기에 다른 로직을 추가하여 원하는 작업을 수행합니다.
                 if (songId != null) {
-                    Log.d("MusicPlayerManager", "songId not nullr")
-//                    Log.d("MusicPlayerManager", defaultPlaylists.value.itemList.count().toString())
-                    Log.d("MusicPlayerManager", currentStoredMusicList.count().toString())
-
-
-                    // defaultPlaylists에서 해당 노래를 찾기
-//                    val musicInfo = defaultPlaylists.value.itemList.find { it.songId == songId }
                     val musicInfo = currentStoredMusicList.find { it.songId == songId }
                     currentMusic.value = musicInfo
-                    musicInfo?.let { Log.d("MusicPlayerManager", it.title) }
                 }
             }
         }
@@ -112,13 +92,7 @@ class MusicPlayerManager private constructor(
     private fun observeStoredMusicChanges() {
         coroutineScope.launch {
             storedMusicRepository.getByDefaultPlaylist().collect { storedMusicList ->
-                // 이곳에서 데이터베이스의 변경사항을 처리합니다.
-                // 변경된 음악 리스트를 처리하는 로직을 작성합니다.
                 currentStoredMusicList = storedMusicList
-
-                storedMusicList.forEach { item ->
-                    Log.d("MusicPlayer-default", item.title + item.order)
-                }
             }
         }
     }
@@ -209,10 +183,7 @@ class MusicPlayerManager private constructor(
             val music = currentMusic
             val file = File(filePath, "${music.id}-${music.title}.mp3")
             if(!file.exists()) {
-                Log.d("file-MusicPlayer", "download")
                 downloadFileAsync(music.url, file.absolutePath)
-            } else run {
-                Log.d("file-MusicPlayer", "file exists")
             }
             playMusicFromUrl(file.absolutePath)
         }

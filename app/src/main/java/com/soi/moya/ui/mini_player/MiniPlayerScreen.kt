@@ -50,16 +50,20 @@ fun MiniPlayerScreen(
     viewModel: MiniPlayerViewModel = viewModel(factory = AppViewModelProvider.Factory),
     maxHeight: Float,
     navController: NavHostController,
-    music: MusicInfo,
+    music: MusicInfo
 ) {
-    val height = remember { Animatable(viewModel.height.value) }
+    val height = remember { Animatable(viewModel.minHeight) }
     val coroutineScope = rememberCoroutineScope()
     val heightFraction = ((height.value - viewModel.minHeight) / (maxHeight - viewModel.minHeight)).coerceIn(0f, 1f)
 
     viewModel.setMaxHeight(maxHeight)
 
-    LaunchedEffect(viewModel.height.value) {
-        height.animateTo(viewModel.height.value)
+    val isMiniActivated by viewModel.isMiniPlayerActivated.collectAsState()
+
+    LaunchedEffect(isMiniActivated) {
+        if (!isMiniActivated) {
+            height.animateTo(maxHeight)
+        }
     }
 
     Box(
@@ -104,9 +108,13 @@ fun MiniPlayerScreen(
                                 dragStarted = false
                             }
                             val newHeight =
-                                max(viewModel.minHeight, height.value - dragAmount * viewModel.scalingFactor)
-                            coroutineScope.launch { height.snapTo(newHeight) }
-                            viewModel.setHeight(newHeight)
+                                max(
+                                    viewModel.minHeight,
+                                    height.value - dragAmount * viewModel.scalingFactor
+                                )
+                            coroutineScope.launch {
+                                height.snapTo(newHeight)
+                            }
                             change.consume()
                         },
                         onDragEnd = {
@@ -117,7 +125,14 @@ fun MiniPlayerScreen(
                                 dragDirection > 0 && height.value >= viewModel.threshold.value -> maxHeight
                                 else -> height.value
                             }
-                            viewModel.setHeight(targetHeight)
+                            val isMiniActivated = when {
+                                dragDirection < 0 && height.value > viewModel.threshold.value -> false
+                                dragDirection > 0 && height.value < viewModel.threshold.value -> true
+                                dragDirection < 0 && height.value <= viewModel.threshold.value -> true
+                                dragDirection > 0 && height.value >= viewModel.threshold.value -> false
+                                else -> true
+                            }
+                            viewModel.setIsMiniplayerActivated(isMiniActivated)
                             coroutineScope.launch {
                                 height.animateTo(targetHeight)
                             }
@@ -128,7 +143,6 @@ fun MiniPlayerScreen(
                     if (height.value == viewModel.minHeight)
                         Modifier
                             .clickable {
-                                viewModel.setHeight(maxHeight)
                                 coroutineScope.launch {
                                     height.animateTo(maxHeight)
                                 }
