@@ -152,29 +152,32 @@ fun MiniPlayerScreen(
                 )
         ) {
 
-            MusicPlayerScreen(
-                navController = navController,
-                music = music,
-                modifier = Modifier
-                    .alpha(heightFraction)
-                    .pointerInput(Unit) {
-                        if (heightFraction <= 0f) {
-                            detectTapGestures(onPress = { })
+            if (heightFraction > 0.1f) {
+                MusicPlayerScreen(
+                    navController = navController,
+                    music = music,
+                    modifier = Modifier
+                        .alpha(heightFraction)
+                        .pointerInput(Unit) {
+                            if (heightFraction <= 0f) {
+                                detectTapGestures(onPress = { })
+                            }
                         }
-                    }
 
-            )
+                )
+            } else {
 
-            MiniPlayer(
-                music = music,
-                modifier = Modifier
-                    .alpha(1f - heightFraction)
-                    .pointerInput(Unit) {
-                        if (1f - heightFraction <= 0f) {
-                            detectTapGestures(onPress = { })
+                MiniPlayer(
+                    music = music,
+                    modifier = Modifier
+                        .alpha(1f - heightFraction)
+                        .pointerInput(Unit) {
+                            if (1f - heightFraction <= 0f) {
+                                detectTapGestures(onPress = { })
+                            }
                         }
-                    }
-            )
+                )
+            }
         }
     }
 }
