@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
@@ -30,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
@@ -40,7 +42,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
@@ -62,6 +63,7 @@ fun MusicPlayerScreen(
 
     val progress = remember { mutableFloatStateOf(0f) }
     val isLike by viewModel.isLike.collectAsState()
+    var isPlaylist = remember { mutableStateOf(false) }
 
     BackHandler {
         viewModel.popBackStack(navController)
@@ -71,7 +73,7 @@ fun MusicPlayerScreen(
         Modifier
             .background(it.getSubColor())
             .fillMaxSize()
-            .padding(20.dp)
+//            .padding(20.dp)
     }?.let {
         Column(
             modifier = modifier.then(it)
@@ -87,10 +89,38 @@ fun MusicPlayerScreen(
                 viewModel.updateLikeMusic(music)
             }
 
-            MusicLylicView(
-                music = music,
-                modifier = Modifier.weight(1f)
-            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                if (isPlaylist.value) {
+                    PlaylistScreen()
+                } else {
+                    MusicLyricView(
+                        music = music
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .padding(end = 40.dp)
+                        .size(43.dp)
+                        .background(
+                            color = music.team.getBackgroundColor(),
+                            shape = CircleShape
+                        )
+                        .align(Alignment.BottomEnd) // 오른쪽 하단에 배치
+                        .clickable {
+                            isPlaylist.value = !isPlaylist.value
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.playlist), contentDescription = "",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+
         }
 
         MusicPlayerSlider(
@@ -135,7 +165,9 @@ fun MusicNavigationBar(
     }
 
     Row(
-        modifier = Modifier.statusBarsPadding(),
+        modifier = Modifier
+            .statusBarsPadding()
+            .padding(top = 10.dp, bottom = 20.dp, start = 20.dp, end = 20.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -201,8 +233,8 @@ fun MusicNavigationBar(
 }
 
 @Composable
-fun MusicLylicView(
-    modifier: Modifier,
+fun MusicLyricView(
+    modifier: Modifier = Modifier,
     music: MusicInfo,
 ) {
     val scrollState = rememberScrollState()
@@ -212,7 +244,7 @@ fun MusicLylicView(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 20.dp, horizontal = 20.dp)
+            .padding(vertical = 20.dp, horizontal = 40.dp)
     ) {
         Text(
             text = music.lyrics.replace("\\n", "\n"),

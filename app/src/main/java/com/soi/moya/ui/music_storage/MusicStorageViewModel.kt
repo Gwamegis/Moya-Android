@@ -19,7 +19,7 @@ class MusicStorageViewModel(
     application: Application
 ): AndroidViewModel(application = application) {
     val storageUiState: StateFlow<StorageUiState> =
-        storedMusicRepository.getByDefaultPlaylist().map { StorageUiState(it) }
+        storedMusicRepository.getByStoragePlaylist().map { StorageUiState(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

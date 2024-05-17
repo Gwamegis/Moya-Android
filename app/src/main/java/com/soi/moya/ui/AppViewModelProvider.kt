@@ -11,6 +11,7 @@ import com.soi.moya.ui.main_activity.MusicViewModel
 import com.soi.moya.ui.mini_player.MiniPlayerViewModel
 import com.soi.moya.ui.music_list.MusicListViewModel
 import com.soi.moya.ui.music_player.MusicPlayerViewModel
+import com.soi.moya.ui.music_player.PlaylistViewModel
 import com.soi.moya.ui.music_storage.MusicStorageViewModel
 import com.soi.moya.ui.notice.NoticeBottomSheetViewModel
 import com.soi.moya.ui.search.SearchViewModel
@@ -50,6 +51,12 @@ object AppViewModelProvider {
         }
         initializer {
             MiniPlayerViewModel(moyaApplication())
+        }
+        initializer {
+            PlaylistViewModel(
+                moyaApplication(),
+                moyaApplication().container.itemsRepository
+            )
         }
         initializer {
             MusicPlayerViewModel(
