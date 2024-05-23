@@ -149,7 +149,7 @@ class MusicPlayerViewModel(
     }
     private fun checkItemExistence() {
         viewModelScope.launch {
-            _isLike.value = doesItemExist(_songId)
+            _isLike.value = _musicPlayerManager.value.currentMusic.value?.let { doesItemExist(it.songId) } == true
         }
     }
 }

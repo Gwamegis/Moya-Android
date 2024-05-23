@@ -4,6 +4,7 @@ import android.app.Application
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.soi.moya.data.MusicManager
 import com.soi.moya.data.StoredMusicRepository
@@ -59,18 +60,11 @@ class MusicPlayerManager private constructor(
 
     private val musicManager = MusicManager.getInstance()
 
-    //playlist 화면에서 선언해서 사용가능할듯
-//    val defaultPlaylists: StateFlow<StorageUiState> =
-//        storedMusicRepository.getByDefaultPlaylist().map { StorageUiState(it) }
-//            .stateIn(
-//                scope = coroutineScope,
-//                started = SharingStarted.WhileSubscribed(MusicStorageViewModel.TIMEOUT_MILLIS),
-//                initialValue = StorageUiState()
-//            )
-
     private var currentStoredMusicList = listOf<StoredMusic>()
 
-    private var currentMusic = mutableStateOf<StoredMusic?>(null)
+    private var _currentMusic = mutableStateOf<StoredMusic?>(null)
+    val currentMusic: State<StoredMusic?> get() = _currentMusic
+
     private val _userPreferences = UserPreferences(application)
 
     init {
@@ -83,7 +77,7 @@ class MusicPlayerManager private constructor(
             _userPreferences.currentPlaySongId.collectLatest { songId ->
                 if (songId != null) {
                     val musicInfo = currentStoredMusicList.find { it.songId == songId }
-                    currentMusic.value = musicInfo
+                    _currentMusic.value = musicInfo
                 }
             }
         }
@@ -97,7 +91,7 @@ class MusicPlayerManager private constructor(
         }
     }
     fun playNextSong(increment: Int) {
-        var nextOrder = currentMusic.value?.order?.plus(increment)
+        var nextOrder = _currentMusic.value?.order?.plus(increment)
 
         if (nextOrder == currentStoredMusicList.count()) {
             nextOrder = 0

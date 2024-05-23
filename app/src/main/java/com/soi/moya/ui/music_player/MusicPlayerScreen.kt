@@ -57,6 +57,7 @@ fun MusicPlayerScreen(
     navController: NavHostController,
     music: MusicInfo,
     modifier: Modifier = Modifier,
+    onClickBackButton: () -> Unit
 ) {
     val currentPosition by rememberUpdatedState(newValue = viewModel.currentPosition.value)
     val duration = viewModel.getDuration()
@@ -73,7 +74,6 @@ fun MusicPlayerScreen(
         Modifier
             .background(it.getSubColor())
             .fillMaxSize()
-//            .padding(20.dp)
     }?.let {
         Column(
             modifier = modifier.then(it)
@@ -82,9 +82,7 @@ fun MusicPlayerScreen(
             MusicNavigationBar(
                 music = music,
                 isLike = isLike,
-                onClickBackButton = {
-
-                }
+                onClickBackButton = {onClickBackButton()}
             ) {
                 viewModel.updateLikeMusic(music)
             }
@@ -102,7 +100,7 @@ fun MusicPlayerScreen(
                 }
                 Box(
                     modifier = Modifier
-                        .padding(end = 40.dp)
+                        .padding(end = 20.dp)
                         .size(43.dp)
                         .background(
                             color = music.team.getBackgroundColor(),
@@ -173,13 +171,13 @@ fun MusicNavigationBar(
     ) {
         IconButton(
             modifier = Modifier
-                .size(20.dp),
+                .size(15.dp),
             onClick = {
                 onClickBackButton()
             }) {
 
             Icon(
-                painterResource(id = R.drawable.chevron_left),
+                painterResource(id = R.drawable.chevron_down),
                 contentDescription = null,
                 tint = MoyaColor.white
             )
@@ -309,8 +307,8 @@ fun MusicPlayerSlider(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                start = 20.dp,
-                end = 20.dp
+                start = 40.dp,
+                end = 40.dp
             )
     ) {
         Slider(

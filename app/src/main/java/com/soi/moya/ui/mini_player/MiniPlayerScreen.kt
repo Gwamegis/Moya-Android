@@ -1,6 +1,7 @@
 package com.soi.moya.ui.mini_player
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -62,11 +63,12 @@ fun MiniPlayerScreen(
 
     val isMiniActivated by viewModel.isMiniPlayerActivated.collectAsState()
 
-    LaunchedEffect(isMiniActivated) {
-        if (!isMiniActivated) {
-            height.animateTo(maxHeight)
-        }
-    }
+//    LaunchedEffect(isMiniActivated) {
+//        if (!isMiniActivated) {
+//            height.animateTo(maxHeight)
+//        }
+//        Log.d("MiniPlayer", isMiniActivated.toString())
+//    }
 
     Box(
         modifier = Modifier
@@ -148,6 +150,7 @@ fun MiniPlayerScreen(
                                 coroutineScope.launch {
                                     height.animateTo(maxHeight)
                                 }
+                                viewModel.setIsMiniplayerActivated(false)
                             }
                     else
                         Modifier
@@ -164,7 +167,13 @@ fun MiniPlayerScreen(
                             if (heightFraction <= 0f) {
                                 detectTapGestures(onPress = { })
                             }
+                        },
+                    onClickBackButton = {
+                        coroutineScope.launch {
+                            height.animateTo(viewModel.minHeight)
                         }
+                        viewModel.setIsMiniplayerActivated(true)
+                    }
                 )
             } else {
                 MiniPlayer(
