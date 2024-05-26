@@ -2,6 +2,7 @@ package com.soi.moya.ui.music_player
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -106,7 +108,8 @@ fun PlaylistScreen(
             isVisible = gradientTopColor,
             gradientColors = listOf(
                 music.team.getSubColor(),
-                music.team.getSubColor().copy(0.3f)
+                music.team.getSubColor().copy(0.7f),
+                Color.Transparent
             )
         )
 
@@ -115,7 +118,8 @@ fun PlaylistScreen(
                 .align(Alignment.BottomCenter),
             isVisible = gradientBottomColor,
             gradientColors = listOf(
-                music.team.getSubColor().copy(0.3f),
+                Color.Transparent,
+                music.team.getSubColor().copy(0.7f),
                 music.team.getSubColor()
             )
         )
@@ -131,6 +135,7 @@ fun PlaylistItem(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
+            .background(color = if (isCurrentSong) Color.White.copy(alpha = 0.2f) else Color.Transparent)
             .padding(vertical = 10.dp, horizontal = 40.dp)
             .clickable { viewModel.onTapListItem(music) }
     ) {
