@@ -26,7 +26,6 @@ class SeasonSongManager private constructor() {
                     for (team in Team.values()) {
                         val teamData = SeasonSong::class.memberProperties.firstOrNull { it.name == team.name }?.get(result.data) as? String ?: ""
                         _seasonSong[team.name] = MutableLiveData(teamData.split(","))
-                        Log.d("testestestst", teamData)
                     }
                 } else -> {
                     // fail 처리

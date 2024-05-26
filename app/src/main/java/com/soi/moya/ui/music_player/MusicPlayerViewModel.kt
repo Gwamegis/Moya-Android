@@ -137,7 +137,7 @@ class MusicPlayerViewModel(
         viewModelScope.launch {
             val order = storedMusicRepository.getItemCount(playlist = "favorite")
             val item = music.toStoredMusic(
-                team = team,
+                team = music.team,
                 order = order,
                 date = Utility.getCurrentTimeString(),
                 playlist = "favorite"

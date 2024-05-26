@@ -218,7 +218,6 @@ fun MusicNavigationBar(
             modifier = Modifier
                 .size(26.dp),
             onClick = {
-                //TODO: 데이터 추가
                 onClickHeartButton(isLike)
             }) {
             Icon(

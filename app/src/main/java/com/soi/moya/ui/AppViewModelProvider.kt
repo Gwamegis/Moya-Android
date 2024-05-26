@@ -26,7 +26,7 @@ object AppViewModelProvider {
         }
         initializer {
             MusicStorageViewModel(
-                moyaApplication().container.itemsRepository,
+                storedMusicRepository = moyaApplication().container.itemsRepository,
                 application = moyaApplication()
             )
         }

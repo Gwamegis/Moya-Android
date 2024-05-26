@@ -50,7 +50,7 @@ fun StoredMusic.copy(order: Int): StoredMusic = StoredMusic(
 )
 
 fun StoredMusic.copy(playlist: String, order: Int, date: String): StoredMusic = StoredMusic(
-    id = id,
+    id = id+"_"+playlist,
     songId = songId,
     team = team,
     title = title,
