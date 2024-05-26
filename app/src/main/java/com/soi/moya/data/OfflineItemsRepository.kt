@@ -17,6 +17,7 @@ class OfflineItemsRepository(private val storedMusicDao: StoredMusicDao) : Store
     override suspend fun deleteItem(item: StoredMusic) = storedMusicDao.delete(item)
     override suspend fun updateItem(item: StoredMusic) = storedMusicDao.update(item)
     override suspend fun getItemById(id: String, playlist: String): StoredMusic = storedMusicDao.getItemById(id, playlist)
+    override suspend fun isSongLiked(id: String): Boolean = storedMusicDao.isSongInFavorite(id)
     override suspend fun updateOrder(start: Int, end: Int, increment: Int) = storedMusicDao.updateOrder(start, end, increment)
     override suspend fun updateOrder(id: String, order: Int) = storedMusicDao.updateOrder(id, order)
 }
