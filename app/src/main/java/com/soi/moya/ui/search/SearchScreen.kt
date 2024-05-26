@@ -79,6 +79,8 @@ fun ResultView(
     result: List<MusicInfo>,
     viewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
+    val focusManager = LocalFocusManager.current
+
     LazyColumn {
         items(result) { music ->
             val image = viewModel.fetchAlbumImageResourceId(music, music.team)
@@ -89,8 +91,11 @@ fun ResultView(
                 image = image,
                 onClickCell = {
                     viewModel.onTapListItem(music = music)
+                    focusManager.clearFocus()
                 },
                 onClickExtraButton = {
+                    viewModel.onTapListItem(music = music)
+                    focusManager.clearFocus()
                 }
             )
         }

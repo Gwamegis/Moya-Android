@@ -61,8 +61,6 @@ class MusicListViewModel(
     }
 
     fun onTapListItem(music: MusicInfo) {
-        //만약 이미 default에 있으면 전체화면 + 음악재생
-        //defuault에 업스면 추가하고 전체화면 + 음악재생
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val existingMusic = storedMusicRepository.getItemById(music.id, "default")
