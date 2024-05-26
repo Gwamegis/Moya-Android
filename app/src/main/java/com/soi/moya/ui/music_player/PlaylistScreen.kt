@@ -66,7 +66,10 @@ fun PlaylistScreen(
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-        items(defaultPlaylists.itemList) { item ->
+        items(
+            items = defaultPlaylists.itemList,
+            key = { item -> item.songId }
+        ) { item ->
             val dismissState = rememberDismissState(
                 confirmStateChange = { dismissValue ->
                     if (dismissValue == DismissValue.DismissedToEnd || dismissValue == DismissValue.DismissedToStart) {
