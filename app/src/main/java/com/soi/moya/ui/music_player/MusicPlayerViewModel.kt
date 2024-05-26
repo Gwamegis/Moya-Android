@@ -71,7 +71,6 @@ class MusicPlayerViewModel(
         checkItemExistence()
         startUpdateCurrentPositionAndDuration()
         subscribeCurrentSongID()
-        observeCurrentStoredSong()
     }
 
     private fun startUpdateCurrentPositionAndDuration() {
@@ -88,14 +87,7 @@ class MusicPlayerViewModel(
         viewModelScope.launch {
             _userPreferences.currentPlaySongId.collect { songId ->
                 _currentSongId.postValue(songId)
-            }
-        }
-    }
-
-    private fun observeCurrentStoredSong() {
-        _currentSongId.observeForever { songId ->
-            if (songId != null) {
-                viewModelScope.launch {
+                if (songId != null) {
                     val liked = storedMusicRepository.isSongLiked(songId)
                     _isLike.value = liked
                 }
