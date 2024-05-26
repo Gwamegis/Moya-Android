@@ -49,7 +49,7 @@ fun StoredMusic.copy(order: Int): StoredMusic = StoredMusic(
     playlist = playlist
 )
 
-fun StoredMusic.copy(playlist: String, order: Int, date: String): StoredMusic = StoredMusic(
+fun StoredMusic.toDefaultItem(playlist: String, order: Int, date: String): StoredMusic = StoredMusic(
     id = id+"_"+playlist,
     songId = songId,
     team = team,

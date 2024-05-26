@@ -1,7 +1,6 @@
 package com.soi.moya.ui.music_storage
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
@@ -13,12 +12,12 @@ import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
+import com.soi.moya.models.toDefaultItem
 import com.soi.moya.repository.MusicPlayerManager
 import com.soi.moya.ui.Utility
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -87,7 +86,7 @@ class MusicStorageViewModel(
                         end = order,
                         increment = 1
                     )
-                    val newMusic = music.copy(
+                    val newMusic = music.toDefaultItem(
                         playlist = "default",
                         order = 0,
                         date = Utility.getCurrentTimeString()
