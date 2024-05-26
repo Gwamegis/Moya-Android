@@ -120,6 +120,7 @@ fun MusicPlayerScreen(
         }
 
         MusicPlayerSlider(
+            music = music,
             currentPosition = currentPosition ?: 0,
             duration = duration,
             viewModel = viewModel,
@@ -295,6 +296,7 @@ fun GradientBox(
 
 @Composable
 fun MusicPlayerSlider(
+    music: MusicInfo,
     currentPosition: Int,
     duration: Int,
     viewModel: MusicPlayerViewModel,
@@ -317,8 +319,8 @@ fun MusicPlayerSlider(
             modifier = Modifier
                 .fillMaxWidth(),
             colors = SliderDefaults.colors(
-                thumbColor = viewModel.team.getPointColor(),
-                activeTrackColor = viewModel.team.getPointColor(),
+                thumbColor = music.team.getPointColor(),
+                activeTrackColor = music.team.getPointColor(),
                 inactiveTrackColor = MoyaColor.gray,
             ),
         )
