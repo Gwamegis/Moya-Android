@@ -73,7 +73,8 @@ interface StoredMusicDao{
     fun deleteAll()
     @Query("SELECT * from stored_music WHERE songId = :id AND playlist_title = :playlist")
     fun getItemById(id: String, playlist: String): StoredMusic
-
+    @Query("SELECT EXISTS(SELECT 1 FROM stored_music WHERE songId = :id AND playlist_title = 'favorite')")
+    suspend fun isSongInFavorite(id: String): Boolean
     @Query("UPDATE stored_music SET `order` = `order` + :increment WHERE playlist_title = 'default' AND `order` >= :start AND `order` < :end")
     fun updateOrder(start: Int, end: Int, increment: Int)
 

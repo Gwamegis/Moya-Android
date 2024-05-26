@@ -11,7 +11,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
+import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.Team
+import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
 import com.soi.moya.repository.MusicPlayerManager
@@ -35,8 +37,10 @@ class MusicPlayerViewModel(
     private val storedMusicRepository: StoredMusicRepository
 ): AndroidViewModel(application) {
 
+    private val _userPreferences = UserPreferences(application)
+
     private val _currentSongId = MutableLiveData<String?>()
-    var music: MusicInfo? = null
+    var music: StoredMusic? = null
 
     private val _songId: String
         get() = _currentSongId.value ?: ""
@@ -66,6 +70,8 @@ class MusicPlayerViewModel(
     init {
         checkItemExistence()
         startUpdateCurrentPositionAndDuration()
+        subscribeCurrentSongID()
+        observeCurrentStoredSong()
     }
 
     private fun startUpdateCurrentPositionAndDuration() {
@@ -74,6 +80,25 @@ class MusicPlayerViewModel(
                 _currentPosition.value = musicPlayerManager.value.getCurrentPosition()
                 _isPlaying.value = musicPlayerManager.value.isPlaying()
                 delay(1000)
+            }
+        }
+    }
+
+    private fun subscribeCurrentSongID() {
+        viewModelScope.launch {
+            _userPreferences.currentPlaySongId.collect { songId ->
+                _currentSongId.postValue(songId)
+            }
+        }
+    }
+
+    private fun observeCurrentStoredSong() {
+        _currentSongId.observeForever { songId ->
+            if (songId != null) {
+                viewModelScope.launch {
+                    val liked = storedMusicRepository.isSongLiked(songId)
+                    _isLike.value = liked
+                }
             }
         }
     }
