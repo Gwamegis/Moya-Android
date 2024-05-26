@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.soi.moya.R
@@ -88,6 +89,7 @@ fun PlaylistScreen(
                 background = {}
             ){
                 PlaylistItem(
+                    viewModel,
                     music = item,
                     isCurrentSong = item.songId == currentSongId
                 )
@@ -96,7 +98,11 @@ fun PlaylistScreen(
     }
 }
 @Composable
-fun PlaylistItem(music: StoredMusic, isCurrentSong: Boolean) {
+fun PlaylistItem(
+    viewModel: PlaylistViewModel,
+    music: StoredMusic,
+    isCurrentSong: Boolean,
+) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -105,7 +111,9 @@ fun PlaylistItem(music: StoredMusic, isCurrentSong: Boolean) {
             .padding(vertical = 10.dp, horizontal = 40.dp)
     ) {
         if (isCurrentSong) {
-            AnimationLoader()
+            AnimationLoader(
+                viewModel = viewModel
+            )
         } else {
             Image(
                 modifier = Modifier
@@ -149,18 +157,21 @@ fun PlaylistItem(music: StoredMusic, isCurrentSong: Boolean) {
         )
     }
 }
-
 @Composable
-fun AnimationLoader() {
+fun AnimationLoader(
+    viewModel: PlaylistViewModel
+) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.waveform))
-    var isPlaying by remember { mutableStateOf(true) }
-    val progress by animateLottieCompositionAsState(composition, isPlaying = isPlaying, iterations = Int.MAX_VALUE)
-
+    val isPlaying by viewModel.isPlaying.collectAsState()
+    val progress by animateLottieCompositionAsState(
+        composition,
+        isPlaying = isPlaying,
+        iterations = LottieConstants.IterateForever
+    )
 
     LottieAnimation(
         composition = composition,
-        progress = { progress },
+        progress = { if (isPlaying) progress else 1f },
         modifier = Modifier.size(40.dp)
     )
 }
-

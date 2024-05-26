@@ -110,11 +110,10 @@ class MusicPlayerManager private constructor(
 
 
     fun togglePlayPause() {
-        _isPlaying.value = !_isPlaying.value
         if (_isPlaying.value) {
-            play()
-        } else {
             pause()
+        } else {
+            play()
         }
     }
 
@@ -145,12 +144,14 @@ class MusicPlayerManager private constructor(
     fun play() {
         if (!mediaPlayer.isPlaying) {
             mediaPlayer.start()
+            _isPlaying.value = true
         }
     }
 
     private fun pause() {
         if (mediaPlayer.isPlaying) {
             mediaPlayer.pause()
+            _isPlaying.value = false
         }
     }
 
