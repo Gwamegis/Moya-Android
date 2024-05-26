@@ -18,7 +18,9 @@ class UserPreferences(private val context: Context) {
         val SELECTED_TEAM = stringPreferencesKey("selected_team")
         val APP_VERSION = stringPreferencesKey("app_version")
         val CURRENT_PLAY_SONG_ID = stringPreferencesKey("song_Id")
-        val IS_MiNIPLAYER_ACTIVATED = booleanPreferencesKey("is_miniplayer_activated")
+        val IS_MINIPLAYER_ACTIVATED = booleanPreferencesKey("is_miniplayer_activated")
+        val IS_NEED_HIDE_MINIPLAYER = booleanPreferencesKey("is_need_hide_miniplayer")
+        val IS_LYRIC_STATE = booleanPreferencesKey("is_lyric_state")
     }
 
     val getSelectedTeam: Flow<String?> = context.dataStore.data
@@ -38,7 +40,16 @@ class UserPreferences(private val context: Context) {
 
     val isMiniPlayerActivated: Flow<Boolean> = context.dataStore.data
         .map {
-            it[IS_MiNIPLAYER_ACTIVATED] ?: true
+            it[IS_MINIPLAYER_ACTIVATED] ?: true
+        }
+
+    val isNeedHideMiniPlayer: Flow<Boolean> = context.dataStore.data
+        .map {
+            it[IS_NEED_HIDE_MINIPLAYER] ?: false
+        }
+    val isLyricState: Flow<Boolean> = context.dataStore.data
+        .map {
+            it[IS_LYRIC_STATE] ?: false
         }
     suspend fun saveSelectedTeam(team: Team) {
         context.dataStore.edit { preferences ->
@@ -62,7 +73,17 @@ class UserPreferences(private val context: Context) {
 
     suspend fun saveIsMiniplayerActivated(isActivated: Boolean) {
         context.dataStore.edit {
-            it[IS_MiNIPLAYER_ACTIVATED] = isActivated
+            it[IS_MINIPLAYER_ACTIVATED] = isActivated
+        }
+    }
+    suspend fun saveIsNeedHideMiniPlayer(isNeedToHide: Boolean) {
+        context.dataStore.edit {
+            it[IS_NEED_HIDE_MINIPLAYER] = isNeedToHide
+        }
+    }
+    suspend fun saveIsLyricState(isLyric: Boolean) {
+        context.dataStore.edit {
+            it[IS_LYRIC_STATE] = isLyric
         }
     }
 }

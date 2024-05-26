@@ -1,5 +1,6 @@
 package com.soi.moya.ui.main_activity
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.theme.MoyaTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseComposeActivity() {
@@ -43,14 +45,22 @@ class MainActivity : BaseComposeActivity() {
          var selectedTeam by remember { mutableStateOf<String?>(null) }
         var isLoaded by remember { mutableStateOf(false) }
         var currentMusic by remember { mutableStateOf<MusicInfo?>(null) }
+        var isNeedToHideMiniPlayer by remember { mutableStateOf(false) }
 
-        LaunchedEffect(userPreferences) {
+        LaunchedEffect(userPreferences.getSelectedTeam) {
             userPreferences.getSelectedTeam.collect { team ->
                 selectedTeam = team
                 isLoaded = true
             }
         }
-        LaunchedEffect(currentMusic) {
+
+        LaunchedEffect(userPreferences.isNeedHideMiniPlayer) {
+            userPreferences.isNeedHideMiniPlayer.collect { value ->
+                isNeedToHideMiniPlayer = value
+            }
+        }
+
+        LaunchedEffect(userPreferences.currentPlaySongId) {
             userPreferences.currentPlaySongId.collect { id ->
                 if (id != null) {
                     musicManager.getMusicById(id)?.let { musicInfo ->
@@ -65,11 +75,13 @@ class MainActivity : BaseComposeActivity() {
                 MoyaTheme(team = Team.valueOf(selectedTeam ?: "doosan")) {
                     BottomNavScreen()
                     currentMusic?.let { music ->
-                        MiniPlayerScreen(
-                            maxHeight = computeWindowSizeClasses(),
-                            navController = navController,
-                            music = music
-                        )
+                        if (!isNeedToHideMiniPlayer) {
+                            MiniPlayerScreen(
+                                maxHeight = computeWindowSizeClasses(),
+                                navController = navController,
+                                music = music
+                            )
+                        }
                     }
                 }
             } else {

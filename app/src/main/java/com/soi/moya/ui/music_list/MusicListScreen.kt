@@ -186,7 +186,8 @@ fun SwitchTeamAndPlayerTitleView(
 fun MusicListHeaderView(
     team: Team,
     musicListSize: Int,
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: MusicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     Column() {
         Box(
@@ -209,6 +210,7 @@ fun MusicListHeaderView(
                     .height(120.dp)
                     .padding(horizontal = 20.dp)
                     .clickable {
+                        viewModel.onTapSelectTeamButton()
                         navController.navigate(SELECT_TEAM)
                     })
         }

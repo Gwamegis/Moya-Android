@@ -167,4 +167,10 @@ class MusicListViewModel(
             musicPlayerManager.value.playMusic(music)
         }
     }
+
+    fun onTapSelectTeamButton() {
+        viewModelScope.launch {
+            _userPreferences.saveIsNeedHideMiniPlayer(isNeedToHide = true)
+        }
+    }
 }

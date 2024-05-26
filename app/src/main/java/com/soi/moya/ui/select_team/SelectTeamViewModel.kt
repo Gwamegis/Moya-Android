@@ -36,6 +36,7 @@ class SelectTeamViewModel(application: Application): AndroidViewModel(applicatio
     fun onClickNext() {
         viewModelScope.launch {
             selectedTeam.value?.let { _userPreferences.saveSelectedTeam(team = it) }
+            _userPreferences.saveIsNeedHideMiniPlayer(isNeedToHide = false)
         }
     }
 }
