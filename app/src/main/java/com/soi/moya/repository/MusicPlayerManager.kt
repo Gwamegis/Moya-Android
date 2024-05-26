@@ -183,6 +183,18 @@ class MusicPlayerManager private constructor(
         }
     }
 
+    fun playMusic(currentMusic: StoredMusic) {
+        val filePath = application.filesDir.absolutePath
+        coroutineScope.launch {
+            val music = currentMusic
+            val file = File(filePath, "${music.songId}-${music.title}.mp3")
+            if(!file.exists()) {
+                downloadFileAsync(music.url, file.absolutePath)
+            }
+            playMusicFromUrl(file.absolutePath)
+        }
+    }
+
     private suspend fun downloadFileAsync(url: String, filePath: String): File? {
         return withContext(Dispatchers.IO) {
             try {
@@ -216,7 +228,6 @@ class MusicPlayerManager private constructor(
     private fun saveCurrentSongId(songId: String) {
         coroutineScope.launch {
             _userPreferences.saveCurrentSongId(songId)
-            _userPreferences.saveIsMiniplayerActivated(false)
         }
     }
 }
