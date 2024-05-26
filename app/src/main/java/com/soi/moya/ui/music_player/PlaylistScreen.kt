@@ -147,6 +147,7 @@ fun PlaylistItem(
             )
         }
 
+        /* TODO: 음악 순서 변경 기능 추가
         Image(
             painter = painterResource(id = R.drawable.playlistitem),
             contentDescription = "",
@@ -155,6 +156,7 @@ fun PlaylistItem(
                 .alpha(0.5f),
             colorFilter = ColorFilter.tint(MoyaColor.gray)
         )
+         */
     }
 }
 @Composable
