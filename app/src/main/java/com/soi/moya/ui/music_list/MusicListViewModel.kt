@@ -1,9 +1,7 @@
 package com.soi.moya.ui.music_list
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -14,7 +12,6 @@ import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
-import com.soi.moya.models.copy
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
 import com.soi.moya.repository.MusicPlayerManager
@@ -22,7 +19,6 @@ import com.soi.moya.ui.Utility
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -121,8 +117,6 @@ class MusicListViewModel(
                 val currentSongId = _userPreferences.currentPlaySongId.firstOrNull()
 
                 if (currentSongId != music.id) {
-                    // 현재 재생 중인 음악과 선택한 음악이 같을 때의 작업 수행
-                    // 최초 실행 시 current == music.id 가 같은 경우 존재 예외 처리 필요
                     playMusic(music)
                 }
             }
