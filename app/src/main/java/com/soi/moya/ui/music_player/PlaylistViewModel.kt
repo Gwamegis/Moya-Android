@@ -73,4 +73,21 @@ class PlaylistViewModel(
             }
         }
     }
+
+    fun onTapListItem(music: StoredMusic) {
+        saveCurrentSongId(music.songId)
+        playMusic(music = music)
+    }
+    private fun saveCurrentSongId(songId: String) {
+        viewModelScope.launch {
+            _userPreferences.saveCurrentSongId(songId)
+            _userPreferences.saveIsMiniplayerActivated(false)
+        }
+    }
+
+    private fun playMusic(music: StoredMusic) {
+        viewModelScope.launch {
+            musicPlayerManager.playMusic(music)
+        }
+    }
 }

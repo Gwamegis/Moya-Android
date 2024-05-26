@@ -94,9 +94,7 @@ fun MusicPlayerScreen(
                 if (isPlaylist.value) {
                     PlaylistScreen()
                 } else {
-                    MusicLyricView(
-                        music = music
-                    )
+                    MusicLyricView(music = music)
                 }
                 Box(
                     modifier = Modifier
