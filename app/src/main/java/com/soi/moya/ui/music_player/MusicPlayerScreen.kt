@@ -92,7 +92,9 @@ fun MusicPlayerScreen(
                     .weight(1f)
             ) {
                 if (isPlaylist.value) {
-                    PlaylistScreen()
+                    PlaylistScreen(
+                        music = music
+                    )
                 } else {
                     MusicLyricView(music = music)
                 }

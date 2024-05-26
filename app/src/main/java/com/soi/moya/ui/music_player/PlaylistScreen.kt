@@ -1,52 +1,33 @@
 package com.soi.moya.ui.music_player
 
-import android.util.Log
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DismissDirection
 import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -60,50 +41,78 @@ import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.Team
 import com.soi.moya.ui.AppViewModelProvider
-import com.soi.moya.ui.music_storage.StorageUiState
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
-import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun PlaylistScreen(
+    music: MusicInfo,
     viewModel: PlaylistViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val defaultPlaylists by viewModel.defaultPlaylist.collectAsState()
     val currentSongId by viewModel.currentSongId.observeAsState()
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        items(
-            items = defaultPlaylists.itemList,
-            key = { item -> item.songId }
-        ) { item ->
-            val dismissState = rememberDismissState(
-                confirmStateChange = { dismissValue ->
-                    if (dismissValue == DismissValue.DismissedToEnd || dismissValue == DismissValue.DismissedToStart) {
-                        viewModel.deletePlaylistItem(song = item)
-                        true
-                    } else {
-                        false
-                    }
-                }
-            )
+    val scrollState = rememberLazyListState()
+    val gradientTopColor = scrollState.canScrollBackward
+    val gradientBottomColor = scrollState.canScrollForward
 
-            SwipeToDismiss(
-                modifier = Modifier.animateItemPlacement(),
-                state = dismissState,
-                directions = setOf(DismissDirection.EndToStart),
-                background = {}
-            ){
-                PlaylistItem(
-                    viewModel,
-                    music = item,
-                    isCurrentSong = item.songId == currentSongId
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = scrollState
+        ) {
+            items(
+                items = defaultPlaylists.itemList,
+                key = { item -> item.songId }
+            ) { item ->
+                val dismissState = rememberDismissState(
+                    confirmStateChange = { dismissValue ->
+                        if (dismissValue == DismissValue.DismissedToEnd || dismissValue == DismissValue.DismissedToStart) {
+                            viewModel.deletePlaylistItem(song = item)
+                            true
+                        } else {
+                            false
+                        }
+                    }
                 )
+
+                SwipeToDismiss(
+                    modifier = Modifier.animateItemPlacement(),
+                    state = dismissState,
+                    directions = setOf(DismissDirection.EndToStart),
+                    background = {}
+                ) {
+                    PlaylistItem(
+                        viewModel,
+                        music = item,
+                        isCurrentSong = item.songId == currentSongId
+                    )
+                }
             }
         }
+        GradientBox(
+            modifier = Modifier
+                .align(Alignment.TopCenter),
+            isVisible = gradientTopColor,
+            gradientColors = listOf(
+                music.team.getSubColor(),
+                music.team.getSubColor().copy(0.3f)
+            )
+        )
+
+        GradientBox(
+            modifier = Modifier
+                .align(Alignment.BottomCenter),
+            isVisible = gradientBottomColor,
+            gradientColors = listOf(
+                music.team.getSubColor().copy(0.3f),
+                music.team.getSubColor()
+            )
+        )
     }
 }
 @Composable
@@ -116,7 +125,6 @@ fun PlaylistItem(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .background(color = if (isCurrentSong) Color.White.copy(alpha = 0.2f) else Color.Transparent)
             .padding(vertical = 10.dp, horizontal = 40.dp)
             .clickable { viewModel.onTapListItem(music) }
     ) {
