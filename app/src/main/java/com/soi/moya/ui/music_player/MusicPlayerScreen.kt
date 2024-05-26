@@ -248,7 +248,8 @@ fun MusicLyricView(
             text = music.lyrics.replace("\\n", "\n"),
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(scrollState),
+                .verticalScroll(scrollState)
+                .padding(bottom = 73.dp),
             style = getTextStyle(style = MoyaFont.CustomHeadlineBold),
             color = MoyaColor.white.copy(0.8f)
         )
