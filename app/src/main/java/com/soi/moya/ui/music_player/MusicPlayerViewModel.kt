@@ -62,10 +62,13 @@ class MusicPlayerViewModel(
     val currentPosition: State<Int> get() = _currentPosition
     private val _currentPosition = mutableIntStateOf(0)
 
+    private val _isLyricDisplaying = MutableStateFlow(true)
+    val isLyricDisplaying: StateFlow<Boolean> = _isLyricDisplaying
+
     init {
-        checkItemExistence()
         startUpdateCurrentPositionAndDuration()
         subscribeCurrentSongID()
+        subscribeIsLyricView()
     }
 
     private fun startUpdateCurrentPositionAndDuration() {
@@ -87,6 +90,20 @@ class MusicPlayerViewModel(
                     _isLike.value = liked
                 }
             }
+        }
+    }
+
+    private fun subscribeIsLyricView() {
+        viewModelScope.launch {
+            _userPreferences.isLyricDisplaying.collect { value ->
+                _isLyricDisplaying.value = value
+            }
+        }
+    }
+
+    fun toggleisLyricDisplaying() {
+        viewModelScope.launch {
+            _userPreferences.saveIsLyricState(!_isLyricDisplaying.value)
         }
     }
 
@@ -154,14 +171,6 @@ class MusicPlayerViewModel(
             withContext(Dispatchers.IO) {
                 storedMusicRepository.deleteById(id = music.id, playlist = "favorite")
             }
-        }
-    }
-    private suspend fun doesItemExist(itemId: String): Boolean {
-        return storedMusicRepository.doesItemExist(itemId = itemId, playlist = "favorite")
-    }
-    private fun checkItemExistence() {
-        viewModelScope.launch {
-            _isLike.value = _musicPlayerManager.value.currentMusic.value?.let { doesItemExist(it.songId) } == true
         }
     }
 }

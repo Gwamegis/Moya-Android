@@ -64,7 +64,7 @@ fun MusicPlayerScreen(
 
     val progress = remember { mutableFloatStateOf(0f) }
     val isLike by viewModel.isLike.collectAsState()
-    var isPlaylist = remember { mutableStateOf(false) }
+    val isLyricDisplaying by viewModel.isLyricDisplaying.collectAsState()
 
     BackHandler {
         viewModel.popBackStack(navController)
@@ -91,7 +91,7 @@ fun MusicPlayerScreen(
                 modifier = Modifier
                     .weight(1f)
             ) {
-                if (isPlaylist.value) {
+                if (isLyricDisplaying) {
                     PlaylistScreen(
                         music = music
                     )
@@ -108,7 +108,7 @@ fun MusicPlayerScreen(
                         )
                         .align(Alignment.BottomEnd) // 오른쪽 하단에 배치
                         .clickable {
-                            isPlaylist.value = !isPlaylist.value
+                            viewModel.toggleisLyricDisplaying()
                         },
                     contentAlignment = Alignment.Center
                 ) {
