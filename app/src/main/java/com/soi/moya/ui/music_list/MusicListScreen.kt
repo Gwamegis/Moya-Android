@@ -115,7 +115,7 @@ fun MusicListScreen(
                                 team = team,
                                 image = albumImageResourceId,
                                 onClickCell = {
-                                    viewModel.onTapListItem(music, team)
+                                    viewModel.onTapListItem(music)
                                 }
                             )
                         }

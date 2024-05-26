@@ -1,6 +1,5 @@
 package com.soi.moya.ui
 
-import android.app.Application
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -35,7 +34,10 @@ object AppViewModelProvider {
             SelectTeamViewModel(application = moyaApplication())
         }
         initializer {
-            SearchViewModel(application = moyaApplication())
+            SearchViewModel(
+                application = moyaApplication(),
+                storedMusicRepository = moyaApplication().container.itemsRepository
+            )
         }
         initializer {
             NoticeBottomSheetViewModel(application = moyaApplication())

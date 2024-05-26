@@ -1,9 +1,7 @@
 package com.soi.moya.ui.music_list
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -14,7 +12,6 @@ import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
-import com.soi.moya.models.copy
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
 import com.soi.moya.repository.MusicPlayerManager
@@ -22,7 +19,6 @@ import com.soi.moya.ui.Utility
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -64,25 +60,7 @@ class MusicListViewModel(
         }
     }
 
-    fun onTapListItem(music: MusicInfo, team: Team) {
-        saveItem(music, team)
-    }
-
-    private fun saveIsMiniplayerActivated() {
-        viewModelScope.launch {
-            _userPreferences.saveIsMiniplayerActivated(false)
-        }
-    }
-
-    private fun saveCurrentSongId(songId: String) {
-        viewModelScope.launch {
-            _userPreferences.saveCurrentSongId(songId)
-            _userPreferences.saveIsMiniplayerActivated(false)
-        }
-    }
-
-    private fun saveItem(music: MusicInfo, team: Team) {
-
+    fun onTapListItem(music: MusicInfo) {
         //만약 이미 default에 있으면 전체화면 + 음악재생
         //defuault에 업스면 추가하고 전체화면 + 음악재생
         viewModelScope.launch {
@@ -107,7 +85,7 @@ class MusicListViewModel(
                     )
 
                     val newMusic = music.toStoredMusic(
-                        team = team,
+                        team = music.team,
                         order = 0,
                         date = Utility.getCurrentTimeString(),
                         playlist = "default"
@@ -129,6 +107,18 @@ class MusicListViewModel(
         }
     }
 
+    private fun saveIsMiniplayerActivated() {
+        viewModelScope.launch {
+            _userPreferences.saveIsMiniplayerActivated(false)
+        }
+    }
+
+    private fun saveCurrentSongId(songId: String) {
+        viewModelScope.launch {
+            _userPreferences.saveCurrentSongId(songId)
+            _userPreferences.saveIsMiniplayerActivated(false)
+        }
+    }
 
     private fun updateMusicForSelectedTeam() {
 

@@ -1,7 +1,6 @@
 package com.soi.moya.ui.mini_player
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,8 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -40,7 +37,6 @@ import com.soi.moya.models.MusicInfo
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.music_player.MusicPlayerScreen
 import com.soi.moya.ui.music_player.MusicPlayerViewModel
-import com.soi.moya.ui.music_player.PlaylistScreen
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -63,12 +59,11 @@ fun MiniPlayerScreen(
 
     val isMiniActivated by viewModel.isMiniPlayerActivated.collectAsState()
 
-//    LaunchedEffect(isMiniActivated) {
-//        if (!isMiniActivated) {
-//            height.animateTo(maxHeight)
-//        }
-//        Log.d("MiniPlayer", isMiniActivated.toString())
-//    }
+    LaunchedEffect(isMiniActivated) {
+        if (!isMiniActivated) {
+            height.animateTo(maxHeight)
+        }
+    }
 
     Box(
         modifier = Modifier

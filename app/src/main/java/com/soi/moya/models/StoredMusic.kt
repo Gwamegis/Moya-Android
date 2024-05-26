@@ -49,6 +49,20 @@ fun StoredMusic.copy(order: Int): StoredMusic = StoredMusic(
     playlist = playlist
 )
 
+fun StoredMusic.copy(playlist: String, order: Int, date: String): StoredMusic = StoredMusic(
+    id = id,
+    songId = songId,
+    team = team,
+    title = title,
+    lyrics = lyrics,
+    info = info,
+    type = type,
+    url = url,
+    order = order,
+    date = date,
+    playlist = playlist
+)
+
 fun StoredMusic.toMusicInfo(): MusicInfo = MusicInfo(
     id = songId,
     team = Team.fromString(team) ?: Team.doosan,

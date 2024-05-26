@@ -16,7 +16,7 @@ interface StoredMusicRepository {
     suspend fun insertAll(items: List<StoredMusic>)
     suspend fun deleteItem(item: StoredMusic)
     suspend fun updateItem(item: StoredMusic)
-    suspend fun getItemById(id: String, playlist: String): StoredMusic
+    suspend fun getItemById(id: String, playlist: String): StoredMusic?
     suspend fun isSongLiked(id: String): Boolean
 
     //order 값이 start <= .. < end 사이인 경우 increment 값 만큼 order를 업데이트

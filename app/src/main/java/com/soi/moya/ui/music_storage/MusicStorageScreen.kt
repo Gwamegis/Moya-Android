@@ -168,17 +168,13 @@ fun MusicStorageScreen(
 
 @Composable
 fun ItemList(
-    storageMusicItems: List<StoredMusic>,
-    navController: NavHostController
+    storageMusicItems: List<StoredMusic>
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(storageMusicItems) { item ->
-            ItemView(
-                music = item,
-                navController = navController
-            )
+            ItemView(music = item)
         }
     }
 }
@@ -187,7 +183,6 @@ fun ItemList(
 @Composable
 fun ItemView(
     music: StoredMusic,
-    navController: NavHostController,
     viewModel: MusicStorageViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
 
@@ -201,7 +196,7 @@ fun ItemView(
         cellType = CellType.List,
         image = viewModel.fetchAlbumImageResourceId(music.toMusicInfo(), Team.valueOf(music.team)),
         onClickCell = {
-            navController.navigate("MUSIC_PLAYER/${music.team}/${music.id}")
+            viewModel.onTapListItem(music = music)
         },
         onClickExtraButton = {
             showBottomSheet = true
@@ -375,10 +370,7 @@ fun bodyContent(
     ){
         //content, not necessarily scrollable or list
         if (storageUiState.itemList.isNotEmpty()) {
-            ItemList(
-                storageMusicItems = storageUiState.itemList,
-                navController = navController
-            )
+            ItemList(storageMusicItems = storageUiState.itemList,)
         } else {
             emptyList()
         }

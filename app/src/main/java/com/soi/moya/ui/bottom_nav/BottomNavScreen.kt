@@ -91,7 +91,7 @@ fun NavGraph(
             )
         }
         composable(NavItem.Search.route) {
-            SearchScreen(navController = navController)
+            SearchScreen()
         }
         composable(NavItem.MusicStorage.route) {
             MusicStorageScreen(navController = navController)

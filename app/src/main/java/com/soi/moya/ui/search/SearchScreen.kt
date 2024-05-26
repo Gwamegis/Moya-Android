@@ -1,6 +1,5 @@
 package com.soi.moya.ui.search
 
-import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,11 +38,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.ui.AppViewModelProvider
@@ -58,8 +54,7 @@ import com.soi.moya.ui.theme.getTextStyle
 
 @Composable
 fun SearchScreen(
-    viewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    navController: NavHostController
+    viewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val result by viewModel.searchResult.collectAsState()
     val text by viewModel.searchText.collectAsState()
@@ -73,8 +68,7 @@ fun SearchScreen(
             EmptyView()
         } else {
             ResultView(
-                result = result,
-                navController = navController
+                result = result
             )
         }
     }
@@ -83,8 +77,7 @@ fun SearchScreen(
 @Composable
 fun ResultView(
     result: List<MusicInfo>,
-    navController: NavHostController,
-    viewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    viewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     LazyColumn {
         items(result) { music ->
@@ -95,10 +88,9 @@ fun ResultView(
                 cellType = CellType.Search,
                 image = image,
                 onClickCell = {
-                    navController.navigate("MUSIC_PLAYER/${music.team.name}/${music.id}")
+                    viewModel.onTapListItem(music = music)
                 },
                 onClickExtraButton = {
-                    navController.navigate("MUSIC_PLAYER/${music.team.name}/${music.id}")
                 }
             )
         }
@@ -250,17 +242,4 @@ fun SearchBar(viewModel: SearchViewModel) {
             modifier = Modifier.padding(top = 20.dp)
         )
     }
-
-}
-
-@Preview
-@Composable
-fun SearchScreenPreview() {
-    val viewModel = SearchViewModel(application = Application())
-    val navController = rememberNavController()
-
-    SearchScreen(
-        viewModel = viewModel,
-        navController = navController
-    )
 }

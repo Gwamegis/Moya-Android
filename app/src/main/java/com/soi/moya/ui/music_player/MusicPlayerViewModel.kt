@@ -18,15 +18,10 @@ import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
 import com.soi.moya.repository.MusicPlayerManager
 import com.soi.moya.ui.Utility
-import com.soi.moya.ui.music_storage.MusicStorageViewModel
-import com.soi.moya.ui.music_storage.StorageUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
@@ -141,7 +136,7 @@ class MusicPlayerViewModel(
     private fun likeMusic(music: MusicInfo) {
         viewModelScope.launch {
             val order = storedMusicRepository.getItemCount(playlist = "favorite")
-            val music = music.toStoredMusic(
+            val item = music.toStoredMusic(
                 team = team,
                 order = order,
                 date = Utility.getCurrentTimeString(),
@@ -149,7 +144,7 @@ class MusicPlayerViewModel(
             )
 
             withContext(Dispatchers.IO) {
-                storedMusicRepository.insertItem(music.toItem())
+                storedMusicRepository.insertItem(item.toItem())
             }
         }
     }
