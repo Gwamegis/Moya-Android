@@ -99,8 +99,6 @@ class MusicListViewModel(
                 val currentSongId = _userPreferences.currentPlaySongId.firstOrNull()
 
                 if (currentSongId != music.id) {
-                    // 현재 재생 중인 음악과 선택한 음악이 같을 때의 작업 수행
-                    // 최초 실행 시 current == music.id 가 같은 경우 존재 예외 처리 필요
                     playMusic(music)
                 }
             }
