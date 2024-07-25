@@ -2,7 +2,7 @@ package com.soi.moya.ui.music_player
 
 import android.app.Application
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -59,8 +59,8 @@ class MusicPlayerViewModel(
     private val musicPlayerManager: State<MusicPlayerManager>
         get() = _musicPlayerManager
 
-    val currentPosition: State<Int> get() = _currentPosition
-    private val _currentPosition = mutableIntStateOf(0)
+    val currentPosition: State<Long> get() = _currentPosition
+    private val _currentPosition = mutableLongStateOf(0)
 
     private val _isLyricDisplaying = MutableStateFlow(true)
     val isLyricDisplaying: StateFlow<Boolean> = _isLyricDisplaying
@@ -115,17 +115,17 @@ class MusicPlayerViewModel(
         musicPlayerManager.value.playNextSong(increment)
     }
 
-    fun formatTime(time: Int): String {
-        val minutes = TimeUnit.MILLISECONDS.toMinutes(time.toLong())
-        val seconds = TimeUnit.MILLISECONDS.toSeconds(time.toLong()) - TimeUnit.MINUTES.toSeconds(minutes)
+    fun formatTime(time: Long): String {
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(time)
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(minutes)
         return String.format("%02d:%02d", minutes, seconds)
     }
 
-    fun getDuration(): Int {
+    fun getDuration(): Long {
         return musicPlayerManager.value.getDuration()
     }
 
-    fun seekTo(position: Int) {
+    fun seekTo(position: Long) {
         musicPlayerManager.value.seekTo(position)
     }
 

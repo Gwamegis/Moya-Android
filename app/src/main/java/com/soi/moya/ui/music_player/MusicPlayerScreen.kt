@@ -1,7 +1,6 @@
 package com.soi.moya.ui.music_player
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
@@ -125,13 +123,12 @@ fun MusicPlayerScreen(
             music = music,
             currentPosition = currentPosition ?: 0,
             duration = duration,
-            viewModel = viewModel,
-            onProgressChanged = { newProgress ->
-                progress.value = newProgress
-            }
-        )
+            viewModel = viewModel
+        ) { newProgress ->
+            progress.value = newProgress
+        }
 
-        MusicPlayerBottomButtonView(
+            MusicPlayerBottomButtonView(
             isPlaying = viewModel.isPlaying.value,
             onClickPlayButton = {
                 viewModel.togglePlayPause()
@@ -300,8 +297,8 @@ fun GradientBox(
 @Composable
 fun MusicPlayerSlider(
     music: MusicInfo,
-    currentPosition: Int,
-    duration: Int,
+    currentPosition: Long,
+    duration: Long,
     viewModel: MusicPlayerViewModel,
     onProgressChanged: (Float) -> Unit
 ) {
@@ -317,7 +314,7 @@ fun MusicPlayerSlider(
             value = if (duration > 0) currentPosition.toFloat() / duration.toFloat() else 0f,
             onValueChange = {
                 onProgressChanged(it)
-                viewModel.seekTo((it * duration).toInt())
+                viewModel.seekTo((it * duration).toLong())
             },
             modifier = Modifier
                 .fillMaxWidth(),
