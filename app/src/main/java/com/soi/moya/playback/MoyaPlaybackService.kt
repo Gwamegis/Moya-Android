@@ -4,154 +4,228 @@ import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import android.view.KeyEvent
 import androidx.annotation.OptIn
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.media3.common.AudioAttributes
+import androidx.media3.common.ForwardingPlayer
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.Player.COMMAND_SEEK_TO_NEXT
+import androidx.media3.common.Player.COMMAND_SEEK_TO_PREVIOUS
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.util.EventLogger
-import androidx.media3.session.MediaLibraryService
+import androidx.media3.session.MediaButtonReceiver
 import androidx.media3.session.MediaSession
+import androidx.media3.session.MediaSession.ConnectionResult
+import androidx.media3.session.MediaSession.ControllerInfo
+import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
+import androidx.media3.session.MediaSessionService
+import androidx.media3.session.SessionCommand
+import androidx.media3.session.SessionError
+import androidx.media3.session.SessionResult
+import androidx.media3.session.MediaController
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.SettableFuture
 import com.soi.moya.R
+import com.soi.moya.ui.main_activity.MainActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
 
-open class MoyaPlaybackService : MediaLibraryService() {
+open class MoyaPlaybackService : MediaSessionService() {
 
-    private lateinit var mediaLibrarySession: MediaLibrarySession
+    private lateinit var mediaSession: MediaSession
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     companion object {
         private const val NOTIFICATION_ID = 123
-        private const val CHANNEL_ID = "demo_session_notification_channel_id"
+        private const val CHANNEL_ID = "moya_session_notification_channel_id"
+        private const val CHANNEL_NAME = "Moya Media Playback"
+        const val SAVE_TO_FAVORITES = "com.moya.save_to_favorites"
     }
 
-    /**
-     * Returns the single top session activity. It is used by the notification when the app task is
-     * active and an activity is in the fore or background.
-     *
-     * Tapping the notification then typically should trigger a single top activity. This way, the
-     * user navigates to the previous activity when pressing back.
-     *
-     * If null is returned, [MediaSession.setSessionActivity] is not set by the demo service.
-     */
-    open fun getSingleTopActivity(): PendingIntent? = null
+    override fun onGetSession(controllerInfo: ControllerInfo): MediaSession? = mediaSession
 
-    /**
-     * Returns a back stacked session activity that is used by the notification when the service is
-     * running standalone as a foreground service. This is typically the case after the app has been
-     * dismissed from the recent tasks, or after automatic playback resumption.
-     *
-     * Typically, a playback activity should be started with a stack of activities underneath. This
-     * way, when pressing back, the user doesn't land on the home screen of the device, but on an
-     * activity defined in the back stack.
-     *
-     * See [androidx.core.app.TaskStackBuilder] to construct a back stack.
-     *
-     * If null is returned, [MediaSession.setSessionActivity] is not set by the demo service.
-     */
-    open fun getBackStackedActivity(): PendingIntent? = null
-
-    /**
-     * Creates the library session callback to implement the domain logic. Can be overridden to return
-     * an alternative callback, for example a subclass of [DemoMediaLibrarySessionCallback].
-     *
-     * This method is called when the session is built by the [DemoPlaybackService].
-     */
-    protected open fun createLibrarySessionCallback(): MediaLibrarySession.Callback {
-        return MoyaMediaLibrarySessionCallback(this)
-    }
-
-    @OptIn(UnstableApi::class) // MediaSessionService.setListener
     override fun onCreate() {
         super.onCreate()
-        initializeSessionAndPlayer()
-        setListener(MediaSessionServiceListener())
-    }
+        val player = ExoPlayer.Builder(this).build()
 
-    override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession {
-        return mediaLibrarySession
+        /*
+        *Android의 Media3 라이브러리에서 제공하는 추상 클래스
+        * Player인터페이스를 구현하는 여러 플레이어 객체를 감싸서 다양한 플레이어에 대한 공통된 기능을 제공하는데 사용 */
+        val forwardingPlayer = @OptIn(UnstableApi::class)
+        object : ForwardingPlayer(player) {
+            override fun play() {
+                // Add custom logic
+                super.play()
+            }
+
+            override fun setPlayWhenReady(playWhenReady: Boolean) {
+                // Add custom logic
+                super.setPlayWhenReady(playWhenReady)
+            }
+        }
+
+        mediaSession = MediaSession.Builder(this, forwardingPlayer)
+            .setCallback(MoyaMediaSessionCallback(this))
+            .build()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        val player = mediaLibrarySession.player
-        if (!player.playWhenReady || player.mediaItemCount == 0) {
+        super.onTaskRemoved(rootIntent)
+        val player = mediaSession?.player!!
+        if (!player.playWhenReady
+            || player.mediaItemCount == 0
+            || player.playbackState == Player.STATE_ENDED) {
             stopSelf()
         }
     }
-
-    // MediaSession.setSessionActivity
-    // MediaSessionService.clearListener
-    @OptIn(UnstableApi::class)
     override fun onDestroy() {
-        getBackStackedActivity()?.let { mediaLibrarySession.setSessionActivity(it) }
-        mediaLibrarySession.release()
-        mediaLibrarySession.player.release()
-        clearListener()
+        mediaSession?.run {
+            player.release()
+            release()
+            mediaSession.release()
+        }
         super.onDestroy()
     }
 
-    private fun initializeSessionAndPlayer() {
-        val player =
-            ExoPlayer.Builder(this)
-                .setAudioAttributes(AudioAttributes.DEFAULT, /* handleAudioFocus= */ true)
+    private inner class MoyaMediaSessionCallback(
+        private val context: Context
+    ): MediaSession.Callback {
+        /*
+        * MediaSession의 클라이언트인 MediaController가 MediaSession에 연결할때 호출되는 콜백 메서드로
+        * 클라이언트가 세션에 연결될 때 어떤 명령어를 사용할 수 있는지를 정의함
+        *
+        * 명령어 집합 정의
+        * 명령어 집합 반환*/
+        @OptIn(UnstableApi::class)
+        override fun onConnect(
+            session: MediaSession,
+            controller: ControllerInfo
+        ): ConnectionResult {
+            //TODO: 공식문서 보고 커스텀 함수 적용하기
+            val playerCommands =
+                ConnectionResult.DEFAULT_PLAYER_COMMANDS.buildUpon()
+                    .remove(COMMAND_SEEK_TO_PREVIOUS)
+                    .remove(COMMAND_SEEK_TO_NEXT)
+                    .build()
+
+            val sessionCommands = ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
+                .add(SessionCommand(SAVE_TO_FAVORITES, Bundle.EMPTY))
                 .build()
-        player.addAnalyticsListener(EventLogger())
 
-        mediaLibrarySession =
-            MediaLibrarySession.Builder(this, player, createLibrarySessionCallback())
-                .also { builder -> getSingleTopActivity()?.let { builder.setSessionActivity(it) } }
+            return ConnectionResult.AcceptedResultBuilder(session)
+                .setAvailableSessionCommands(sessionCommands)
+                .setAvailablePlayerCommands(playerCommands)
                 .build()
-    }
+        }
 
-    @OptIn(UnstableApi::class) // MediaSessionService.Listener
-    private inner class MediaSessionServiceListener : Listener {
+        @OptIn(UnstableApi::class)
+        override fun onCustomCommand(
+            session: MediaSession,
+            controller: ControllerInfo,
+            customCommand: SessionCommand,
+            args: Bundle
+        ): ListenableFuture<SessionResult> {
+            return when (customCommand.customAction) {
+                SAVE_TO_FAVORITES -> {
+                    // Do custom logic here
+                    saveToFavorites(session.player.currentMediaItem)
+                    Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+                }
+                else -> {
+                    // Handle other custom commands or provide a default result
+                    Futures.immediateFuture(SessionResult(SessionError.ERROR_UNKNOWN))
+                }
+            }
+        }
 
-        /**
-         * This method is only required to be implemented on Android 12 or above when an attempt is made
-         * by a media controller to resume playback when the {@link MediaSessionService} is in the
-         * background.
-         */
-        override fun onForegroundServiceStartNotAllowedException() {
-            if (
-                Build.VERSION.SDK_INT >= 33 &&
-                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
-                PackageManager.PERMISSION_GRANTED
-            ) {
-                // Notification permission is required but not granted
+        @UnstableApi
+        override fun onPlaybackResumption(
+            mediaSession: MediaSession,
+            controller: ControllerInfo
+        ): ListenableFuture<MediaItemsWithStartPosition> {
+            val settable = SettableFuture.create<MediaItemsWithStartPosition>()
+            scope.launch {
+                val resumptionPlaylist = restorePlaylist()
+                settable.set(resumptionPlaylist)
+            }
+            return settable
+        }
+
+        private fun saveToFavorites(mediaItem: MediaItem?) {
+            if (mediaItem == null) {
+                Log.e("CustomMediaSessionCallback", "MediaItem is null, cannot save to favorites.")
                 return
             }
-            val notificationManagerCompat = NotificationManagerCompat.from(this@MoyaPlaybackService)
-            ensureNotificationChannel(notificationManagerCompat)
-            val builder =
-                NotificationCompat.Builder(this@MoyaPlaybackService, CHANNEL_ID)
-                    .setSmallIcon(R.drawable.alarm)
-                    .setContentTitle(getString(R.string.notification_content_title))
-                    .setStyle(
-                        NotificationCompat.BigTextStyle().bigText(getString(R.string.notification_content_text))
-                    )
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                    .setAutoCancel(true)
-                    .also { builder -> getBackStackedActivity()?.let { builder.setContentIntent(it) } }
-            notificationManagerCompat.notify(NOTIFICATION_ID, builder.build())
-        }
-    }
 
-    private fun ensureNotificationChannel(notificationManagerCompat: NotificationManagerCompat) {
-        if (
-            Build.VERSION.SDK_INT < 26 ||
-            notificationManagerCompat.getNotificationChannel(CHANNEL_ID) != null
-        ) {
-            return
+            // Example: Extract media item information
+            val mediaId = mediaItem.mediaId ?: return
+            val mediaTitle = mediaItem.mediaMetadata.title ?: "Unknown Title"
+
+            // Example: Save to a simple list or a database
+            // Here, we will use a local list for demonstration purposes
+            val favoritesList = getFavoritesList()
+
+            if (favoritesList.contains(mediaId)) {
+                Log.i("CustomMediaSessionCallback", "Media item is already in favorites.")
+            } else {
+                favoritesList.add(mediaId)
+                Log.i("CustomMediaSessionCallback", "Media item added to favorites: $mediaTitle")
+                // Optionally, save the updated list to persistent storage
+                saveFavoritesList(favoritesList)
+            }
         }
 
-        val channel =
-            NotificationChannel(
-                CHANNEL_ID,
-                getString(R.string.notification_channel_name),
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-        notificationManagerCompat.createNotificationChannel(channel)
+        // Example function to get the current favorites list
+        private fun getFavoritesList(): MutableList<String> {
+            // Example: Load from shared preferences or a database
+            // Here, we will use a simple mutable list
+            return mutableListOf()
+        }
+
+        // Example function to save the updated favorites list
+        private fun saveFavoritesList(favoritesList: List<String>) {
+            // Example: Save to shared preferences or a database
+            // Here, we will just log the action
+            Log.i("CustomMediaSessionCallback", "Favorites list updated: $favoritesList")
+        }
+
+
+        //TODO: 재생목록 가져오는 로직 추가하기
+        @OptIn(UnstableApi::class)
+        private suspend fun restorePlaylist(): MediaItemsWithStartPosition {
+            return withContext(Dispatchers.IO) {
+                // Retrieve the playlist and start position from SharedPreferences
+                val playlistJson = "[]"
+                val startPosition = 0
+
+                val mediaItems = mutableListOf<MediaItem>()
+                val jsonArray = JSONArray(playlistJson)
+                for (i in 0 until jsonArray.length()) {
+                    val mediaItemJson = jsonArray.getJSONObject(i)
+                    val uri = mediaItemJson.getString("uri")
+                    val mediaId = mediaItemJson.getString("mediaId")
+                    val mediaItem = MediaItem.Builder()
+                        .setUri(uri)
+                        .setMediaId(mediaId)
+                        .build()
+                    mediaItems.add(mediaItem)
+                }
+                MediaItemsWithStartPosition(mediaItems, startPosition, 0)
+            }
+        }
     }
 }

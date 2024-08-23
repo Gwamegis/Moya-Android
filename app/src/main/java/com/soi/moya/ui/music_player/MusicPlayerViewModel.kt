@@ -1,6 +1,8 @@
 package com.soi.moya.ui.music_player
 
 import android.app.Application
+import android.content.ComponentName
+import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -8,6 +10,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.session.MediaController
+import androidx.media3.session.SessionToken
 import androidx.navigation.NavHostController
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
@@ -16,6 +22,7 @@ import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
+import com.soi.moya.playback.MoyaPlaybackService
 import com.soi.moya.repository.MusicPlayerManager
 import com.soi.moya.ui.Utility
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +32,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
+
+data class PlayerState(
+    val player: Player? = null,
+    val currentMediaTitle: String = "",
+    val currentMediaArtist: String = "",
+    val mediaItems: List<MediaItem> = emptyList(),
+    val currentMediaItemIndex: Int = -1
+)
 
 class MusicPlayerViewModel(
     application: Application,
@@ -49,6 +64,8 @@ class MusicPlayerViewModel(
             storedMusicRepository = storedMusicRepository
             )
     )
+    private val musicPlayerManager: State<MusicPlayerManager>
+        get() = _musicPlayerManager
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
@@ -56,26 +73,93 @@ class MusicPlayerViewModel(
     private val _isLike = MutableStateFlow(false)
     val isLike: StateFlow<Boolean> = _isLike
 
-    private val musicPlayerManager: State<MusicPlayerManager>
-        get() = _musicPlayerManager
-
     val currentPosition: State<Long> get() = _currentPosition
     private val _currentPosition = mutableLongStateOf(0)
 
     private val _isLyricDisplaying = MutableStateFlow(true)
     val isLyricDisplaying: StateFlow<Boolean> = _isLyricDisplaying
 
+    private val _state = MutableStateFlow(PlayerState())
+    val state: StateFlow<PlayerState> = _state
+
+//    private var mediaController: MediaController? = null
+
     init {
+//        viewModelScope.launch {
+//            initializeController(context = application)
+//        }
+        subscribeIsLyricView()
         startUpdateCurrentPositionAndDuration()
         subscribeCurrentSongID()
-        subscribeIsLyricView()
     }
+
+//    private suspend fun initializeController(context: Context) {
+//        mediaController = withContext(Dispatchers.IO) {
+//            MediaController.Builder(
+//                context,
+//                SessionToken(context, ComponentName(context, MoyaPlaybackService::class.java))
+//            ).buildAsync().get()
+//        }
+//
+//        mediaController?.let { controller ->
+//            _state.value = state.value.copy(player = controller)
+//
+//            controller.addListener(object : Player.Listener {
+//                override fun onEvents(player: Player, events: Player.Events) {
+//                    if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
+//                        updateUI()
+//                    }
+//                }
+//            })
+//        }
+//    }
+
+    private fun updateUI() {
+//        mediaController?.let { controller ->
+//            _state.value = PlayerState(
+//                player = controller,
+//                currentMediaTitle = controller.mediaMetadata.title.toString() ?: "",
+//                currentMediaArtist = controller.mediaMetadata.artist.toString() ?: "",
+//                mediaItems = List(controller.mediaItemCount) { index -> controller.getMediaItemAt(index) },
+//                currentMediaItemIndex = controller.currentMediaItemIndex
+//            )
+//        }
+    }
+
+//    fun onMediaItemClick(index: Int) {
+//        mediaController?.let { controller ->
+//            if (controller.currentMediaItemIndex == index) {
+//                controller.playWhenReady = !controller.playWhenReady
+//            } else {
+//                controller.seekToDefaultPosition(index)
+//            }
+//            updateUI()
+//        }
+//    }
+//
+//    fun onDeleteMediaItem(index: Int) {
+//        mediaController?.let { controller ->
+//            controller.removeMediaItem(index)
+//            updateUI()
+//        }
+//    }
+//
+//    override fun onCleared() {
+//        mediaController?.release()
+//        super.onCleared()
+//    }
+
+//    init {
+//        startUpdateCurrentPositionAndDuration()
+//        subscribeCurrentSongID()
+//        subscribeIsLyricView()
+//    }
 
     private fun startUpdateCurrentPositionAndDuration() {
         viewModelScope.launch {
             while (true) {
                 _currentPosition.value = musicPlayerManager.value.getCurrentPosition()
-                _isPlaying.value = musicPlayerManager.value.isPlaying()
+                _isPlaying.value = musicPlayerManager.value.isPlaying.value
                 delay(1000)
             }
         }

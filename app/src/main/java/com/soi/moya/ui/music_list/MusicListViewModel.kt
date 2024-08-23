@@ -1,12 +1,16 @@
 package com.soi.moya.ui.music_list
 
 import android.app.Application
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.soi.moya.data.MusicManager
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 import com.soi.moya.data.SeasonSongManager
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
@@ -60,7 +64,23 @@ class MusicListViewModel(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun onTapListItem(music: MusicInfo) {
+//        val mediaItem =
+//            MediaItem.Builder()
+//                .setMediaId(music.id)
+//                .setUri(music.url)
+//                .setMediaMetadata(
+//                    MediaMetadata.Builder()
+//                        .setArtist(music.team.getKrTeamName())
+//                        .setTitle(music.title)
+////                        .setArtworkUri(music.team.getPlayerAlbumImageResourceId())
+//                        .build()
+//                )
+//                .build()
+
+
+
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val existingMusic = storedMusicRepository.getItemById(music.id, "default")
@@ -162,6 +182,7 @@ class MusicListViewModel(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun playMusic(music: MusicInfo) {
         viewModelScope.launch {
             musicPlayerManager.value.playMusic(music)

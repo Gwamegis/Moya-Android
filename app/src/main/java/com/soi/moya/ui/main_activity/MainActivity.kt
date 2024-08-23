@@ -42,7 +42,7 @@ class MainActivity : BaseComposeActivity() {
         val context = LocalContext.current
         val userPreferences = remember { UserPreferences(context) }
         val navController = rememberNavController()
-         var selectedTeam by remember { mutableStateOf<String?>(null) }
+        var selectedTeam by remember { mutableStateOf<String?>(null) }
         var isLoaded by remember { mutableStateOf(false) }
         var currentMusic by remember { mutableStateOf<MusicInfo?>(null) }
         var isNeedToHideMiniPlayer by remember { mutableStateOf(false) }

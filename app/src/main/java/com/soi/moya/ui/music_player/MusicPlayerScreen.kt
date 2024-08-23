@@ -12,15 +12,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Slider
@@ -35,8 +32,6 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -94,7 +89,7 @@ fun MusicPlayerScreen(
                         music = music
                     )
                 } else {
-                    MusicLyricView(music = music)
+                    MusicLyricScreen(music = music)
                 }
                 Box(
                     modifier = Modifier
@@ -224,73 +219,6 @@ fun MusicNavigationBar(
                 tint = tintColor
             )
         }
-    }
-}
-
-@Composable
-fun MusicLyricView(
-    modifier: Modifier = Modifier,
-    music: MusicInfo,
-) {
-    val scrollState = rememberScrollState()
-    val gradientTopColor = scrollState.value > 10
-    val gradientBottomColor = scrollState.value < scrollState.maxValue
-
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 20.dp, horizontal = 40.dp)
-    ) {
-        Text(
-            text = music.lyrics.replace("\\n", "\n"),
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(bottom = 73.dp),
-            style = getTextStyle(style = MoyaFont.CustomHeadlineBold),
-            color = MoyaColor.white.copy(0.8f)
-        )
-
-        GradientBox(
-            modifier = Modifier
-                .align(Alignment.TopCenter),
-            isVisible = gradientTopColor,
-            gradientColors = listOf(
-                music.team.getSubColor(),
-                music.team.getSubColor().copy(0.3f)
-            )
-        )
-
-        GradientBox(
-            modifier = Modifier
-                .align(Alignment.BottomCenter),
-            isVisible = gradientBottomColor,
-            gradientColors = listOf(
-                music.team.getSubColor().copy(0.3f),
-                music.team.getSubColor()
-            )
-        )
-    }
-}
-
-@Composable
-fun GradientBox(
-    modifier: Modifier,
-    isVisible: Boolean,
-    gradientColors: List<Color>
-) {
-    if (isVisible) {
-        Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .height(80.dp)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = gradientColors
-                    )
-                )
-
-        )
     }
 }
 
