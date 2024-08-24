@@ -197,7 +197,6 @@ class MusicPlayerManager private constructor(
             )
 
             controller?.addMediaItem(mediaItem)
-//            controller?.setMediaItem(mediaItem)
             controller?.prepare()
             controller?.play()
         }
@@ -289,21 +288,6 @@ class MusicPlayerManager private constructor(
             .build()
     }
 
-    private fun loadPlaylist() {
-        coroutineScope.launch {
-//            storedMusicRepository.getByDefaultPlaylist().collect { playlistItems ->
-//                exoPlayer.clearMediaItems()
-//                playlistItems.forEach { item ->
-//                    val mediaItem = MediaItem.Builder()
-//                        .setUri(Uri.parse(item.url))
-//                        .setMediaId(item.songId)
-//                        .build()
-//                    exoPlayer.addMediaItem(mediaItem)
-//                }
-//                exoPlayer.prepare()
-//            }
-        }
-    }
     fun getCurrentPosition(): Long {
         return controller?.currentPosition ?: 0L
     }
