@@ -32,7 +32,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".playback.MoyaPlaybackService"
+            android:name=".playback.PlaybackService"
             android:foregroundServiceType="mediaPlayback"
             android:exported="true">
             <intent-filter>

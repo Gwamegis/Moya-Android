@@ -19,13 +19,12 @@ import androidx.media3.session.SessionToken
 import com.google.common.net.MediaType
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
-import com.soi.moya.R
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
-import com.soi.moya.playback.MoyaPlaybackService
+import com.soi.moya.playback.PlaybackService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,7 +79,7 @@ class MusicPlayerManager private constructor(
         controllerFuture =
             MediaController.Builder(
                 application,
-                SessionToken(application, ComponentName(application, MoyaPlaybackService::class.java)),
+                SessionToken(application, ComponentName(application, PlaybackService::class.java)),
             ).buildAsync()
         updateMediaMetadataUI()
         controllerFuture.addListener({ setController() }, MoreExecutors.directExecutor())
@@ -185,13 +184,20 @@ class MusicPlayerManager private constructor(
             if (!file.exists()) {
                 downloadFileAsync(currentMusic.url, file.absolutePath)
             }
+            val resourceId = if (currentMusic.type) currentMusic.team.getPlayerAlbumImageResourceId() else currentMusic.team.getTeamImageResourceId()
+            val imageUri = Uri.parse("android.resource://com.soi.moya/$resourceId")
 
-            val mediaItem = MediaItem.Builder()
-                .setUri(Uri.fromFile(file))
-                .setMediaId(currentMusic.id)
-                .build()
+            val mediaItem = buildMediaItem(
+                title = currentMusic.title,
+                mediaId = currentMusic.id,
+                mediaType = MediaMetadata.MEDIA_TYPE_MUSIC,
+                artist = currentMusic.team.getKrTeamName(),
+                sourceUri = Uri.fromFile(file),
+                imageUri = imageUri
+            )
 
             controller?.addMediaItem(mediaItem)
+//            controller?.setMediaItem(mediaItem)
             controller?.prepare()
             controller?.play()
         }

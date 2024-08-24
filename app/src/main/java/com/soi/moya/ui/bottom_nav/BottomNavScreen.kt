@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -35,7 +34,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
-import com.soi.moya.data.MusicManager
 import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_PlAYER
@@ -43,8 +41,6 @@ import com.soi.moya.ui.MUSIC_STORAGE
 import com.soi.moya.ui.SEARCH
 import com.soi.moya.ui.music_list.MusicListScreen
 import com.soi.moya.ui.SELECT_TEAM
-import com.soi.moya.ui.main_activity.MusicViewModel
-import com.soi.moya.ui.music_player.MusicPlayerScreen
 import com.soi.moya.ui.music_storage.MusicStorageScreen
 import com.soi.moya.ui.notice.NoticeBottomSheetViewModel
 import com.soi.moya.ui.notice.new_feature.NewFeatureNoticeScreen

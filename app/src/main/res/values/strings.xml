@@ -160,4 +160,5 @@
     <!-- Defines a way of appending an item to a list of items. For example appending "banana" to "apple, pear" to get "apple, pear, banana". Note: the command separator will appear between all consecutive list items, so do not use an equivalent of 'and'. [CHAR LIMIT=40] -->
     <string name="exo_item_list"><xliff:g example="apple, pear" id="list">%1$s</xliff:g>, <xliff:g example="banana" id="item">%2$s</xliff:g></string>
     <string name="title_activity_player">PlayerActivity</string>
+    <string name="notification_icon_description">모두의 야구 로고</string>
 </resources>
