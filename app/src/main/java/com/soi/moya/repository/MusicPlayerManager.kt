@@ -8,10 +8,12 @@ import android.os.Build
 import android.widget.TextView
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.viewModelScope
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaController
@@ -29,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -62,7 +65,10 @@ class MusicPlayerManager private constructor(
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
 
-    private val mediaItemList: MutableList<MediaItem> = mutableListOf()
+//    private val mediaItemList: MutableList<MediaItem> = mutableListOf()
+
+    private val _mediaItemList = MutableStateFlow<List<MediaItem>>(emptyList())
+    val mediaItemList: StateFlow<List<MediaItem>> = _mediaItemList
 
     private lateinit var controllerFuture: ListenableFuture<MediaController>
 
@@ -88,7 +94,7 @@ class MusicPlayerManager private constructor(
     @OptIn(UnstableApi::class) // PlayerView.setShowSubtitleButton
     private fun setController() {
         val controller = this.controller ?: return
-        updateCurrentPlaylistUI()
+        initializeMediaList()
 
         controller.addListener(
             object : Player.Listener {
@@ -96,7 +102,7 @@ class MusicPlayerManager private constructor(
                     if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
                     }
                     if (events.contains(Player.EVENT_TIMELINE_CHANGED)) {
-                        updateCurrentPlaylistUI()
+                        initializeMediaList()
                     }
                     if (events.contains(Player.EVENT_MEDIA_METADATA_CHANGED)) {
                         updateMediaMetadataUI()
@@ -110,8 +116,23 @@ class MusicPlayerManager private constructor(
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     _isPlaying.value = isPlaying
                 }
+
+                override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                    // 미디어 아이템이 변경될 때 SharedPreferences 업데이트
+                    Log.e("***Music player manager", "position: ${getCurrentMediaItemIndex()}  id: ${mediaItem?.mediaId ?: ""}")
+                    saveCurrentSongPosition()
+                }
             }
         )
+    }
+
+    private fun saveCurrentSongPosition() {
+        coroutineScope.launch {
+            _userPreferences.saveCurrentSongPosition(getCurrentMediaItemIndex())
+        }
+    }
+    private fun getCurrentMediaItemIndex(): Int {
+        return controller?.currentMediaItemIndex ?: -1
     }
 
     private fun updateMediaMetadataUI() {
@@ -127,17 +148,32 @@ class MusicPlayerManager private constructor(
         //title 설정
         //artist 설정
     }
-
-    //변경된 플레이리스트로 업데이트
-    private fun updateCurrentPlaylistUI() {
+    private fun initializeMediaList() {
         val controller = this.controller ?: return
-        mediaItemList.clear()
+        clearMediaItemList()
         for (i in 0 until controller.mediaItemCount) {
-            mediaItemList.add(controller.getMediaItemAt(i))
+            addMediaItem(controller.getMediaItemAt(i))
         }
-        //플레이리스트 변경되었다고 알림보내기
     }
 
+    fun clearMediaItemList() {
+        _mediaItemList.value = emptyList()
+    }
+    fun addMediaItem(mediaItem: MediaItem) {
+        val currentList = _mediaItemList.value
+        val updatedList = currentList.toMutableList().apply {
+            add(mediaItem)
+        }
+        _mediaItemList.value = updatedList
+    }
+    fun addMediaItems(mediaItems: List<MediaItem>) {
+        // 현재 상태를 가져옵니다.
+        val currentList = _mediaItemList.value
+        val updatedList = currentList.toMutableList().apply {
+            addAll(mediaItems)
+        }
+        _mediaItemList.value = updatedList
+    }
 
     fun playNextSong(increment: Int) {
         if (increment == 1) {
@@ -176,6 +212,7 @@ class MusicPlayerManager private constructor(
         controller?.release()
     }
 
+    @OptIn(UnstableApi::class)
     @RequiresApi(Build.VERSION_CODES.O)
     fun playMusic(currentMusic: MusicInfo) {
         val filePath = application.filesDir.absolutePath
@@ -184,19 +221,7 @@ class MusicPlayerManager private constructor(
             if (!file.exists()) {
                 downloadFileAsync(currentMusic.url, file.absolutePath)
             }
-            val resourceId = if (currentMusic.type) currentMusic.team.getPlayerAlbumImageResourceId() else currentMusic.team.getTeamImageResourceId()
-            val imageUri = Uri.parse("android.resource://com.soi.moya/$resourceId")
 
-            val mediaItem = buildMediaItem(
-                title = currentMusic.title,
-                mediaId = currentMusic.id,
-                mediaType = MediaMetadata.MEDIA_TYPE_MUSIC,
-                artist = currentMusic.team.getKrTeamName(),
-                sourceUri = Uri.fromFile(file),
-                imageUri = imageUri
-            )
-
-            controller?.addMediaItem(mediaItem)
             controller?.prepare()
             controller?.play()
         }
@@ -210,21 +235,20 @@ class MusicPlayerManager private constructor(
                 downloadFileAsync(currentMusic.url, file.absolutePath)
             }
 
-            val resourceId = if (currentMusic.type) Team.valueOf(currentMusic.team).getPlayerAlbumImageResourceId() else Team.valueOf(currentMusic.team).getTeamImageResourceId()
-            val imageUri = Uri.parse("android.resource://com.soi.moya/$resourceId")
-
-            val mediaItem = buildMediaItem(
-                title = currentMusic.title,
-                mediaId = currentMusic.songId,
-                mediaType = MediaMetadata.MEDIA_TYPE_MUSIC,
-                artist = currentMusic.team,
-                sourceUri = Uri.fromFile(file),
-                imageUri = imageUri
-            )
-
-            controller?.addMediaItem(mediaItem)
             controller?.prepare()
             controller?.play()
+        }
+    }
+
+    fun playMediaItemById(mediaItemId: String) {
+        val mediaItems = _mediaItemList.value
+        val index = mediaItems.indexOfFirst { it.mediaId == mediaItemId }
+        if (index != -1) {
+            controller?.let {
+                it.seekToDefaultPosition(index)
+                it.prepare()
+                it.play()
+            }
         }
     }
 

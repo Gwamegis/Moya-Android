@@ -18,6 +18,7 @@ class UserPreferences(private val context: Context) {
         val SELECTED_TEAM = stringPreferencesKey("selected_team")
         val APP_VERSION = stringPreferencesKey("app_version")
         val CURRENT_PLAY_SONG_ID = stringPreferencesKey("song_Id")
+        val CURRENT_PLAY_SONG_POSITION = stringPreferencesKey("song_position")
         val IS_MINIPLAYER_ACTIVATED = booleanPreferencesKey("is_miniplayer_activated")
         val IS_NEED_HIDE_MINIPLAYER = booleanPreferencesKey("is_need_hide_miniplayer")
         val IS_LYRIC_DISPLAYING = booleanPreferencesKey("is_lyric_displaying")
@@ -36,6 +37,11 @@ class UserPreferences(private val context: Context) {
     val currentPlaySongId: Flow<String?> = context.dataStore.data
         .map {
             it[CURRENT_PLAY_SONG_ID]
+        }
+
+    val currentPlaySongPosition: Flow<Int?> = context.dataStore.data
+        .map {
+            it[CURRENT_PLAY_SONG_POSITION]?.toInt() ?: -1
         }
 
     val isMiniPlayerActivated: Flow<Boolean> = context.dataStore.data
@@ -60,6 +66,13 @@ class UserPreferences(private val context: Context) {
     suspend fun saveCurrentSongId(songId: String) {
         context.dataStore.edit { preferences ->
             preferences[CURRENT_PLAY_SONG_ID] = songId
+        }
+    }
+
+    suspend fun saveCurrentSongPosition(position: Int) {
+        context.dataStore.edit { preferences ->
+            Log.e("***UserPreference", "currentPosition: ${position}")
+            preferences[CURRENT_PLAY_SONG_POSITION] = position.toString()
         }
     }
 

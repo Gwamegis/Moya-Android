@@ -1,5 +1,7 @@
 package com.soi.moya.ui.music_player
 
+import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,9 +34,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.MediaItem
+import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
@@ -55,8 +62,11 @@ fun PlaylistScreen(
     music: MusicInfo,
     viewModel: PlaylistViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
-    val defaultPlaylists by viewModel.defaultPlaylist.collectAsState()
+//    val defaultPlaylists by viewModel.defaultPlaylists.collectAsState()
+    val mediaItemLists by viewModel.mediaItemList.collectAsState()
+
     val currentSongId by viewModel.currentSongId.observeAsState()
+    val currentSongPosition by viewModel.currentSongPosition.observeAsState()
     val scrollState = rememberLazyListState()
     val gradientTopColor = scrollState.canScrollBackward
     val gradientBottomColor = scrollState.canScrollForward
@@ -70,13 +80,14 @@ fun PlaylistScreen(
             state = scrollState
         ) {
             items(
-                items = defaultPlaylists.itemList,
-                key = { item -> item.songId }
+                items = mediaItemLists,
+                key = { item -> item.mediaId }
             ) { item ->
                 val dismissState = rememberDismissState(
                     confirmStateChange = { dismissValue ->
                         if (dismissValue == DismissValue.DismissedToEnd || dismissValue == DismissValue.DismissedToStart) {
-                            viewModel.deletePlaylistItem(song = item)
+                            Log.e("*** playlist screen", "dismissValue order: $item")
+                            viewModel.deletePlaylistItem(songId = item.mediaId, order = viewModel.getMediaItemIndex(mediaId = item.mediaId))
                             true
                         } else {
                             false
@@ -85,7 +96,8 @@ fun PlaylistScreen(
                 )
 
                 SwipeToDismiss(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItemPlacement()
+                        .clickable { viewModel.onTapListItem(item) },
                     state = dismissState,
                     directions = setOf(DismissDirection.EndToStart),
                     background = {}
@@ -93,7 +105,7 @@ fun PlaylistScreen(
                     PlaylistItem(
                         viewModel,
                         music = item,
-                        isCurrentSong = item.songId == currentSongId
+                        isCurrentSong = viewModel.getMediaItemIndex(item.mediaId) == currentSongPosition
                     )
                 }
             }
@@ -128,7 +140,7 @@ fun PlaylistScreen(
 @Composable
 fun PlaylistItem(
     viewModel: PlaylistViewModel,
-    music: StoredMusic,
+    music: MediaItem,
     isCurrentSong: Boolean,
 ) {
     Row(
@@ -137,24 +149,13 @@ fun PlaylistItem(
         modifier = Modifier
             .background(color = if (isCurrentSong) Color.White.copy(alpha = 0.2f) else Color.Transparent)
             .padding(vertical = 10.dp, horizontal = 40.dp)
-            .clickable { viewModel.onTapListItem(music) }
     ) {
         if (isCurrentSong) {
             AnimationLoader(
                 viewModel = viewModel
             )
         } else {
-            Image(
-                modifier = Modifier
-                    .size(40.dp)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(10.dp)),
-                painter = painterResource(
-                    id = if (music.type) Team.valueOf(music.team).getPlayerAlbumImageResourceId()
-                    else Team.valueOf(music.team).getTeamAlbumImageResourceId()
-                ),
-                contentDescription = null,
-            )
+            MediaItemImage(artworkUri = music.mediaMetadata.artworkUri)
         }
 
         Column(
@@ -165,12 +166,12 @@ fun PlaylistItem(
         ) {
 
             Text(
-                text = music.title,
+                text = music.mediaMetadata.title.toString(),
                 style = getTextStyle(style = MoyaFont.CustomBodyMedium),
                 color = MoyaColor.white
             )
             Text(
-                text = Team.valueOf(music.team).getKrTeamName(),
+                text = music.mediaMetadata.artist.toString(),
                 style = getTextStyle(style = MoyaFont.CustomCaptionMedium),
                 color = MoyaColor.gray
             )
@@ -188,6 +189,26 @@ fun PlaylistItem(
          */
     }
 }
+
+@Composable
+fun MediaItemImage(artworkUri: Uri?) {
+    val painter = rememberImagePainter(
+        ImageRequest.Builder(LocalContext.current)
+            .data(artworkUri) // MediaItem의 artworkUri를 데이터로 사용
+            .build()
+    )
+
+    Image(
+        painter = painter,
+        contentDescription = null,
+        modifier = Modifier
+            .size(40.dp)
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(10.dp)),
+        contentScale = ContentScale.Crop // 이미지 크롭
+    )
+}
+
 @Composable
 fun AnimationLoader(
     viewModel: PlaylistViewModel

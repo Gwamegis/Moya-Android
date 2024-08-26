@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import androidx.media3.common.MediaItem
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.UserPreferences
@@ -34,19 +35,26 @@ class PlaylistViewModel(
     private val _currentSongId = MutableLiveData<String?>()
     val currentSongId: LiveData<String?> = _currentSongId
 
+    private val _currentSongPosition = MutableLiveData<Int?>()
+    val currentSongPosition: LiveData<Int?> = _currentSongPosition
+
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
 
-    val defaultPlaylist: StateFlow<StorageUiState> =
-        storedMusicRepository.getByDefaultPlaylist().map { StorageUiState(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(MusicStorageViewModel.TIMEOUT_MILLIS),
-                initialValue = StorageUiState()
-            )
+//    val defaultPlaylist: StateFlow<StorageUiState> =
+//        storedMusicRepository.getByDefaultPlaylist().map { StorageUiState(it) }
+//            .stateIn(
+//                scope = viewModelScope,
+//                started = SharingStarted.WhileSubscribed(MusicStorageViewModel.TIMEOUT_MILLIS),
+//                initialValue = StorageUiState()
+//            )
+
+    // StateFlow to observe media item list
+    val mediaItemList: StateFlow<List<MediaItem>> = musicPlayerManager.mediaItemList
 
     init {
         observeCurrentSongId()
+        observeCurrentSongPosition()
         collectMusicIsPlaying()
     }
 
@@ -54,6 +62,14 @@ class PlaylistViewModel(
         viewModelScope.launch {
             _userPreferences.currentPlaySongId.collect{
                 _currentSongId.value = it
+            }
+        }
+    }
+
+    private fun observeCurrentSongPosition() {
+        viewModelScope.launch {
+            _userPreferences.currentPlaySongPosition.collect{
+                _currentSongPosition.value = it
             }
         }
     }
@@ -65,17 +81,24 @@ class PlaylistViewModel(
         }
     }
 
-    fun deletePlaylistItem(song: StoredMusic) {
+    fun deletePlaylistItem(songId: String, order: Int) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                storedMusicRepository.deleteById(id = song.songId, playlist = "default")
-                storedMusicRepository.updateOrder(start = song.order + 1, end = defaultPlaylist.value.itemList.count(), increment = -1)
+                storedMusicRepository.deleteById(id = songId, playlist = "default")
+                storedMusicRepository.updateOrder(start = order + 1, end = mediaItemList.value.count(), increment = -1)
             }
         }
     }
 
     fun onTapListItem(music: StoredMusic) {
+        //TODO: currentSongId가 아닌 current position을 저장
         saveCurrentSongId(music.songId)
+        playMusic(music = music)
+    }
+
+    fun onTapListItem(music: MediaItem) {
+        //TODO: currentSongId가 아닌 current position을 저장
+        saveCurrentSongId(music.mediaId)
         playMusic(music = music)
     }
     private fun saveCurrentSongId(songId: String) {
@@ -89,5 +112,19 @@ class PlaylistViewModel(
         viewModelScope.launch {
             musicPlayerManager.playMusic(music)
         }
+    }
+
+    private fun playMusic(music: MediaItem) {
+        viewModelScope.launch {
+            musicPlayerManager.playMediaItemById(music.mediaId)
+        }
+    }
+
+    fun getMediaItemIndex(mediaId: String): Int {
+        return mediaItemList.value.indexOfFirst { it.mediaId == mediaId }
+    }
+
+    fun getMediaItemIndexById(mediaId: String): Int? {
+        return mediaItemList.value.indexOfFirst { it.mediaId == mediaId }.takeIf { it >= 0 }
     }
 }

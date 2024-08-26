@@ -18,6 +18,7 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
+import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.util.EventLogger
@@ -89,6 +90,8 @@ open class MoyaPlaybackService() : MediaSessionService() {
             .build()
     }
 
+    @SuppressLint("Range")
+    @OptIn(UnstableApi::class)
     suspend fun loadInitialPlaylist(application: MoyaApplication) {
         val playlist = application.container.itemsRepository.getByDefaultPlaylist()
 
@@ -116,7 +119,7 @@ open class MoyaPlaybackService() : MediaSessionService() {
         }
     }
 
-    fun buildMediaItem(
+    private fun buildMediaItem(
         title: String,
         mediaId: String,
         isPlayable: Boolean = true,
@@ -222,7 +225,7 @@ open class MoyaPlaybackService() : MediaSessionService() {
 
         @OptIn(UnstableApi::class)
         val mediaNotificationSessionCommands =
-            MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
+            ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
                 .build()
         @OptIn(UnstableApi::class)
         override fun onConnect(
@@ -254,14 +257,13 @@ open class MoyaPlaybackService() : MediaSessionService() {
                     // Call the restorePlaylist function to get the playlist
                     val resumptionPlaylist =
                         withContext(Dispatchers.IO) {
-                            restorePlaylist().get()
+//                            restorePlaylist().get()
                         }  // Block until the future completes
-                    settable.set(resumptionPlaylist)
+//                    settable.set(resumptionPlaylist)
                 } catch (e: Exception) {
                     settable.setException(e)
                 }
             }
-
             return settable
         }
         override fun onAddMediaItems(
@@ -288,13 +290,13 @@ open class MoyaPlaybackService() : MediaSessionService() {
         fun getCurrentMediaItems(exoPlayer: ExoPlayer): List<MediaItem> {
             val mediaItems = mutableListOf<MediaItem>()
             for (i in 0 until exoPlayer.mediaItemCount) {
-                exoPlayer.getMediaItemAt(i)?.let { mediaItems.add(it) }
+                exoPlayer.getMediaItemAt(i).let { mediaItems.add(it) }
             }
             return mediaItems
         }
 
 
-        //TODO: 재생목록 가져오는 로직 추가하기
+        //??
         @OptIn(UnstableApi::class)
         private fun restorePlaylist(): ListenableFuture<MediaItemsWithStartPosition> {
             // Create a SettableFuture to return
