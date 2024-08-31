@@ -45,4 +45,11 @@ class MiniPlayerViewModel(
             _userPreferences.saveIsMiniplayerActivated(isActivated)
         }
     }
+
+    fun popBackStack() {
+        //미니플레이어 상태 활성화
+        viewModelScope.launch {
+            _userPreferences.saveIsMiniplayerActivated(true)
+        }
+    }
 }

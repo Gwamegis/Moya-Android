@@ -1,5 +1,6 @@
 package com.soi.moya.ui.main_activity
 
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.compose.runtime.Composable
@@ -21,15 +22,17 @@ import com.soi.moya.ui.bottom_nav.BottomNavScreen
 import com.soi.moya.ui.mini_player.MiniPlayerScreen
 import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.theme.MoyaTheme
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : BaseComposeActivity() {
 
-    private var backPressedTime: Long = 0
+    private val musicManager = MusicManager.getInstance()
+
     private val toast: Toast by lazy {
         Toast.makeText(baseContext, getString(R.string.back_btn_pressed), Toast.LENGTH_SHORT)
     }
-
-    private val musicManager = MusicManager.getInstance()
+    private var backPressedTime: Long = 0
+    private var _isMiniPlayerActivated = MutableStateFlow(false)
 
     @Composable
     override fun Content() {
@@ -40,6 +43,12 @@ class MainActivity : BaseComposeActivity() {
         var isLoaded by remember { mutableStateOf(false) }
         var currentMusic by remember { mutableStateOf<MusicInfo?>(null) }
         var isNeedToHideMiniPlayer by remember { mutableStateOf(false) }
+
+        LaunchedEffect(userPreferences.isMiniPlayerActivated) {
+            userPreferences.isMiniPlayerActivated.collect { value ->
+                _isMiniPlayerActivated.value = value
+            }
+        }
 
         LaunchedEffect(userPreferences.getSelectedTeam) {
             userPreferences.getSelectedTeam.collect { team ->
@@ -83,30 +92,43 @@ class MainActivity : BaseComposeActivity() {
             }
         }
 
-        val callback = createOnBackPressedCallback()
-        onBackPressedDispatcher.addCallback(this, callback)
-    }
-
-    private fun createOnBackPressedCallback(): OnBackPressedCallback {
-        return object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (backPressedTime + 2000 > System.currentTimeMillis()) {
-                    toast.cancel()
-                    finish()
-                } else {
-                    toast.show()
-                }
-                backPressedTime = System.currentTimeMillis()
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            setupOnBackPressedDispatcher()
         }
     }
-
     private fun computeWindowSizeClasses(): Float{
         val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(this)
         val height = metrics.bounds.height()
         val density = resources.displayMetrics.density
 
         return height/density
+    }
+
+
+    private fun setupOnBackPressedDispatcher() {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                handleBackPress()
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, callback)
+    }
+
+    private fun handleBackPress() {
+        if (_isMiniPlayerActivated.value) {
+            if (backPressedTime + 2000 > System.currentTimeMillis()) {
+                toast.cancel()
+                finish()
+            } else {
+                toast.show()
+            }
+            backPressedTime = System.currentTimeMillis()
+        }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        handleBackPress()
     }
 }
 

@@ -1,8 +1,6 @@
 package com.soi.moya.ui.music_player
 
 import android.app.Application
-import android.content.ComponentName
-import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -12,9 +10,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.session.MediaController
-import androidx.media3.session.SessionToken
-import androidx.navigation.NavHostController
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.StoredMusic
@@ -22,7 +17,6 @@ import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
-import com.soi.moya.playback.MoyaPlaybackService
 import com.soi.moya.repository.MusicPlayerManager
 import com.soi.moya.ui.Utility
 import kotlinx.coroutines.Dispatchers
@@ -82,79 +76,11 @@ class MusicPlayerViewModel(
     private val _state = MutableStateFlow(PlayerState())
     val state: StateFlow<PlayerState> = _state
 
-//    private var mediaController: MediaController? = null
-
     init {
-//        viewModelScope.launch {
-//            initializeController(context = application)
-//        }
         subscribeIsLyricView()
         startUpdateCurrentPositionAndDuration()
         subscribeCurrentSongID()
     }
-
-//    private suspend fun initializeController(context: Context) {
-//        mediaController = withContext(Dispatchers.IO) {
-//            MediaController.Builder(
-//                context,
-//                SessionToken(context, ComponentName(context, MoyaPlaybackService::class.java))
-//            ).buildAsync().get()
-//        }
-//
-//        mediaController?.let { controller ->
-//            _state.value = state.value.copy(player = controller)
-//
-//            controller.addListener(object : Player.Listener {
-//                override fun onEvents(player: Player, events: Player.Events) {
-//                    if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
-//                        updateUI()
-//                    }
-//                }
-//            })
-//        }
-//    }
-
-    private fun updateUI() {
-//        mediaController?.let { controller ->
-//            _state.value = PlayerState(
-//                player = controller,
-//                currentMediaTitle = controller.mediaMetadata.title.toString() ?: "",
-//                currentMediaArtist = controller.mediaMetadata.artist.toString() ?: "",
-//                mediaItems = List(controller.mediaItemCount) { index -> controller.getMediaItemAt(index) },
-//                currentMediaItemIndex = controller.currentMediaItemIndex
-//            )
-//        }
-    }
-
-//    fun onMediaItemClick(index: Int) {
-//        mediaController?.let { controller ->
-//            if (controller.currentMediaItemIndex == index) {
-//                controller.playWhenReady = !controller.playWhenReady
-//            } else {
-//                controller.seekToDefaultPosition(index)
-//            }
-//            updateUI()
-//        }
-//    }
-//
-//    fun onDeleteMediaItem(index: Int) {
-//        mediaController?.let { controller ->
-//            controller.removeMediaItem(index)
-//            updateUI()
-//        }
-//    }
-//
-//    override fun onCleared() {
-//        mediaController?.release()
-//        super.onCleared()
-//    }
-
-//    init {
-//        startUpdateCurrentPositionAndDuration()
-//        subscribeCurrentSongID()
-//        subscribeIsLyricView()
-//    }
-
     private fun startUpdateCurrentPositionAndDuration() {
         viewModelScope.launch {
             while (true) {
@@ -211,15 +137,6 @@ class MusicPlayerViewModel(
 
     fun seekTo(position: Long) {
         musicPlayerManager.value.seekTo(position)
-    }
-
-    fun popBackStack(navController: NavHostController) {
-        stopMusic()
-        navController.popBackStack()
-    }
-
-    fun stopMusic() {
-        _musicPlayerManager.value.stop()
     }
 
     //좋아요 관련 함수

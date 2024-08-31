@@ -7,8 +7,6 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.toArgb
-import com.soi.moya.ui.theme.MoyaColor
 
 abstract class BaseComposeActivity: ComponentActivity() {
 

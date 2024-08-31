@@ -1,7 +1,6 @@
 package com.soi.moya.ui.music_player
 
 import android.annotation.SuppressLint
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,10 +57,6 @@ fun MusicPlayerScreen(
     val progress = remember { mutableFloatStateOf(0f) }
     val isLike by viewModel.isLike.collectAsState()
     val isLyricDisplaying by viewModel.isLyricDisplaying.collectAsState()
-
-    BackHandler {
-        viewModel.popBackStack(navController)
-    }
 
     music?.team?.let {
         Modifier

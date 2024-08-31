@@ -1,6 +1,8 @@
 package com.soi.moya.ui.mini_player
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
+import androidx.annotation.OptIn
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,6 +33,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
@@ -43,6 +46,7 @@ import com.soi.moya.ui.theme.getTextStyle
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
+@OptIn(UnstableApi::class)
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun MiniPlayerScreen(
@@ -62,7 +66,13 @@ fun MiniPlayerScreen(
     LaunchedEffect(isMiniActivated) {
         if (!isMiniActivated) {
             height.animateTo(maxHeight)
+        } else {
+            height.animateTo(viewModel.minHeight)
         }
+    }
+
+    BackHandler(enabled = !isMiniActivated) {
+        viewModel.popBackStack()
     }
 
     Box(
