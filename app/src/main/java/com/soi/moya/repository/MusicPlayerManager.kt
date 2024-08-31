@@ -120,15 +120,16 @@ class MusicPlayerManager private constructor(
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                     // 미디어 아이템이 변경될 때 SharedPreferences 업데이트
                     Log.e("***Music player manager", "position: ${getCurrentMediaItemIndex()}  id: ${mediaItem?.mediaId ?: ""}")
-                    saveCurrentSongPosition()
+                    saveCurrentSong(songId = mediaItem?.mediaId ?: "")
                 }
             }
         )
     }
 
-    private fun saveCurrentSongPosition() {
+    private fun saveCurrentSong(songId: String) {
         coroutineScope.launch {
             _userPreferences.saveCurrentSongPosition(getCurrentMediaItemIndex())
+            _userPreferences.saveCurrentSongId(songId = songId)
         }
     }
     private fun getCurrentMediaItemIndex(): Int {

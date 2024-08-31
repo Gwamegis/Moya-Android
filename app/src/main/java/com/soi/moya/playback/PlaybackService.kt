@@ -24,7 +24,6 @@ class PlaybackService() : MoyaPlaybackService() {
     override fun getBackStackedActivity(): PendingIntent? {
         return TaskStackBuilder.create(this).run {
             addNextIntent(Intent(this@PlaybackService, MainActivity::class.java))
-//            addNextIntent(Intent(this@PlaybackService, PlayerActivity::class.java))
             getPendingIntent(0, immutableFlag or PendingIntent.FLAG_UPDATE_CURRENT)
         }
     }
