@@ -7,6 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import com.soi.moya.data.MusicManager
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.SeasonSongManager
@@ -18,17 +19,20 @@ import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
 import com.soi.moya.repository.MusicPlayerManager
 import com.soi.moya.ui.Utility
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class MusicListViewModel(
+@HiltViewModel
+class MusicListViewModel @Inject constructor(
     private val application: Application,
     private val storedMusicRepository: StoredMusicRepository
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val _userPreferences = UserPreferences(application)
     private val _selectedTeam = MutableStateFlow<String>("doosan")
@@ -67,34 +71,30 @@ class MusicListViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val existingMusic = storedMusicRepository.getItemById(music.id, "default")
+                val count = storedMusicRepository.getItemCount("default")
 
                 if (existingMusic != null) {
                     // 이미 저장된 음악 정보가 있을 때
                     storedMusicRepository.updateOrder(
-                        start = 0,
-                        end = existingMusic.order,
-                        increment = 1
+                        start = existingMusic.order+1,
+                        end = count-1,
+                        increment = -1
                     )
-                    storedMusicRepository.updateOrder(existingMusic.songId, 0)
+                    storedMusicRepository.updateOrder(existingMusic.songId, count-1)
                 } else {
                     // 새로운 음악 정보를 추가할 때
                     val order = storedMusicRepository.getItemCount(playlist = "default")
-                    storedMusicRepository.updateOrder(
-                        start = 0,
-                        end = order,
-                        increment = 1
-                    )
 
                     val newMusic = music.toStoredMusic(
                         team = music.team,
-                        order = 0,
+                        order = count-1,
                         date = Utility.getCurrentTimeString(),
                         playlist = "default"
                     )
                     storedMusicRepository.insertItem(newMusic.toItem())
                 }
 
-                saveCurrentSongId(music.id)
+                saveCurrentSongId(music.id, count-1)
                 saveIsMiniplayerActivated()
 
                 val currentSongId = _userPreferences.currentPlaySongId.firstOrNull()
@@ -112,10 +112,11 @@ class MusicListViewModel(
         }
     }
 
-    private fun saveCurrentSongId(songId: String) {
+    private fun saveCurrentSongId(songId: String, position: Int) {
         viewModelScope.launch {
             _userPreferences.saveCurrentSongId(songId)
             _userPreferences.saveIsMiniplayerActivated(false)
+            _userPreferences.saveCurrentSongPosition(position)
         }
     }
 

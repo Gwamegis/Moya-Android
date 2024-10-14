@@ -31,11 +31,13 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import com.soi.moya.R
+import com.soi.moya.data.OfflineItemsRepository
 import com.soi.moya.models.Team
 import com.soi.moya.ui.MoyaApplication
+import com.soi.moya.ui.Utility
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -46,6 +48,9 @@ open class MoyaPlaybackService() : MediaSessionService() {
     private lateinit var player: ExoPlayer
     private val scope = CoroutineScope(Dispatchers.IO)
     private lateinit var application: MoyaApplication
+
+    private lateinit var mediaRepository: OfflineItemsRepository
+
     companion object {
         private const val NOTIFICATION_ID = 123
         private const val CHANNEL_ID = "moya_session_notification_channel_id"
@@ -69,7 +74,7 @@ open class MoyaPlaybackService() : MediaSessionService() {
         setListener(MediaSessionServiceListener())
 
         CoroutineScope(Dispatchers.IO).launch {
-            loadInitialPlaylist(application)
+            loadPlaylist(application)
         }
     }
 
@@ -83,7 +88,8 @@ open class MoyaPlaybackService() : MediaSessionService() {
 
         /*
         * ForwardingPlayer :Android의 Media3 라이브러리에서 제공하는 추상 클래스
-        * Player인터페이스를 구현하는 여러 플레이어 객체를 감싸서 다양한 플레이어에 대한 공통된 기능을 제공하는데 사용 */
+        * Player인터페이스를 구현하는 여러 플레이어 객체를 감싸서 다양한 플레이어에 대한 공통된 기능을 제공하는데 사용
+        */
 
         mediaSession = MediaSession.Builder(this, player)
             .setCallback(createSessionCallback())
@@ -92,66 +98,39 @@ open class MoyaPlaybackService() : MediaSessionService() {
 
     @SuppressLint("Range")
     @OptIn(UnstableApi::class)
-    suspend fun loadInitialPlaylist(application: MoyaApplication) {
-        val playlist = application.container.itemsRepository.getByDefaultPlaylist()
-
+    suspend fun loadPlaylist(application: MoyaApplication) {
+        val playlist = withContext(Dispatchers.IO) {
+            application.container.itemsRepository.getByDefaultPlaylist()
+                .firstOrNull() ?: emptyList()
+        }
         val filePath = application.filesDir.absolutePath
-        val mediaItems = playlist.map { songs ->
-            songs.map { song ->
-                val file = File(filePath, "${song.songId}-${song.title}.mp3")
-                val resourceId = if (song.type) Team.valueOf(song.team).getPlayerAlbumImageResourceId() else Team.valueOf(song.team).getTeamImageResourceId()
-                val imageUri = Uri.parse("android.resource://com.soi.moya/$resourceId")
+        val mediaItems = playlist.mapNotNull { song ->
+            val file = File(filePath, "${song.songId}-${song.title}.mp3")
+            if (!file.exists()) return@mapNotNull null
 
-                buildMediaItem(
-                    title = song.title,
-                    mediaId = song.songId,
-                    mediaType = MediaMetadata.MEDIA_TYPE_MUSIC,
-                    artist = Team.valueOf(song.team).getKrTeamName(),
-                    sourceUri = Uri.fromFile(file),
-                    imageUri = imageUri
-                )
+            val resourceId = if(song.type) {
+                Team.valueOf(song.team).getPlayerAlbumImageResourceId()
+            } else {
+                Team.valueOf(song.team).getTeamImageResourceId()
             }
+            val imageUri = Uri.parse("android.resource://com.soi.moya/$resourceId")
+
+            Utility.buildMediaItem(
+                title = song.title,
+                mediaId = song.songId,
+                mediaType = MediaMetadata.MEDIA_TYPE_MUSIC,
+                artist = Team.valueOf(song.team).getKrTeamName(),
+                sourceUri = Uri.fromFile(file),
+                imageUri = imageUri
+            )
         }
-        mediaItems.collect { items ->
-            withContext(Dispatchers.Main) {
-                player.setMediaItems(items)
-            }
+
+        withContext(Dispatchers.Main) {
+            player.setMediaItems(mediaItems)
         }
     }
 
-    private fun buildMediaItem(
-        title: String,
-        mediaId: String,
-        isPlayable: Boolean = true,
-        isBrowsable: Boolean = false,
-        mediaType: @MediaMetadata.MediaType Int,
-        subtitleConfigurations: List<MediaItem.SubtitleConfiguration> = mutableListOf(),
-        album: String? = null,
-        artist: String? = null,
-        genre: String? = null,
-        sourceUri: Uri? = null,
-        imageUri: Uri? = null
-    ): MediaItem {
-        val metadata =
-            MediaMetadata.Builder()
-                .setAlbumTitle(album)
-                .setTitle(title)
-                .setArtist(artist)
-                .setGenre(genre)
-                .setIsBrowsable(isBrowsable)
-                .setIsPlayable(isPlayable)
-                .setArtworkUri(imageUri)
-                .setMediaType(mediaType)
-                .build()
-
-        return MediaItem.Builder()
-            .setMediaId(mediaId)
-            .setSubtitleConfigurations(subtitleConfigurations)
-            .setMediaMetadata(metadata)
-            .setUri(sourceUri)
-            .build()
-    }
-
+    //알림센터 위젯 설정
     @OptIn(UnstableApi::class) // MediaSessionService.Listener
     private inner class MediaSessionServiceListener : Listener {
         @SuppressLint("ResourceType")
@@ -161,7 +140,6 @@ open class MoyaPlaybackService() : MediaSessionService() {
                 checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
                 PackageManager.PERMISSION_GRANTED
             ) {
-                // Notification permission is required but not granted
                 return
             }
             val notificationManagerCompat = NotificationManagerCompat.from(this@MoyaPlaybackService)
@@ -197,6 +175,7 @@ open class MoyaPlaybackService() : MediaSessionService() {
             notificationManagerCompat.createNotificationChannel(channel)
         }
     }
+    //최근 앱 목록에서 제거 시 호출
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         val player = mediaSession.player
@@ -207,8 +186,8 @@ open class MoyaPlaybackService() : MediaSessionService() {
     @OptIn(UnstableApi::class)
     override fun onDestroy() {
         getBackStackedActivity()?.let { mediaSession.setSessionActivity(it) }
+        player.release()
         mediaSession.release()
-        mediaSession.player.release()
         clearListener()
         super.onDestroy()
     }
@@ -221,7 +200,8 @@ open class MoyaPlaybackService() : MediaSessionService() {
         * 클라이언트가 세션에 연결될 때 어떤 명령어를 사용할 수 있는지를 정의함
         *
         * 명령어 집합 정의
-        * 명령어 집합 반환*/
+        * 명령어 집합 반환
+        */
 
         @OptIn(UnstableApi::class)
         val mediaNotificationSessionCommands =
@@ -246,6 +226,10 @@ open class MoyaPlaybackService() : MediaSessionService() {
             return ConnectionResult.AcceptedResultBuilder(session).build()
         }
 
+        /* 미디어세션에서 다시 재생 시작 시 호출
+        * 재생 중단 후 다시 재생할 시점에 어떤 플레이리스트를 로드할지를 결정
+        *
+         */
         @UnstableApi
         override fun onPlaybackResumption(
             mediaSession: MediaSession,
@@ -254,12 +238,9 @@ open class MoyaPlaybackService() : MediaSessionService() {
             val settable = SettableFuture.create<MediaItemsWithStartPosition>()
             scope.launch {
                 try {
-                    // Call the restorePlaylist function to get the playlist
-                    val resumptionPlaylist =
-                        withContext(Dispatchers.IO) {
-//                            restorePlaylist().get()
-                        }  // Block until the future completes
-//                    settable.set(resumptionPlaylist)
+                    val mediaItems = getCurrentMediaItemsFromSession(mediaSession) ?: loadPlaylist(application)
+                    restoreMediaSession(application, mediaSession)
+                    settable.set(MediaItemsWithStartPosition(mediaItems, 0, 0))
                 } catch (e: Exception) {
                     settable.setException(e)
                 }
@@ -271,7 +252,10 @@ open class MoyaPlaybackService() : MediaSessionService() {
             controller: ControllerInfo,
             mediaItems: List<MediaItem>
         ): ListenableFuture<List<MediaItem>> {
-            return Futures.immediateFuture(resolveMediaItems(mediaItems))
+            mediaItems.forEach { mediaItem ->
+                player.addMediaItem(mediaItem)
+            }
+            return Futures.immediateFuture(mediaItems)
         }
 
         @OptIn(UnstableApi::class)
@@ -282,65 +266,77 @@ open class MoyaPlaybackService() : MediaSessionService() {
             startIndex: Int,
             startPositionMs: Long
         ): ListenableFuture<MediaItemsWithStartPosition> {
+
+            player.setMediaItems(mediaItems, startIndex, startPositionMs)
+
             return Futures.immediateFuture(
-                MediaItemsWithStartPosition(resolveMediaItems(mediaItems), startIndex, startPositionMs)
+                MediaItemsWithStartPosition(mediaItems, startIndex, startPositionMs)
             )
         }
-        // 현재 재생 목록을 가져오는 함수
-        fun getCurrentMediaItems(exoPlayer: ExoPlayer): List<MediaItem> {
-            val mediaItems = mutableListOf<MediaItem>()
-            for (i in 0 until exoPlayer.mediaItemCount) {
-                exoPlayer.getMediaItemAt(i).let { mediaItems.add(it) }
+        fun getCurrentMediaItemsFromSession(mediaSession: MediaSession): List<MediaItem>? {
+            val player = mediaSession.player
+            return if (player.mediaItemCount > 0) {
+                val mediaItems = mutableListOf<MediaItem>()
+                for (i in 0 until player.mediaItemCount) {
+                    mediaItems.add(player.getMediaItemAt(i))
+                }
+                mediaItems
+            } else {
+                null  // 세션에 재생 목록이 없을 경우
             }
+        }
+        @SuppressLint("Range")
+        @OptIn(UnstableApi::class)
+        suspend fun loadPlaylist(application: MoyaApplication): List<MediaItem> {
+            val playlist = withContext(Dispatchers.IO) {
+                application.container.itemsRepository.getByDefaultPlaylist()
+                    .firstOrNull() ?: emptyList()
+            }
+            val filePath = application.filesDir.absolutePath
+            val mediaItems = playlist.mapNotNull { song ->
+                val file = File(filePath, "${song.songId}-${song.title}.mp3")
+                if (!file.exists()) return@mapNotNull null
+
+                val resourceId = if(song.type) {
+                    Team.valueOf(song.team).getPlayerAlbumImageResourceId()
+                } else {
+                    Team.valueOf(song.team).getTeamImageResourceId()
+                }
+                val imageUri = Uri.parse("android.resource://com.soi.moya/$resourceId")
+
+                Utility.buildMediaItem(
+                    title = song.title,
+                    mediaId = song.songId,
+                    mediaType = MediaMetadata.MEDIA_TYPE_MUSIC,
+                    artist = Team.valueOf(song.team).getKrTeamName(),
+                    sourceUri = Uri.fromFile(file),
+                    imageUri = imageUri
+                )
+            }
+
             return mediaItems
         }
 
-
-        //??
         @OptIn(UnstableApi::class)
-        private fun restorePlaylist(): ListenableFuture<MediaItemsWithStartPosition> {
-            // Create a SettableFuture to return
-            val settableFuture = SettableFuture.create<MediaItemsWithStartPosition>()
+        suspend fun restoreMediaSession(application: MoyaApplication, mediaSession: MediaSession) {
+            val mediaItems = getCurrentMediaItemsFromSession(mediaSession)
 
-            scope.launch {
-                // Retrieve playlist and start position from your data source
-                val playlist = application.container.itemsRepository.getByDefaultPlaylist()  // List<StoredMusic>
-                val startPositionMs: Long = 0  // Long (start position)
-
-                // Map your StoredMusic to MediaItem
-                val mediaItems = playlist.map { songs ->
-                    songs.map { song ->
-                        MediaItem.Builder()
-                            .setUri(Uri.parse(song.url))  // Media file URI
-                            .setMediaId(song.id)  // Media ID
-                            .setMediaMetadata(
-                                MediaMetadata.Builder()
-                                    .setTitle(song.title)  // Title
-                                    .setArtist(song.team)  // Artist
-                                    .build()
-                            )
-                            .build()
-                    }
-                }
-
-                mediaItems.collect {items ->
-                    val mediaItemsWithStartPosition = MediaItemsWithStartPosition(items, 0, startPositionMs)
-                    settableFuture.set(mediaItemsWithStartPosition)
-                }
+            if (mediaItems != null && mediaItems.isNotEmpty()) {
+                mediaSession.player.setMediaItems(mediaItems)
+            } else {
+                val newMediaItems = loadPlaylist(application)
+                mediaSession.player.setMediaItems(newMediaItems)
             }
-
-            return settableFuture
+            mediaSession.player.prepare()
         }
 
         private fun resolveMediaItems(mediaItems: List<MediaItem>): List<MediaItem> {
-            val playlist = getCurrentMediaItems(player)
+            val currentPlaylist = mutableListOf<MediaItem>()
 
-            // 새 미디어 아이템을 리스트에 추가합니다.
-            val currentPlaylist = playlist.toMutableList()
-
-            mediaItems.forEach { item ->
-                currentPlaylist.add(0, item)
+            for (i in 0 until player.mediaItemCount) {
+                currentPlaylist.add(player.getMediaItemAt(i))
             }
+            currentPlaylist.addAll(mediaItems)
 
             return currentPlaylist
         }

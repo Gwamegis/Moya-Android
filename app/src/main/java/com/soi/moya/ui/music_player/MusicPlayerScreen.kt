@@ -33,11 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
-import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -45,12 +45,13 @@ import com.soi.moya.ui.theme.getTextStyle
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun MusicPlayerScreen(
-    viewModel: MusicPlayerViewModel = viewModel(factory = AppViewModelProvider.Factory),
     navController: NavHostController,
     music: MusicInfo,
     modifier: Modifier = Modifier,
     onClickBackButton: () -> Unit
 ) {
+    val viewModel: MusicPlayerViewModel = hiltViewModel()
+
     val currentPosition by rememberUpdatedState(newValue = viewModel.currentPosition.value)
     val duration = viewModel.getDuration()
 

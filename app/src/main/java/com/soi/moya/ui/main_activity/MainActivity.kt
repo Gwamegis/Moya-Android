@@ -22,8 +22,10 @@ import com.soi.moya.ui.bottom_nav.BottomNavScreen
 import com.soi.moya.ui.mini_player.MiniPlayerScreen
 import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.theme.MoyaTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 
+@AndroidEntryPoint
 class MainActivity : BaseComposeActivity() {
 
     private val musicManager = MusicManager.getInstance()

@@ -36,9 +36,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.MediaItem
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
@@ -49,9 +48,6 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
-import com.soi.moya.models.StoredMusic
-import com.soi.moya.models.Team
-import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -60,8 +56,9 @@ import com.soi.moya.ui.theme.getTextStyle
 @Composable
 fun PlaylistScreen(
     music: MusicInfo,
-    viewModel: PlaylistViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
+    val viewModel: PlaylistViewModel = hiltViewModel()
+
 //    val defaultPlaylists by viewModel.defaultPlaylists.collectAsState()
     val mediaItemLists by viewModel.mediaItemList.collectAsState()
 
@@ -96,7 +93,8 @@ fun PlaylistScreen(
                 )
 
                 SwipeToDismiss(
-                    modifier = Modifier.animateItemPlacement()
+                    modifier = Modifier
+                        .animateItemPlacement()
                         .clickable { viewModel.onTapListItem(item) },
                     state = dismissState,
                     directions = setOf(DismissDirection.EndToStart),

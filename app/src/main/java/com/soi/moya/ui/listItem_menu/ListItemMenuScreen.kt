@@ -25,11 +25,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
-import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
@@ -38,9 +37,10 @@ import com.soi.moya.ui.theme.getTextStyle
 fun ListItemMenuScreen(
     music: MusicInfo,
     team: Team,
-    onClick: ()->Unit,
-    viewModel: ListItemMenuViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    onClick: ()->Unit
 ) {
+    val viewModel: ListItemMenuViewModel = hiltViewModel()
+
     val doesExist = remember { mutableStateOf(false) }
     LaunchedEffect(music.id) {
         doesExist.value = viewModel.doesItemExist(music.id)

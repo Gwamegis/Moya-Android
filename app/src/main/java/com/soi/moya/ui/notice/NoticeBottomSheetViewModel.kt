@@ -4,20 +4,24 @@ import android.app.Application
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.TrafficManager
 import com.soi.moya.data.VersionManager
 import com.soi.moya.models.Traffic
 import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.Version
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
+import javax.inject.Inject
 
-class NoticeBottomSheetViewModel(
+@HiltViewModel
+class NoticeBottomSheetViewModel @Inject constructor(
     application: Application
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val _userPreferences = UserPreferences(application)
     private val _versionManager = VersionManager.getInstance()

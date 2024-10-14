@@ -1,8 +1,7 @@
 package com.soi.moya.ui.listItem_menu
 
 import android.app.Application
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
@@ -10,14 +9,16 @@ import com.soi.moya.models.Team
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
 import com.soi.moya.ui.Utility
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class ListItemMenuViewModel(
-    private val storedMusicRepository: StoredMusicRepository,
-    application: Application
-): AndroidViewModel(application = application) {
+@HiltViewModel
+class ListItemMenuViewModel @Inject constructor(
+    private val storedMusicRepository: StoredMusicRepository
+): ViewModel() {
     suspend fun doesItemExist(itemId: String): Boolean {
         return storedMusicRepository.doesItemExist(itemId = itemId, playlist = "favorite")
     }

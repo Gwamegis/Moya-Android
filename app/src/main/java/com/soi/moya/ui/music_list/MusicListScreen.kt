@@ -45,12 +45,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
-import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.SELECT_TEAM
 import com.soi.moya.ui.component.CellType
 import com.soi.moya.ui.component.MusicListItem
@@ -66,9 +66,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MusicListScreen(
-    viewModel: MusicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
     navController: NavHostController
 ) {
+    val viewModel: MusicListViewModel = hiltViewModel()
+
     val selectedTeam by viewModel.selectedTeam.collectAsState()
     val scope = rememberCoroutineScope()
     val tabs = listOf(R.string.team_tab, R.string.player_tab)
@@ -190,8 +191,9 @@ fun MusicListHeaderView(
     team: Team,
     musicListSize: Int,
     navController: NavHostController,
-    viewModel: MusicListViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
+    val viewModel: MusicListViewModel = hiltViewModel()
+
     Column() {
         Box(
             modifier = Modifier

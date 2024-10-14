@@ -54,13 +54,13 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.MotionLayoutScope
 import androidx.constraintlayout.compose.layoutId
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.Team
 import com.soi.moya.models.toMusicInfo
-import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.component.CellType
 import com.soi.moya.ui.component.MusicListItem
 import com.soi.moya.ui.listItem_menu.ListItemMenuScreen
@@ -77,9 +77,9 @@ enum class SwipingStates {
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MusicStorageScreen(
-    viewModel: MusicStorageViewModel = viewModel(factory = AppViewModelProvider.Factory),
     navController: NavHostController
 ) {
+    val viewModel: MusicStorageViewModel = hiltViewModel()
 
     val storageUiState by viewModel.storageUiState.collectAsState()
     Surface(
@@ -184,8 +184,8 @@ fun ItemList(
 @Composable
 fun ItemView(
     music: StoredMusic,
-    viewModel: MusicStorageViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
+    val viewModel: MusicStorageViewModel = hiltViewModel()
 
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()

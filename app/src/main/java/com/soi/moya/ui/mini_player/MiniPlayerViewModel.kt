@@ -3,14 +3,18 @@ package com.soi.moya.ui.mini_player
 import android.app.Application
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.models.UserPreferences
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MiniPlayerViewModel(
+@HiltViewModel
+class MiniPlayerViewModel @Inject constructor(
     application: Application
-) : AndroidViewModel(application) {
+) : ViewModel() {
 
     private val _userPreferences = UserPreferences(application)
 

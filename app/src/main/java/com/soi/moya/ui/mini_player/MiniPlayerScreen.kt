@@ -32,12 +32,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
-import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.music_player.MusicPlayerScreen
 import com.soi.moya.ui.music_player.MusicPlayerViewModel
 import com.soi.moya.ui.theme.MoyaColor
@@ -50,11 +49,12 @@ import kotlin.math.max
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun MiniPlayerScreen(
-    viewModel: MiniPlayerViewModel = viewModel(factory = AppViewModelProvider.Factory),
     maxHeight: Float,
     navController: NavHostController,
     music: MusicInfo
 ) {
+    val viewModel: MiniPlayerViewModel = hiltViewModel()
+
     val height = remember { Animatable(viewModel.minHeight) }
     val coroutineScope = rememberCoroutineScope()
     val heightFraction = ((height.value - viewModel.minHeight) / (maxHeight - viewModel.minHeight)).coerceIn(0f, 1f)
@@ -198,10 +198,10 @@ fun MiniPlayerScreen(
 
 @Composable
 fun MiniPlayer(
-    viewModel: MusicPlayerViewModel = viewModel(factory = AppViewModelProvider.Factory),
     music: MusicInfo,
     modifier: Modifier = Modifier,
 ) {
+    val viewModel: MusicPlayerViewModel = hiltViewModel()
     val isPlaying by viewModel.isPlaying.collectAsState()
     Row(
         modifier = modifier

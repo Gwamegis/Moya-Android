@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import com.soi.moya.data.StoredMusicRepository
@@ -12,6 +13,7 @@ import com.soi.moya.models.UserPreferences
 import com.soi.moya.repository.MusicPlayerManager
 import com.soi.moya.ui.music_storage.MusicStorageViewModel
 import com.soi.moya.ui.music_storage.StorageUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,11 +22,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class PlaylistViewModel(
+@HiltViewModel
+class PlaylistViewModel @Inject constructor(
     application: Application,
     private val storedMusicRepository: StoredMusicRepository
-) : AndroidViewModel(application) {
+) : ViewModel() {
     private val _userPreferences = UserPreferences(application)
 
     private val musicPlayerManager = MusicPlayerManager.getInstance(

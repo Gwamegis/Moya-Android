@@ -3,12 +3,16 @@ package com.soi.moya.ui.select_team
 import android.app.Application
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SelectTeamViewModel(application: Application): AndroidViewModel(application = Application()) {
+@HiltViewModel
+class SelectTeamViewModel @Inject constructor(application: Application): ViewModel() {
     val teams = Team.values()
     var selectedTeam = mutableStateOf<Team?>(null)
 

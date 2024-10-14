@@ -5,7 +5,7 @@ plugins {
 
     id 'kotlin-android'
     id 'kotlin-kapt'
-
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -175,4 +175,11 @@ dependencies {
     implementation "androidx.media:media:1.7.0"
 
     implementation("io.coil-kt:coil-compose:2.4.0")
+
+    //hilt
+    implementation "com.google.dagger:hilt-android:2.49"
+    kapt "com.google.dagger:hilt-compiler:2.49"
+
+    // Hilt for ViewModel
+    implementation "androidx.hilt:hilt-navigation-compose:1.2.0" // Hilt와 Jetpack Compose 통합
 }

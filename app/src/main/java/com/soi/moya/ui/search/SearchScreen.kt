@@ -39,10 +39,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
-import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.Utility
 import com.soi.moya.ui.WindowSize
 import com.soi.moya.ui.component.CellType
@@ -54,8 +54,9 @@ import com.soi.moya.ui.theme.getTextStyle
 
 @Composable
 fun SearchScreen(
-    viewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val viewModel: SearchViewModel = hiltViewModel()
+
     val result by viewModel.searchResult.collectAsState()
     val text by viewModel.searchText.collectAsState()
 
@@ -77,8 +78,8 @@ fun SearchScreen(
 @Composable
 fun ResultView(
     result: List<MusicInfo>,
-    viewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
+    val viewModel: SearchViewModel = hiltViewModel()
     val focusManager = LocalFocusManager.current
 
     LazyColumn {

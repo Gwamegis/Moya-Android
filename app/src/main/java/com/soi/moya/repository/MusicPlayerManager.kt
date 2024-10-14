@@ -280,39 +280,6 @@ class MusicPlayerManager private constructor(
         }
     }
 
-    fun buildMediaItem(
-        title: String,
-        mediaId: String,
-        isPlayable: Boolean = true,
-        isBrowsable: Boolean = false,
-        mediaType: @MediaMetadata.MediaType Int,
-        subtitleConfigurations: List<MediaItem.SubtitleConfiguration> = mutableListOf(),
-        album: String? = null,
-        artist: String? = null,
-        genre: String? = null,
-        sourceUri: Uri? = null,
-        imageUri: Uri? = null
-    ): MediaItem {
-        val metadata =
-            MediaMetadata.Builder()
-                .setAlbumTitle(album)
-                .setTitle(title)
-                .setArtist(artist)
-                .setGenre(genre)
-                .setIsBrowsable(isBrowsable)
-                .setIsPlayable(isPlayable)
-                .setArtworkUri(imageUri)
-                .setMediaType(mediaType)
-                .build()
-
-        return MediaItem.Builder()
-            .setMediaId(mediaId)
-            .setSubtitleConfigurations(subtitleConfigurations)
-            .setMediaMetadata(metadata)
-            .setUri(sourceUri)
-            .build()
-    }
-
     fun getCurrentPosition(): Long {
         return controller?.currentPosition ?: 0L
     }

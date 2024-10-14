@@ -17,17 +17,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Moya"
         tools:targetApi="31">
-        <activity
-            android:name=".ui.music_player.PlayerActivity"
-            android:exported="false"
-            android:label="@string/title_activity_player"
-            android:theme="@style/Theme.Moya" />
+<!--        <activity-->
+<!--            android:name=".ui.main_activity.MainActivity"-->
+<!--            android:exported="false"-->
+<!--            android:label="@string/title_activity_player"-->
+<!--            android:theme="@style/Theme.Moya" />-->
         <activity
             android:name=".ui.main_activity.MainActivity"
+            android:theme="@style/Theme.Moya"
+            android:label="@string/title_activity_main"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -46,7 +47,8 @@
             </intent-filter>
         </receiver>
     </application>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"
+        tools:ignore="ManifestOrder" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
 </manifest>

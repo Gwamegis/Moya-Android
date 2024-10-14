@@ -1,5 +1,6 @@
 package com.soi.moya.base
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,7 +8,10 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import com.soi.moya.playback.PlaybackService
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 abstract class BaseComposeActivity: ComponentActivity() {
 
     @Composable
@@ -28,6 +32,8 @@ abstract class BaseComposeActivity: ComponentActivity() {
         )
         setContent {
             Content()
+            val intent = Intent(this, PlaybackService::class.java)
+            startService(intent)
         }
     }
 }

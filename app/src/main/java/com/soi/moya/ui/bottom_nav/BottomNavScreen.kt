@@ -1,5 +1,6 @@
 package com.soi.moya.ui.bottom_nav
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -27,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -34,7 +36,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.soi.moya.R
-import com.soi.moya.ui.AppViewModelProvider
 import com.soi.moya.ui.MUSIC_LIST
 import com.soi.moya.ui.MUSIC_PlAYER
 import com.soi.moya.ui.MUSIC_STORAGE
@@ -75,6 +76,7 @@ fun BottomNavScreen() {
     }
 }
 
+@SuppressLint("NewApi")
 @Composable
 fun NavGraph(
     navController: NavHostController
@@ -105,7 +107,7 @@ fun NavGraph(
 private fun NoticeBottomSheet(
     content: @Composable () -> Unit,
 ) {
-    val viewModel: NoticeBottomSheetViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val viewModel: NoticeBottomSheetViewModel = hiltViewModel()
     val isNotCheckedVersion = viewModel.isNotCheckedVersion
     val isExistTrafficIssue = viewModel.isExistTrafficIssue
     val version = viewModel.versionState
