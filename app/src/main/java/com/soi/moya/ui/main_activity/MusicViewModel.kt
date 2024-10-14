@@ -17,21 +17,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MusicViewModel @Inject constructor(
-    application: Application
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
-
-    private val _userPreferences = UserPreferences(application)
 
     private val _selectedMusic = MutableLiveData<MusicInfo?>()
     val selectedMusic: LiveData<MusicInfo?> = _selectedMusic
-
-    companion object {
-        @Volatile
-        private var instance: MusicViewModel? = null
-
-        fun getInstance(application: Application) =
-            instance ?: synchronized(this) {
-                instance ?: MusicViewModel(application).also { instance = it }
-            }
-    }
 }

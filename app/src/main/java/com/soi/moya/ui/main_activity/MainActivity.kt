@@ -24,6 +24,7 @@ import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.theme.MoyaTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : BaseComposeActivity() {
@@ -36,10 +37,13 @@ class MainActivity : BaseComposeActivity() {
     private var backPressedTime: Long = 0
     private var _isMiniPlayerActivated = MutableStateFlow(false)
 
+    @Inject
+    lateinit var userPreferences: UserPreferences
+
     @Composable
     override fun Content() {
-        val context = LocalContext.current
-        val userPreferences = remember { UserPreferences(context) }
+//        val context = LocalContext.current
+//        val userPreferences = remember { UserPreferences(context) }
         val navController = rememberNavController()
         var selectedTeam by remember { mutableStateOf<String?>(null) }
         var isLoaded by remember { mutableStateOf(false) }

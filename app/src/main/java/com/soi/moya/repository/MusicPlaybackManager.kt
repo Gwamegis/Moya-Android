@@ -9,6 +9,8 @@ import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.StoredMusic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -24,6 +26,8 @@ class MusicPlaybackManager @Inject constructor(
 ) {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying: StateFlow<Boolean> = _isPlaying
 
     fun play() {
         controllerManager.controller?.play()
@@ -64,8 +68,8 @@ class MusicPlaybackManager @Inject constructor(
         }
     }
 
-    fun playMediaItemById(mediaItemId: String, mediaItemManager: MediaItemManager) {
-        val mediaItems = mediaItemManager.mediaItemList.value
+    fun playMediaItemById(mediaItemId: String) {
+        val mediaItems = controllerManager.mediaItemList.value
         val index = mediaItems.indexOfFirst { it.mediaId == mediaItemId }
         if (index != -1) {
             controllerManager.controller?.let {

@@ -13,11 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MiniPlayerViewModel @Inject constructor(
-    application: Application
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
-
-    private val _userPreferences = UserPreferences(application)
-
     var isMiniPlayerActivated = MutableStateFlow(true)
 
     val minHeight = 55f
@@ -34,7 +31,7 @@ class MiniPlayerViewModel @Inject constructor(
 
     private fun observeIsMiniplayerActivated() {
         viewModelScope.launch {
-            _userPreferences.isMiniPlayerActivated.collect{
+            userPreferences.isMiniPlayerActivated.collect{
                 isMiniPlayerActivated.value = it
             }
         }
@@ -46,14 +43,14 @@ class MiniPlayerViewModel @Inject constructor(
 
     fun setIsMiniplayerActivated(isActivated: Boolean) {
         viewModelScope.launch {
-            _userPreferences.saveIsMiniplayerActivated(isActivated)
+            userPreferences.saveIsMiniplayerActivated(isActivated)
         }
     }
 
     fun popBackStack() {
         //미니플레이어 상태 활성화
         viewModelScope.launch {
-            _userPreferences.saveIsMiniplayerActivated(true)
+            userPreferences.saveIsMiniplayerActivated(true)
         }
     }
 }

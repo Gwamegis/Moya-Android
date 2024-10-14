@@ -83,7 +83,6 @@ fun PlaylistScreen(
                 val dismissState = rememberDismissState(
                     confirmStateChange = { dismissValue ->
                         if (dismissValue == DismissValue.DismissedToEnd || dismissValue == DismissValue.DismissedToStart) {
-                            Log.e("*** playlist screen", "dismissValue order: $item")
                             viewModel.deletePlaylistItem(songId = item.mediaId, order = viewModel.getMediaItemIndex(mediaId = item.mediaId))
                             true
                         } else {

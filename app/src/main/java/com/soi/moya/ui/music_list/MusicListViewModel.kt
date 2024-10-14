@@ -3,9 +3,7 @@ package com.soi.moya.ui.music_list
 import android.app.Application
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.soi.moya.data.MusicManager
@@ -17,7 +15,7 @@ import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
-import com.soi.moya.repository.MusicPlayerManager
+import com.soi.moya.repository.MusicPlaybackManager
 import com.soi.moya.ui.Utility
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -30,11 +28,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MusicListViewModel @Inject constructor(
-    private val application: Application,
-    private val storedMusicRepository: StoredMusicRepository
+    private val storedMusicRepository: StoredMusicRepository,
+    private val musicPlaybackManager: MusicPlaybackManager,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
-
-    private val _userPreferences = UserPreferences(application)
     private val _selectedTeam = MutableStateFlow<String>("doosan")
     val selectedTeam: StateFlow<String> = _selectedTeam
     private val _musicManager = MusicManager.getInstance()
@@ -43,15 +40,6 @@ class MusicListViewModel @Inject constructor(
     private val _teamMusics = mutableStateOf(emptyList<MusicInfo>())
     private val _playerMusics = mutableStateOf(emptyList<MusicInfo>())
 
-    private val _musicPlayerManager = mutableStateOf(
-        MusicPlayerManager.getInstance(
-            application = application,
-            storedMusicRepository = storedMusicRepository
-        )
-    )
-    private val musicPlayerManager: State<MusicPlayerManager>
-        get() = _musicPlayerManager
-
     init {
         observeUserPreference()
         observeSelectedTeam()
@@ -59,7 +47,7 @@ class MusicListViewModel @Inject constructor(
 
     private fun observeUserPreference() {
         viewModelScope.launch {
-            _userPreferences.getSelectedTeam.collect { team ->
+            userPreferences.getSelectedTeam.collect { team ->
                 _selectedTeam.value = team ?: "doosan"
                 updateMusicForSelectedTeam()
             }
@@ -97,7 +85,7 @@ class MusicListViewModel @Inject constructor(
                 saveCurrentSongId(music.id, count-1)
                 saveIsMiniplayerActivated()
 
-                val currentSongId = _userPreferences.currentPlaySongId.firstOrNull()
+                val currentSongId = userPreferences.currentPlaySongId.firstOrNull()
 
                 if (currentSongId != music.id) {
                     playMusic(music)
@@ -108,15 +96,15 @@ class MusicListViewModel @Inject constructor(
 
     private fun saveIsMiniplayerActivated() {
         viewModelScope.launch {
-            _userPreferences.saveIsMiniplayerActivated(false)
+            userPreferences.saveIsMiniplayerActivated(false)
         }
     }
 
     private fun saveCurrentSongId(songId: String, position: Int) {
         viewModelScope.launch {
-            _userPreferences.saveCurrentSongId(songId)
-            _userPreferences.saveIsMiniplayerActivated(false)
-            _userPreferences.saveCurrentSongPosition(position)
+            userPreferences.saveCurrentSongId(songId)
+            userPreferences.saveIsMiniplayerActivated(false)
+            userPreferences.saveCurrentSongPosition(position)
         }
     }
 
@@ -131,7 +119,7 @@ class MusicListViewModel @Inject constructor(
 
     private fun observeSelectedTeam() {
         viewModelScope.launch {
-            _userPreferences.getSelectedTeam.collect { team ->
+            userPreferences.getSelectedTeam.collect { team ->
                 _selectedTeam.value = team ?: "doosan"
                 updateMusicForSelectedTeam()
             }
@@ -169,13 +157,14 @@ class MusicListViewModel @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     private fun playMusic(music: MusicInfo) {
         viewModelScope.launch {
-            musicPlayerManager.value.playMusic(music)
+            musicPlaybackManager.playMusic(music)
+//            musicPlayerManager.value.playMusic(music)
         }
     }
 
     fun onTapSelectTeamButton() {
         viewModelScope.launch {
-            _userPreferences.saveIsNeedHideMiniPlayer(isNeedToHide = true)
+            userPreferences.saveIsNeedHideMiniPlayer(isNeedToHide = true)
         }
     }
 }

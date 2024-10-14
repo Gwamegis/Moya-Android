@@ -1,7 +1,6 @@
 package com.soi.moya.ui.music_player
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,32 +9,23 @@ import androidx.media3.common.MediaItem
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.UserPreferences
-import com.soi.moya.repository.MusicPlayerManager
-import com.soi.moya.ui.music_storage.MusicStorageViewModel
-import com.soi.moya.ui.music_storage.StorageUiState
+import com.soi.moya.repository.MediaControllerManager
+import com.soi.moya.repository.MusicPlaybackManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class PlaylistViewModel @Inject constructor(
-    application: Application,
-    private val storedMusicRepository: StoredMusicRepository
+    private val storedMusicRepository: StoredMusicRepository,
+    private val mediaControllerManager: MediaControllerManager,
+    private val musicPlaybackManager: MusicPlaybackManager,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
-    private val _userPreferences = UserPreferences(application)
-
-    private val musicPlayerManager = MusicPlayerManager.getInstance(
-        application = application,
-        storedMusicRepository
-    )
-
     private val _currentSongId = MutableLiveData<String?>()
     val currentSongId: LiveData<String?> = _currentSongId
 
@@ -45,16 +35,7 @@ class PlaylistViewModel @Inject constructor(
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
 
-//    val defaultPlaylist: StateFlow<StorageUiState> =
-//        storedMusicRepository.getByDefaultPlaylist().map { StorageUiState(it) }
-//            .stateIn(
-//                scope = viewModelScope,
-//                started = SharingStarted.WhileSubscribed(MusicStorageViewModel.TIMEOUT_MILLIS),
-//                initialValue = StorageUiState()
-//            )
-
-    // StateFlow to observe media item list
-    val mediaItemList: StateFlow<List<MediaItem>> = musicPlayerManager.mediaItemList
+    val mediaItemList: StateFlow<List<MediaItem>> = mediaControllerManager.mediaItemList
 
     init {
         observeCurrentSongId()
@@ -64,7 +45,7 @@ class PlaylistViewModel @Inject constructor(
 
     private fun observeCurrentSongId() {
         viewModelScope.launch {
-            _userPreferences.currentPlaySongId.collect{
+            userPreferences.currentPlaySongId.collect{
                 _currentSongId.value = it
             }
         }
@@ -72,14 +53,14 @@ class PlaylistViewModel @Inject constructor(
 
     private fun observeCurrentSongPosition() {
         viewModelScope.launch {
-            _userPreferences.currentPlaySongPosition.collect{
+            userPreferences.currentPlaySongPosition.collect{
                 _currentSongPosition.value = it
             }
         }
     }
     private fun collectMusicIsPlaying() {
         viewModelScope.launch {
-            musicPlayerManager.isPlaying.collect { playing ->
+            mediaControllerManager.isPlaying.collect { playing ->
                 _isPlaying.value = playing
             }
         }
@@ -107,20 +88,20 @@ class PlaylistViewModel @Inject constructor(
     }
     private fun saveCurrentSongId(songId: String) {
         viewModelScope.launch {
-            _userPreferences.saveCurrentSongId(songId)
-            _userPreferences.saveIsMiniplayerActivated(false)
+            userPreferences.saveCurrentSongId(songId)
+            userPreferences.saveIsMiniplayerActivated(false)
         }
     }
 
     private fun playMusic(music: StoredMusic) {
         viewModelScope.launch {
-            musicPlayerManager.playMusic(music)
+            musicPlaybackManager.playMusic(music)
         }
     }
 
     private fun playMusic(music: MediaItem) {
         viewModelScope.launch {
-            musicPlayerManager.playMediaItemById(music.mediaId)
+            musicPlaybackManager.playMediaItemById(music.mediaId)
         }
     }
 

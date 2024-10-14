@@ -12,19 +12,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SelectTeamViewModel @Inject constructor(application: Application): ViewModel() {
+class SelectTeamViewModel @Inject constructor(
+    private val userPreferences: UserPreferences
+): ViewModel() {
     val teams = Team.values()
     var selectedTeam = mutableStateOf<Team?>(null)
-
-    private val _userPreferences = UserPreferences(application)
-
     init {
         observeUserPreference()
     }
 
     private fun observeUserPreference() {
         viewModelScope.launch {
-            _userPreferences.getSelectedTeam.collect { team ->
+            userPreferences.getSelectedTeam.collect { team ->
                 selectedTeam.value = team?.let { Team.valueOf(it) }
             }
         }
@@ -39,8 +38,8 @@ class SelectTeamViewModel @Inject constructor(application: Application): ViewMod
     }
     fun onClickNext() {
         viewModelScope.launch {
-            selectedTeam.value?.let { _userPreferences.saveSelectedTeam(team = it) }
-            _userPreferences.saveIsNeedHideMiniPlayer(isNeedToHide = false)
+            selectedTeam.value?.let { userPreferences.saveSelectedTeam(team = it) }
+            userPreferences.saveIsNeedHideMiniPlayer(isNeedToHide = false)
         }
     }
 }

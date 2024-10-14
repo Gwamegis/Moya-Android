@@ -20,10 +20,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NoticeBottomSheetViewModel @Inject constructor(
-    application: Application
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
-    private val _userPreferences = UserPreferences(application)
     private val _versionManager = VersionManager.getInstance()
     private val _versionState = mutableStateOf<Version?>(null)
     private val _isNotCheckedVersion = mutableStateOf(false)
@@ -47,7 +46,7 @@ class NoticeBottomSheetViewModel @Inject constructor(
         _versionManager.version.observeForever { newVersion ->
             viewModelScope.launch {
 
-                val savedVersion = _userPreferences.appVersion.first()
+                val savedVersion = userPreferences.appVersion.first()
                 _versionState.value = newVersion
                 _isNotCheckedVersion.value = savedVersion < newVersion?.version.toString()
             }
@@ -90,6 +89,6 @@ class NoticeBottomSheetViewModel @Inject constructor(
     }
 
     private suspend fun saveCheckVersion() {
-        _userPreferences.saveAppVersion(_versionState.value)
+        userPreferences.saveAppVersion(_versionState.value)
     }
 }

@@ -29,14 +29,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MusicPlayerViewModel @Inject constructor(
-    application: Application,
     savedStateHandle: SavedStateHandle,
     private val storedMusicRepository: StoredMusicRepository,
     private val mediaControllerManager: MediaControllerManager,
-    private val musicPlaybackManager: MusicPlaybackManager
+    private val musicPlaybackManager: MusicPlaybackManager,
+    private val userPreferences: UserPreferences
 ): ViewModel() {
-    private val _userPreferences = UserPreferences(application)
-
     private val _currentSongId = MutableLiveData<String?>()
     var music: StoredMusic? = null
 
@@ -45,18 +43,6 @@ class MusicPlayerViewModel @Inject constructor(
 
     private val _teamName: String = savedStateHandle["team"] ?: "doosan"
     val team: Team = Team.valueOf(_teamName)
-
-//    private val _musicPlayerManager = mutableStateOf(
-//        MusicPlayerManager.getInstance(
-//            application = application,
-//            storedMusicRepository = storedMusicRepository
-//            )
-//    )
-//    private val musicPlayerManager: State<MusicPlayerManager>
-//        get() = _musicPlayerManager
-
-//    private lateinit var mediaControllerManager: MediaControllerManager
-//    private lateinit var musicPlaybackManager: MusicPlaybackManager
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
@@ -71,9 +57,6 @@ class MusicPlayerViewModel @Inject constructor(
     val isLyricDisplaying: StateFlow<Boolean> = _isLyricDisplaying
 
     init {
-//        mediaControllerManager = MediaControllerManager(application)
-//        musicPlaybackManager = MusicPlaybackManager(mediaControllerManager, application)
-
         subscribeIsLyricView()
         startUpdateCurrentPositionAndDuration()
         subscribeCurrentSongID()
@@ -92,7 +75,7 @@ class MusicPlayerViewModel @Inject constructor(
 
     private fun subscribeCurrentSongID() {
         viewModelScope.launch {
-            _userPreferences.currentPlaySongId.collect { songId ->
+            userPreferences.currentPlaySongId.collect { songId ->
                 _currentSongId.postValue(songId)
                 if (songId != null) {
                     val liked = storedMusicRepository.isSongLiked(songId)
@@ -104,7 +87,7 @@ class MusicPlayerViewModel @Inject constructor(
 
     private fun subscribeIsLyricView() {
         viewModelScope.launch {
-            _userPreferences.isLyricDisplaying.collect { value ->
+            userPreferences.isLyricDisplaying.collect { value ->
                 _isLyricDisplaying.value = value
             }
         }
@@ -112,7 +95,7 @@ class MusicPlayerViewModel @Inject constructor(
 
     fun toggleisLyricDisplaying() {
         viewModelScope.launch {
-            _userPreferences.saveIsLyricState(!_isLyricDisplaying.value)
+            userPreferences.saveIsLyricState(!_isLyricDisplaying.value)
         }
     }
 

@@ -1,9 +1,7 @@
 package com.soi.moya.ui.search
 
+import android.annotation.SuppressLint
 import android.app.Application
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,7 +13,7 @@ import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
-import com.soi.moya.repository.MusicPlayerManager
+import com.soi.moya.repository.MusicPlaybackManager
 import com.soi.moya.ui.Utility
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,22 +27,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    application: Application,
-    private val storedMusicRepository: StoredMusicRepository
+    private val storedMusicRepository: StoredMusicRepository,
+    private val musicPlaybackManager: MusicPlaybackManager,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     private val _musicManager = MusicManager.getInstance()
-
-    private val _userPreferences = UserPreferences(application)
-
-    private val _musicPlayerManager = mutableStateOf(
-        MusicPlayerManager.getInstance(
-            application = application,
-            storedMusicRepository = storedMusicRepository
-        )
-    )
-    private val musicPlayerManager: State<MusicPlayerManager>
-        get() = _musicPlayerManager
 
     private val _searchText = MutableStateFlow("")
     val searchText: StateFlow<String> = _searchText
@@ -136,7 +124,7 @@ class SearchViewModel @Inject constructor(
                 saveCurrentSongId(music.id)
                 saveIsMiniplayerActivated()
 
-                val currentSongId = _userPreferences.currentPlaySongId.firstOrNull()
+                val currentSongId = userPreferences.currentPlaySongId.firstOrNull()
 
                 if (currentSongId != music.id) {
                     playMusic(music)
@@ -147,20 +135,21 @@ class SearchViewModel @Inject constructor(
 
     private fun saveIsMiniplayerActivated() {
         viewModelScope.launch {
-            _userPreferences.saveIsMiniplayerActivated(false)
+            userPreferences.saveIsMiniplayerActivated(false)
         }
     }
 
     private fun saveCurrentSongId(songId: String) {
         viewModelScope.launch {
-            _userPreferences.saveCurrentSongId(songId)
-            _userPreferences.saveIsMiniplayerActivated(false)
+            userPreferences.saveCurrentSongId(songId)
+            userPreferences.saveIsMiniplayerActivated(false)
         }
     }
 
+    @SuppressLint("NewApi")
     private fun playMusic(music: MusicInfo) {
         viewModelScope.launch {
-            musicPlayerManager.value.playMusic(music)
+            musicPlaybackManager.playMusic(music)
         }
     }
 }
