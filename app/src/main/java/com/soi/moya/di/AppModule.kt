@@ -5,6 +5,7 @@ import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.UserPreferences
 import com.soi.moya.repository.MediaControllerManager
 import com.soi.moya.repository.MusicPlaybackManager
+import com.soi.moya.repository.MusicStateRepository
 import com.soi.moya.ui.MoyaApplication
 import dagger.Module
 import dagger.Provides
@@ -30,11 +31,24 @@ object AppModule {
     }
 
     @Provides
-    fun provideMediaControllerManager(application: Application): MediaControllerManager {
-        return MediaControllerManager(application)
+    @Singleton
+    fun provideMusicStateRepository(
+        userPreferences: UserPreferences
+    ): MusicStateRepository {
+        return MusicStateRepository(userPreferences)
     }
 
     @Provides
+    @Singleton
+    fun provideMediaControllerManager(
+        application: Application,
+        musicStateRepository: MusicStateRepository
+    ): MediaControllerManager {
+        return MediaControllerManager(application, musicStateRepository)
+    }
+
+    @Provides
+    @Singleton
     fun provideMusicPlaybackManager(
         controllerManager: MediaControllerManager,
         application: Application

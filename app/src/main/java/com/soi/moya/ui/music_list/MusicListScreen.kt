@@ -34,6 +34,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -70,14 +71,14 @@ fun MusicListScreen(
 ) {
     val viewModel: MusicListViewModel = hiltViewModel()
 
-    val selectedTeam by viewModel.selectedTeam.collectAsState()
+    val selectedTeam by viewModel.selectedTeam.observeAsState()
+
     val scope = rememberCoroutineScope()
     val tabs = listOf(R.string.team_tab, R.string.player_tab)
     val pagerState = rememberPagerState(pageCount = {
         tabs.size
     })
-    val team = Team.valueOf(selectedTeam)
-
+    val team = selectedTeam ?: Team.doosan
     Box(
         modifier = Modifier
             .fillMaxSize()

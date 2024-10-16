@@ -11,6 +11,7 @@ import com.soi.moya.data.VersionManager
 import com.soi.moya.models.Traffic
 import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.Version
+import com.soi.moya.repository.MusicStateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch

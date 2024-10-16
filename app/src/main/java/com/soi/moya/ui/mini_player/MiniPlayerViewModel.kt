@@ -1,22 +1,19 @@
 package com.soi.moya.ui.mini_player
 
-import android.app.Application
+import android.util.Log
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.soi.moya.models.UserPreferences
+import androidx.lifecycle.asLiveData
+import com.soi.moya.repository.MusicStateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MiniPlayerViewModel @Inject constructor(
-    private val userPreferences: UserPreferences
+    private val musicStateRepository: MusicStateRepository
 ) : ViewModel() {
-    var isMiniPlayerActivated = MutableStateFlow(true)
-
     val minHeight = 55f
     private val _maxHeight = MutableStateFlow(0f)
 
@@ -25,32 +22,21 @@ class MiniPlayerViewModel @Inject constructor(
     val bottomPadding = 110f
     val horizontalPadding = 10f
 
-    init {
-        observeIsMiniplayerActivated()
-    }
+    val isMiniPlayerActivated: LiveData<Boolean> = musicStateRepository.isMiniPlayerActivated.asLiveData()
 
-    private fun observeIsMiniplayerActivated() {
-        viewModelScope.launch {
-            userPreferences.isMiniPlayerActivated.collect{
-                isMiniPlayerActivated.value = it
-            }
-        }
-    }
     fun setMaxHeight(value: Float) {
         _maxHeight.value = value
         threshold.value = value / 2
     }
 
     fun setIsMiniplayerActivated(isActivated: Boolean) {
-        viewModelScope.launch {
-            userPreferences.saveIsMiniplayerActivated(isActivated)
-        }
+        musicStateRepository.setMiniPlayerActivated(isActivated)
     }
 
     fun popBackStack() {
         //미니플레이어 상태 활성화
-        viewModelScope.launch {
-            userPreferences.saveIsMiniplayerActivated(true)
-        }
+        Log.d("**miniPlayerViewModel", "back")
+
+        musicStateRepository.setMiniPlayerActivated(true)
     }
 }

@@ -1,23 +1,22 @@
 package com.soi.moya.ui.music_storage
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.SeasonSongManager
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.Team
-import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.toDefaultItem
 import com.soi.moya.repository.MusicPlaybackManager
+import com.soi.moya.repository.MusicStateRepository
 import com.soi.moya.ui.Utility
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -28,8 +27,10 @@ import javax.inject.Inject
 class MusicStorageViewModel @Inject constructor(
     private val storedMusicRepository: StoredMusicRepository,
     private val musicPlaybackManager: MusicPlaybackManager,
-    private val userPreferences: UserPreferences
+    private val musicStateRepository: MusicStateRepository
 ): ViewModel() {
+
+    val currentSongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
 
     val storageUiState: StateFlow<StorageUiState> =
         storedMusicRepository.getByStoragePlaylist().map { StorageUiState(it) }
@@ -86,27 +87,15 @@ class MusicStorageViewModel @Inject constructor(
                     storedMusicRepository.insertItem(newMusic)
                 }
                 saveCurrentSongId(music.songId)
-                saveIsMiniplayerActivated()
-
-                val currentSongId = userPreferences.currentPlaySongId.firstOrNull()
-
-                if (currentSongId != music.songId) {
+                if (currentSongId.value != music.songId) {
                     playMusic(music)
                 }
             }
         }
     }
     private fun saveCurrentSongId(songId: String) {
-        viewModelScope.launch {
-            userPreferences.saveCurrentSongId(songId)
-            userPreferences.saveIsMiniplayerActivated(false)
-        }
-    }
-
-    private fun saveIsMiniplayerActivated() {
-        viewModelScope.launch {
-            userPreferences.saveIsMiniplayerActivated(false)
-        }
+        musicStateRepository.setCurrentPlaySongId(songId)
+        musicStateRepository.setMiniPlayerActivated(false)
     }
 
     private fun playMusic(music: StoredMusic) {

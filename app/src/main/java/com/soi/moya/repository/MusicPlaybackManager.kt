@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Build
 import androidx.annotation.OptIn
 import androidx.annotation.RequiresApi
+import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.StoredMusic
@@ -88,8 +89,6 @@ class MusicPlaybackManager @Inject constructor(
         return controllerManager.controller?.duration ?: 0L
     }
 
-    @OptIn(UnstableApi::class)
-    @RequiresApi(Build.VERSION_CODES.O)
     fun playMusic(currentMusic: MusicInfo) {
         val filePath = application.filesDir.absolutePath
         coroutineScope.launch {
@@ -98,6 +97,7 @@ class MusicPlaybackManager @Inject constructor(
                 downloadFileAsync(currentMusic.url, file.absolutePath)
             }
 
+            Log.d("** playMusic", currentMusic.title )
             controllerManager.controller?.prepare()
             controllerManager.controller?.play()
         }
@@ -110,7 +110,6 @@ class MusicPlaybackManager @Inject constructor(
             if (!file.exists()) {
                 downloadFileAsync(currentMusic.url, file.absolutePath)
             }
-
             controllerManager.controller?.prepare()
             controllerManager.controller?.play()
         }

@@ -2,22 +2,29 @@ package com.soi.moya.repository
 
 import android.app.Application
 import android.content.ComponentName
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.soi.moya.playback.PlaybackService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
-class MediaControllerManager @Inject constructor(private val application: Application) {
+class MediaControllerManager @Inject constructor(
+    private val application: Application,
+    private val musicStateRepository: MusicStateRepository
+) {
     private lateinit var controllerFuture: ListenableFuture<MediaController>
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     val controller: MediaController?
         get() = if (controllerFuture.isDone && !controllerFuture.isCancelled) controllerFuture.get() else null
@@ -33,6 +40,8 @@ class MediaControllerManager @Inject constructor(private val application: Applic
     }
 
     private fun initializeController() {
+        Log.e("**initializeController", "initializeController")
+
         controllerFuture = MediaController.Builder(
             application,
             SessionToken(application, ComponentName(application, PlaybackService::class.java))
@@ -40,8 +49,9 @@ class MediaControllerManager @Inject constructor(private val application: Applic
 
         controllerFuture.addListener({ setController() }, MoreExecutors.directExecutor())
     }
-    @OptIn(UnstableApi::class) // PlayerView.setShowSubtitleButton
     private fun setController() {
+        Log.e("**setController", "setController")
+
         val controller = this.controller ?: return
         // Controller 설정 및 이벤트 리스너 등록
         initializeMediaList()
@@ -52,14 +62,11 @@ class MediaControllerManager @Inject constructor(private val application: Applic
                     if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
                     }
                     if (events.contains(Player.EVENT_TIMELINE_CHANGED)) {
-                        initializeMediaList()
                     }
                     if (events.contains(Player.EVENT_MEDIA_METADATA_CHANGED)) {
                         updateMediaMetadataUI()
                     }
                     if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
-                        // Trigger adapter update to change highlight of current item.
-                        // 리스트 변경되어야한다고 알리기
                     }
                 }
 
@@ -70,12 +77,24 @@ class MediaControllerManager @Inject constructor(private val application: Applic
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                     // 미디어 아이템이 변경될 때 SharedPreferences 업데이트
 //                    Log.e("***Music player manager", "position: ${getCurrentMediaItemIndex()}  id: ${mediaItem?.mediaId ?: ""}")
-//                    saveCurrentSong(songId = mediaItem?.mediaId ?: "")
+                    saveCurrentSong(songId = mediaItem?.mediaId ?: "")
+                    Log.d("**mediaContro-onSet", mediaItem?.mediaMetadata?.title.toString())
                 }
             }
         )
     }
-    private fun initializeMediaList() {
+
+    private fun saveCurrentSong(songId: String) {
+        musicStateRepository.setCurrentPlaySongId(songId)
+        musicStateRepository.setCurrentPlaySongPosition(getCurrentMediaItemIndex())
+    }
+
+    private fun getCurrentMediaItemIndex(): Int {
+        return controller?.currentMediaItemIndex ?: -1
+    }
+    fun initializeMediaList() {
+        Log.e("**initializeMediaList", "initializeMediaList")
+
         val controller = this.controller ?: return
         clearMediaItemList()
         for (i in 0 until controller.mediaItemCount) {
@@ -83,25 +102,47 @@ class MediaControllerManager @Inject constructor(private val application: Applic
         }
     }
 
+    @OptIn(UnstableApi::class)
+    fun updateMediaList(newList: List<MediaItem>) {
+        for (i in 0 until newList.size) {
+            Log.e("**updateMediaList", newList[i].mediaMetadata.title.toString())
+        }
+        _mediaItemList.value = newList
+        controller?.setMediaItems(_mediaItemList.value)
+    }
+
     fun clearMediaItemList() {
         _mediaItemList.value = emptyList()
     }
     fun addMediaItem(mediaItem: MediaItem) {
-        val currentList = _mediaItemList.value
-        val updatedList = currentList.toMutableList().apply {
-            add(mediaItem)
-        }
-        _mediaItemList.value = updatedList
-    }
-    fun addMediaItems(mediaItems: List<MediaItem>) {
-        // 현재 상태를 가져옵니다.
-        val currentList = _mediaItemList.value
-        val updatedList = currentList.toMutableList().apply {
-            addAll(mediaItems)
-        }
-        _mediaItemList.value = updatedList
-    }
+//        val currentList = _mediaItemList.value.toMutableList()
+//        val existingIndex = currentList.indexOfFirst { it.mediaId == mediaItem.mediaId }
+//
+//        if (existingIndex != -1 ){
+//            currentList.removeAt(existingIndex)
+//        }
+//        currentList.add(mediaItem)
+//        _mediaItemList.value = currentList
+//
+//        for (i in 0 until currentList.size) {
+//            Log.d("** addMediaItem", i.toString() + currentList[i].mediaMetadata.title.toString())
+//
+//        }
+//        controllerFuture.get()?.setMediaItems(currentList)
 
+        val currentList = _mediaItemList.value.toMutableList()
+        val existingIndex = currentList.indexOfFirst { it.mediaId == mediaItem.mediaId }
+
+        if (existingIndex != -1 ){
+            currentList.removeAt(existingIndex)
+        }
+        currentList.add(mediaItem)
+
+        for (i in 0 until (controller?.mediaItemCount ?: 1)) {
+            Log.d("**", i.toString() + controller?.getMediaItemAt(i)?.mediaMetadata?.title.toString())
+        }
+        _mediaItemList.value = currentList
+    }
     private fun updateMediaMetadataUI() {
         val controller = this.controller
         if (controller == null || controller.mediaItemCount == 0) {
@@ -114,6 +155,17 @@ class MediaControllerManager @Inject constructor(private val application: Applic
 
         //title 설정
         //artist 설정
+    }
+
+    fun findMediaItemIndex(controller: MediaController, songId: String): Int {
+        val mediaItemCount = controller.mediaItemCount
+        for (index in 0 until mediaItemCount) {
+            val mediaItem = controller.getMediaItemAt(index)
+            if (mediaItem.mediaId == songId) { // mediaId가 songId와 일치하는지 확인
+                return index
+            }
+        }
+        return -1 // 아이템을 찾지 못한 경우
     }
 
     fun releaseController() {

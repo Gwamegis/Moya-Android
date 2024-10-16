@@ -20,7 +20,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.soi.moya.ui.component.ButtonContainer
 import com.soi.moya.R
@@ -75,7 +74,7 @@ fun SelectTeamScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 12.dp, bottom = 30.dp),
-                    isEnabled = { viewModel.selectedTeam.value != null },
+                    isEnabled = { viewModel.selectTeam.value != null },
                     onClick = {
                         viewModel.onClickNext()
                         navController.popBackStack(NavItem.MusicList.route, false)
@@ -98,7 +97,7 @@ fun ImageItem(team: Team, viewModel: SelectTeamViewModel) {
     ) {
         Box {
             Image(painter = image, contentDescription = null)
-            if (viewModel.selectedTeam.value == team) {
+            if (viewModel.selectTeam.value == team) {
                 Image(painter = checkedImage, contentDescription = null)
             }
         }

@@ -1,21 +1,21 @@
 package com.soi.moya.ui.music_player
 
-import android.app.Application
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.Team
-import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
 import com.soi.moya.repository.MediaControllerManager
 import com.soi.moya.repository.MusicPlaybackManager
+import com.soi.moya.repository.MusicStateRepository
 import com.soi.moya.ui.Utility
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -33,13 +33,13 @@ class MusicPlayerViewModel @Inject constructor(
     private val storedMusicRepository: StoredMusicRepository,
     private val mediaControllerManager: MediaControllerManager,
     private val musicPlaybackManager: MusicPlaybackManager,
-    private val userPreferences: UserPreferences
+    private val musicStateRepository: MusicStateRepository
 ): ViewModel() {
-    private val _currentSongId = MutableLiveData<String?>()
-    var music: StoredMusic? = null
 
-    private val _songId: String
-        get() = _currentSongId.value ?: ""
+    val currentSongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
+    val isLyricDisplaying: LiveData<Boolean> = musicStateRepository.isLyricDisplaying.asLiveData()
+
+    var music: StoredMusic? = null
 
     private val _teamName: String = savedStateHandle["team"] ?: "doosan"
     val team: Team = Team.valueOf(_teamName)
@@ -53,11 +53,8 @@ class MusicPlayerViewModel @Inject constructor(
     val currentPosition: State<Long> get() = _currentPosition
     private val _currentPosition = mutableLongStateOf(0)
 
-    private val _isLyricDisplaying = MutableStateFlow(true)
-    val isLyricDisplaying: StateFlow<Boolean> = _isLyricDisplaying
 
     init {
-        subscribeIsLyricView()
         startUpdateCurrentPositionAndDuration()
         subscribeCurrentSongID()
     }
@@ -74,10 +71,9 @@ class MusicPlayerViewModel @Inject constructor(
     }
 
     private fun subscribeCurrentSongID() {
-        viewModelScope.launch {
-            userPreferences.currentPlaySongId.collect { songId ->
-                _currentSongId.postValue(songId)
-                if (songId != null) {
+        currentSongId.observeForever { songId ->
+            if (songId != null) {
+                viewModelScope.launch {
                     val liked = storedMusicRepository.isSongLiked(songId)
                     _isLike.value = liked
                 }
@@ -85,28 +81,17 @@ class MusicPlayerViewModel @Inject constructor(
         }
     }
 
-    private fun subscribeIsLyricView() {
-        viewModelScope.launch {
-            userPreferences.isLyricDisplaying.collect { value ->
-                _isLyricDisplaying.value = value
-            }
-        }
-    }
-
-    fun toggleisLyricDisplaying() {
-        viewModelScope.launch {
-            userPreferences.saveIsLyricState(!_isLyricDisplaying.value)
-        }
+    fun toggleIsLyricDisplaying() {
+        val currentValue = isLyricDisplaying.value ?: false
+        musicStateRepository.setLyricDisplaying(!currentValue)
     }
 
     fun togglePlayPause() {
         musicPlaybackManager.togglePlayPause()
-//        musicPlayerManager.value.togglePlayPause()
     }
 
     fun playNextSong(increment: Int) {
         musicPlaybackManager.playNextSong(increment)
-//        musicPlayerManager.value.playNextSong(increment)
     }
 
     fun formatTime(time: Long): String {
@@ -117,12 +102,10 @@ class MusicPlayerViewModel @Inject constructor(
 
     fun getDuration(): Long {
         return musicPlaybackManager.getDuration()
-//        return musicPlayerManager.value.getDuration()
     }
 
     fun seekTo(position: Long) {
         musicPlaybackManager.seekTo(position)
-//        musicPlayerManager.value.seekTo(position)
     }
 
     //좋아요 관련 함수

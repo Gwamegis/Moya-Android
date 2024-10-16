@@ -1,6 +1,7 @@
 package com.soi.moya.ui.mini_player
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.OptIn
 import androidx.compose.animation.core.Animatable
@@ -23,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -53,6 +55,7 @@ fun MiniPlayerScreen(
     navController: NavHostController,
     music: MusicInfo
 ) {
+
     val viewModel: MiniPlayerViewModel = hiltViewModel()
 
     val height = remember { Animatable(viewModel.minHeight) }
@@ -61,9 +64,10 @@ fun MiniPlayerScreen(
 
     viewModel.setMaxHeight(maxHeight)
 
-    val isMiniActivated by viewModel.isMiniPlayerActivated.collectAsState()
+    val isMiniActivated by viewModel.isMiniPlayerActivated.observeAsState(false)
 
     LaunchedEffect(isMiniActivated) {
+        Log.d("**miniPlayer", "Mini player activated: $isMiniActivated")
         if (!isMiniActivated) {
             height.animateTo(maxHeight)
         } else {
@@ -72,6 +76,7 @@ fun MiniPlayerScreen(
     }
 
     BackHandler(enabled = !isMiniActivated) {
+        Log.d("**miniPlayer", "back")
         viewModel.popBackStack()
     }
 

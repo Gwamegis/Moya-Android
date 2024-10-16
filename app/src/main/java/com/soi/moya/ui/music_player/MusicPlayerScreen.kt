@@ -25,6 +25,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -32,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,7 +59,7 @@ fun MusicPlayerScreen(
 
     val progress = remember { mutableFloatStateOf(0f) }
     val isLike by viewModel.isLike.collectAsState()
-    val isLyricDisplaying by viewModel.isLyricDisplaying.collectAsState()
+    val isLyricDisplaying by viewModel.isLyricDisplaying.observeAsState()
 
     music?.team?.let {
         Modifier
@@ -80,7 +82,7 @@ fun MusicPlayerScreen(
                 modifier = Modifier
                     .weight(1f)
             ) {
-                if (isLyricDisplaying) {
+                if (isLyricDisplaying == true) {
                     PlaylistScreen(
                         music = music
                     )
@@ -97,7 +99,7 @@ fun MusicPlayerScreen(
                         )
                         .align(Alignment.BottomEnd) // 오른쪽 하단에 배치
                         .clickable {
-                            viewModel.toggleisLyricDisplaying()
+                            viewModel.toggleIsLyricDisplaying()
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -191,11 +193,13 @@ fun MusicNavigationBar(
             Text(
                 text = music.title,
                 style = getTextStyle(style = MoyaFont.CustomBodyBold),
-                color = MoyaColor.white
+                color = MoyaColor.white,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             if (music.info.isNotEmpty()) {
                 Text(
-                    text = music.info,
+                    text = music.team.getKrTeamName(),
                     style = getTextStyle(style = MoyaFont.CustomCaptionMedium),
                     color = MoyaColor.gray
                 )

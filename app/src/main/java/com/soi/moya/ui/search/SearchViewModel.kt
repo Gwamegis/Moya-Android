@@ -4,23 +4,23 @@ import android.annotation.SuppressLint
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.soi.moya.data.MusicManager
 import com.soi.moya.data.SeasonSongManager
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
-import com.soi.moya.models.UserPreferences
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
 import com.soi.moya.repository.MusicPlaybackManager
+import com.soi.moya.repository.MusicStateRepository
 import com.soi.moya.ui.Utility
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -29,7 +29,7 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val storedMusicRepository: StoredMusicRepository,
     private val musicPlaybackManager: MusicPlaybackManager,
-    private val userPreferences: UserPreferences
+    private val musicStateRepository: MusicStateRepository
 ) : ViewModel() {
 
     private val _musicManager = MusicManager.getInstance()
@@ -44,6 +44,8 @@ class SearchViewModel @Inject constructor(
 
     private val _seasonSongManager = SeasonSongManager.getInstance()
     private val seasonSongs: Map<String, LiveData<List<String>>> get() = _seasonSongManager.getSeasonSongs()
+
+    val currentSongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
 
     init {
         observeMusicList()
@@ -122,28 +124,16 @@ class SearchViewModel @Inject constructor(
                 }
 
                 saveCurrentSongId(music.id)
-                saveIsMiniplayerActivated()
-
-                val currentSongId = userPreferences.currentPlaySongId.firstOrNull()
-
-                if (currentSongId != music.id) {
+                if (currentSongId.value != music.id) {
                     playMusic(music)
                 }
             }
         }
     }
 
-    private fun saveIsMiniplayerActivated() {
-        viewModelScope.launch {
-            userPreferences.saveIsMiniplayerActivated(false)
-        }
-    }
-
     private fun saveCurrentSongId(songId: String) {
-        viewModelScope.launch {
-            userPreferences.saveCurrentSongId(songId)
-            userPreferences.saveIsMiniplayerActivated(false)
-        }
+        musicStateRepository.setCurrentPlaySongId(songId)
+        musicStateRepository.setMiniPlayerActivated(false)
     }
 
     @SuppressLint("NewApi")

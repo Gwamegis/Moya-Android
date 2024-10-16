@@ -1,15 +1,16 @@
 package com.soi.moya.ui.main_activity
 
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import androidx.window.layout.WindowMetricsCalculator
 import com.soi.moya.R
@@ -17,14 +18,12 @@ import com.soi.moya.base.BaseComposeActivity
 import com.soi.moya.data.MusicManager
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
-import com.soi.moya.models.UserPreferences
 import com.soi.moya.ui.bottom_nav.BottomNavScreen
 import com.soi.moya.ui.mini_player.MiniPlayerScreen
 import com.soi.moya.ui.select_team.SelectTeamScreen
 import com.soi.moya.ui.theme.MoyaTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : BaseComposeActivity() {
@@ -37,51 +36,48 @@ class MainActivity : BaseComposeActivity() {
     private var backPressedTime: Long = 0
     private var _isMiniPlayerActivated = MutableStateFlow(false)
 
-    @Inject
-    lateinit var userPreferences: UserPreferences
+    private val mainViewModel: MainViewModel by viewModels()
+
+    private var backPressedCallback: OnBackPressedCallback? = null
 
     @Composable
     override fun Content() {
-//        val context = LocalContext.current
-//        val userPreferences = remember { UserPreferences(context) }
+        // 초기 콜백 등록 여부를 기억하는 상태 변수
+        val isBackPressedDispatcherSetup = remember { mutableStateOf(false) }
+
+        // setupOnBackPressedDispatcher가 이미 호출되지 않았다면 호출
+        if (!isBackPressedDispatcherSetup.value) {
+            setupOnBackPressedDispatcher()
+            isBackPressedDispatcherSetup.value = true
+        }
+
         val navController = rememberNavController()
-        var selectedTeam by remember { mutableStateOf<String?>(null) }
+        var selectedTeam by remember { mutableStateOf<Team?>(null) }
         var isLoaded by remember { mutableStateOf(false) }
         var currentMusic by remember { mutableStateOf<MusicInfo?>(null) }
         var isNeedToHideMiniPlayer by remember { mutableStateOf(false) }
 
-        LaunchedEffect(userPreferences.isMiniPlayerActivated) {
-            userPreferences.isMiniPlayerActivated.collect { value ->
-                _isMiniPlayerActivated.value = value
-            }
-        }
-
-        LaunchedEffect(userPreferences.getSelectedTeam) {
-            userPreferences.getSelectedTeam.collect { team ->
-                selectedTeam = team
-                isLoaded = true
-            }
-        }
-
-        LaunchedEffect(userPreferences.isNeedHideMiniPlayer) {
-            userPreferences.isNeedHideMiniPlayer.collect { value ->
-                isNeedToHideMiniPlayer = value
-            }
-        }
-
-        LaunchedEffect(userPreferences.currentPlaySongId) {
-            userPreferences.currentPlaySongId.collect { id ->
-                if (id != null) {
-                    musicManager.getMusicById(id)?.let { musicInfo ->
-                        currentMusic = musicInfo
-                    }
+        mainViewModel.currentPlaySongId.observeAsState().value?.let { songId ->
+            if (songId != null) {
+                musicManager.getMusicById(songId)?.let { musicInfo ->
+                    currentMusic = musicInfo
                 }
             }
+        }
+        mainViewModel.isMiniplayerActivated.observeAsState().value?.let { activated ->
+            _isMiniPlayerActivated.value = !activated
+        }
+        mainViewModel.isNeedHideMiniplayer.observeAsState().value?.let { hide ->
+            isNeedToHideMiniPlayer = hide
+        }
+        mainViewModel.selectedTeam.observeAsState().value?.let { team ->
+            selectedTeam = team
+            isLoaded = true
         }
 
         if (isLoaded) {
             if (selectedTeam != null) {
-                MoyaTheme(team = Team.valueOf(selectedTeam ?: "doosan")) {
+                MoyaTheme(team = selectedTeam!!) {
                     BottomNavScreen()
                     currentMusic?.let { music ->
                         if (!isNeedToHideMiniPlayer) {
@@ -98,9 +94,10 @@ class MainActivity : BaseComposeActivity() {
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            setupOnBackPressedDispatcher()
-        }
+        //TODO: 버전별 동작 확인하기
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            setupOnBackPressedDispatcher()
+//        }
     }
     private fun computeWindowSizeClasses(): Float{
         val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(this)
@@ -112,29 +109,29 @@ class MainActivity : BaseComposeActivity() {
 
 
     private fun setupOnBackPressedDispatcher() {
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                handleBackPress()
+        Log.d("**main", "main back")
+        if (backPressedCallback == null) {
+            backPressedCallback = object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    handleBackPress()
+                }
             }
+            onBackPressedDispatcher.addCallback(this, backPressedCallback!!)
         }
-        onBackPressedDispatcher.addCallback(this, callback)
     }
-
     private fun handleBackPress() {
-        if (_isMiniPlayerActivated.value) {
-            if (backPressedTime + 2000 > System.currentTimeMillis()) {
-                toast.cancel()
-                finish()
-            } else {
-                toast.show()
-            }
-            backPressedTime = System.currentTimeMillis()
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+            toast.cancel()
+            finish()
+        } else {
+            toast.show()
         }
+        backPressedTime = System.currentTimeMillis()
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        handleBackPress()
-    }
+//    override fun onBackPressed() {
+//        super.onBackPressed()
+//        handleBackPress()
+//    }
 }
 

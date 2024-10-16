@@ -56,10 +56,8 @@ import com.soi.moya.ui.theme.getTextStyle
 @Composable
 fun PlaylistScreen(
     music: MusicInfo,
+    viewModel: PlaylistViewModel = hiltViewModel()
 ) {
-    val viewModel: PlaylistViewModel = hiltViewModel()
-
-//    val defaultPlaylists by viewModel.defaultPlaylists.collectAsState()
     val mediaItemLists by viewModel.mediaItemList.collectAsState()
 
     val currentSongId by viewModel.currentSongId.observeAsState()
