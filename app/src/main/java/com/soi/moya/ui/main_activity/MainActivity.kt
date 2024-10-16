@@ -1,9 +1,8 @@
 package com.soi.moya.ui.main_activity
 
-import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,14 +41,6 @@ class MainActivity : BaseComposeActivity() {
 
     @Composable
     override fun Content() {
-        // 초기 콜백 등록 여부를 기억하는 상태 변수
-        val isBackPressedDispatcherSetup = remember { mutableStateOf(false) }
-
-        // setupOnBackPressedDispatcher가 이미 호출되지 않았다면 호출
-        if (!isBackPressedDispatcherSetup.value) {
-            setupOnBackPressedDispatcher()
-            isBackPressedDispatcherSetup.value = true
-        }
 
         val navController = rememberNavController()
         var selectedTeam by remember { mutableStateOf<Team?>(null) }
@@ -98,28 +89,22 @@ class MainActivity : BaseComposeActivity() {
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 //            setupOnBackPressedDispatcher()
 //        }
+
+        BackHandler {
+            handleBackPress()
+        }
     }
-    private fun computeWindowSizeClasses(): Float{
+
+    private fun computeWindowSizeClasses(): Float {
         val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(this)
         val height = metrics.bounds.height()
         val density = resources.displayMetrics.density
 
-        return height/density
+        return height / density
     }
 
-
-    private fun setupOnBackPressedDispatcher() {
-        Log.d("**main", "main back")
-        if (backPressedCallback == null) {
-            backPressedCallback = object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    handleBackPress()
-                }
-            }
-            onBackPressedDispatcher.addCallback(this, backPressedCallback!!)
-        }
-    }
     private fun handleBackPress() {
+
         if (backPressedTime + 2000 > System.currentTimeMillis()) {
             toast.cancel()
             finish()
@@ -128,10 +113,5 @@ class MainActivity : BaseComposeActivity() {
         }
         backPressedTime = System.currentTimeMillis()
     }
-
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//        handleBackPress()
-//    }
 }
 
