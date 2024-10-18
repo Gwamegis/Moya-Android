@@ -12,8 +12,6 @@ import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.soi.moya.playback.PlaybackService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -23,8 +21,6 @@ class MediaControllerManager @Inject constructor(
     private val musicStateRepository: MusicStateRepository
 ) {
     private lateinit var controllerFuture: ListenableFuture<MediaController>
-
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     val controller: MediaController?
         get() = if (controllerFuture.isDone && !controllerFuture.isCancelled) controllerFuture.get() else null
@@ -75,10 +71,7 @@ class MediaControllerManager @Inject constructor(
                 }
 
                 override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-                    // 미디어 아이템이 변경될 때 SharedPreferences 업데이트
-//                    Log.e("***Music player manager", "position: ${getCurrentMediaItemIndex()}  id: ${mediaItem?.mediaId ?: ""}")
                     saveCurrentSong(songId = mediaItem?.mediaId ?: "")
-                    Log.d("**mediaContro-onSet", mediaItem?.mediaMetadata?.title.toString())
                 }
             }
         )
@@ -93,8 +86,6 @@ class MediaControllerManager @Inject constructor(
         return controller?.currentMediaItemIndex ?: -1
     }
     fun initializeMediaList() {
-        Log.e("**initializeMediaList", "initializeMediaList")
-
         val controller = this.controller ?: return
         clearMediaItemList()
         for (i in 0 until controller.mediaItemCount) {
@@ -104,9 +95,6 @@ class MediaControllerManager @Inject constructor(
 
     @OptIn(UnstableApi::class)
     fun updateMediaList(newList: List<MediaItem>) {
-        for (i in 0 until newList.size) {
-            Log.e("**updateMediaList", newList[i].mediaMetadata.title.toString())
-        }
         _mediaItemList.value = newList
         controller?.setMediaItems(_mediaItemList.value)
     }
@@ -115,21 +103,6 @@ class MediaControllerManager @Inject constructor(
         _mediaItemList.value = emptyList()
     }
     fun addMediaItem(mediaItem: MediaItem) {
-//        val currentList = _mediaItemList.value.toMutableList()
-//        val existingIndex = currentList.indexOfFirst { it.mediaId == mediaItem.mediaId }
-//
-//        if (existingIndex != -1 ){
-//            currentList.removeAt(existingIndex)
-//        }
-//        currentList.add(mediaItem)
-//        _mediaItemList.value = currentList
-//
-//        for (i in 0 until currentList.size) {
-//            Log.d("** addMediaItem", i.toString() + currentList[i].mediaMetadata.title.toString())
-//
-//        }
-//        controllerFuture.get()?.setMediaItems(currentList)
-
         val currentList = _mediaItemList.value.toMutableList()
         val existingIndex = currentList.indexOfFirst { it.mediaId == mediaItem.mediaId }
 
@@ -137,10 +110,6 @@ class MediaControllerManager @Inject constructor(
             currentList.removeAt(existingIndex)
         }
         currentList.add(mediaItem)
-
-        for (i in 0 until (controller?.mediaItemCount ?: 1)) {
-            Log.d("**", i.toString() + controller?.getMediaItemAt(i)?.mediaMetadata?.title.toString())
-        }
         _mediaItemList.value = currentList
     }
     private fun updateMediaMetadataUI() {

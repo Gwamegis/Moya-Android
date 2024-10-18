@@ -50,6 +50,9 @@ class MusicStateRepository  @Inject constructor (
 
     //TODO: 앱 종료시 데이터 백업
     suspend fun saveToDataStore() {
+        Log.d("**stateRepo", "save to dataStore")
+        Log.d("**stateRepo", selectedTeam.value?.name ?: "")
+
         userPreferences.saveSelectedTeam(selectedTeam.value ?: Team.doosan)
         userPreferences.saveCurrentSongId(currentPlaySongId.value ?: "")
         userPreferences.saveCurrentSongPosition(currentPlaySongPosition.value.toInt())

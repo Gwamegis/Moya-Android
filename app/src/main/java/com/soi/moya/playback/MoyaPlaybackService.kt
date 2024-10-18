@@ -33,15 +33,19 @@ import com.google.common.util.concurrent.SettableFuture
 import com.soi.moya.R
 import com.soi.moya.data.OfflineItemsRepository
 import com.soi.moya.models.Team
+import com.soi.moya.repository.MusicStateRepository
 import com.soi.moya.ui.MoyaApplication
 import com.soi.moya.ui.Utility
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import javax.inject.Inject
 
+@AndroidEntryPoint
 open class MoyaPlaybackService() : MediaSessionService() {
 
     private lateinit var mediaSession: MediaSession
@@ -50,6 +54,9 @@ open class MoyaPlaybackService() : MediaSessionService() {
     private lateinit var application: MoyaApplication
 
     private lateinit var mediaRepository: OfflineItemsRepository
+
+    @Inject
+    lateinit var musicStateRepository: MusicStateRepository
 
     companion object {
         private const val NOTIFICATION_ID = 123
@@ -177,11 +184,15 @@ open class MoyaPlaybackService() : MediaSessionService() {
     }
     //최근 앱 목록에서 제거 시 호출
     override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
+        Log.d("**onTaskRemoved", "onTaskRemoved")
+        CoroutineScope(Dispatchers.IO).launch {
+            musicStateRepository.saveToDataStore() // 상태 저장
+        }
         val player = mediaSession.player
         if (!player.playWhenReady || player.mediaItemCount == 0) {
             stopSelf()
         }
+        super.onTaskRemoved(rootIntent)
     }
     @OptIn(UnstableApi::class)
     override fun onDestroy() {
