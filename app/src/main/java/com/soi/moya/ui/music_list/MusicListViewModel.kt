@@ -16,6 +16,7 @@ import com.soi.moya.models.Team
 import com.soi.moya.models.toItem
 import com.soi.moya.models.toMediaItem
 import com.soi.moya.models.toStoredMusic
+import com.soi.moya.repository.AddItemUseCase
 import com.soi.moya.repository.MediaControllerManager
 import com.soi.moya.repository.MusicPlaybackManager
 import com.soi.moya.repository.MusicStateRepository
@@ -32,7 +33,8 @@ class MusicListViewModel @Inject constructor(
     private val storedMusicRepository: StoredMusicRepository,
     private val musicPlaybackManager: MusicPlaybackManager,
     private val mediaControllerManager: MediaControllerManager,
-    private val musicStateRepository: MusicStateRepository
+    private val musicStateRepository: MusicStateRepository,
+    private val addItemUseCase: AddItemUseCase
 ) : ViewModel() {
     val selectedTeam: LiveData<Team?> = musicStateRepository.selectedTeam.asLiveData()
     val currentSongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
@@ -53,61 +55,25 @@ class MusicListViewModel @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun onTapListItem(music: MusicInfo) {
         val mediaItem = music.toMediaItem(application.filesDir.absolutePath)
-        val controller = mediaControllerManager.controller
 
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val existingMusic = storedMusicRepository.getItemById(music.id, "default")
                 val count = storedMusicRepository.getItemCount("default")
-
+                val position: Int
                 if (existingMusic != null) {
-                    // 이미 저장된 음악 정보가 있을 때
-                    val existingIndex = mediaControllerManager.mediaItemList.value.indexOfFirst { it.mediaId == mediaItem.mediaId }
-
-                    storedMusicRepository.updateOrder(
-                        start = existingIndex,
-                        end = count,
-                        increment = -1
-                    )
-                    storedMusicRepository.updateOrder(existingMusic.songId, count-1)
-
-                    withContext(Dispatchers.Main) {
-                        if (existingIndex != null) {
-                            controller?.removeMediaItem(existingIndex)
-                        }
-                        controller?.addMediaItem(mediaItem)
-                        mediaControllerManager.addMediaItem(mediaItem)
-                    }
-
+                    position = addItemUseCase.handleExistingMusic(existingMusic, mediaItem, count)
                 } else {
-                    // 새로운 음악 정보를 추가할 때
-                    withContext(Dispatchers.Main) {
-                        controller?.addMediaItem(mediaItem)
-                        mediaControllerManager.addMediaItem(mediaItem)
-                    }
-
-                    val newMusic = music.toStoredMusic(
-                        team = music.team,
-                        order = count,
-                        date = Utility.getCurrentTimeString(),
-                        playlist = "default"
-                    )
-                    storedMusicRepository.insertItem(newMusic.toItem())
+                    position = addItemUseCase.handleNewMusic(music, mediaItem, count)
                 }
 
                 withContext(Dispatchers.Main) {
-                    controller?.let {
-                        if (it.mediaItemCount > 0) {
-                            it.seekTo(it.mediaItemCount - 1, 0) // 마지막 아이템의 인덱스와 시작 시간 0
-                        }
-                    }
+                    mediaControllerManager.updateMediaController()
                 }
 
-                saveCurrentSongId(music.id, count-1)
-
+                saveCurrentSongId(music.id, position)
                 if (currentSongId.value != music.id) {
                     playMusic(music)
                 }

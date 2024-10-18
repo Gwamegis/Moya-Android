@@ -12,7 +12,10 @@ import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
 import com.soi.moya.models.toItem
+import com.soi.moya.models.toMediaItem
 import com.soi.moya.models.toStoredMusic
+import com.soi.moya.repository.AddItemUseCase
+import com.soi.moya.repository.MediaControllerManager
 import com.soi.moya.repository.MusicPlaybackManager
 import com.soi.moya.repository.MusicStateRepository
 import com.soi.moya.ui.Utility
@@ -27,9 +30,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
+    private val application: Application,
     private val storedMusicRepository: StoredMusicRepository,
     private val musicPlaybackManager: MusicPlaybackManager,
-    private val musicStateRepository: MusicStateRepository
+    private val mediaControllerManager: MediaControllerManager,
+    private val musicStateRepository: MusicStateRepository,
+    private val addItemUseCase: AddItemUseCase
 ) : ViewModel() {
 
     private val _musicManager = MusicManager.getInstance()
@@ -93,37 +99,24 @@ class SearchViewModel @Inject constructor(
     }
 
     fun onTapListItem(music: MusicInfo) {
+        val mediaItem = music.toMediaItem(application.filesDir.absolutePath)
+        val controller = mediaControllerManager.controller
+
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val existingMusic = storedMusicRepository.getItemById(music.id, "default")
-
-                if (existingMusic != null) {
-                    // 이미 저장된 음악 정보가 있을 때
-                    storedMusicRepository.updateOrder(
-                        start = 0,
-                        end = existingMusic.order,
-                        increment = 1
-                    )
-                    storedMusicRepository.updateOrder(existingMusic.songId, 0)
+                val count = storedMusicRepository.getItemCount("default")
+                val position: Int = if (existingMusic != null) {
+                    addItemUseCase.handleExistingMusic(existingMusic, mediaItem, count)
                 } else {
-                    // 새로운 음악 정보를 추가할 때
-                    val order = storedMusicRepository.getItemCount(playlist = "default")
-                    storedMusicRepository.updateOrder(
-                        start = 0,
-                        end = order,
-                        increment = 1
-                    )
-
-                    val newMusic = music.toStoredMusic(
-                        team = music.team,
-                        order = 0,
-                        date = Utility.getCurrentTimeString(),
-                        playlist = "default"
-                    )
-                    storedMusicRepository.insertItem(newMusic.toItem())
+                    addItemUseCase.handleNewMusic(music, mediaItem, count)
                 }
 
-                saveCurrentSongId(music.id)
+                withContext(Dispatchers.Main) {
+                    mediaControllerManager.updateMediaController()
+                }
+
+                saveCurrentSongId(music.id, position)
                 if (currentSongId.value != music.id) {
                     playMusic(music)
                 }
@@ -131,9 +124,10 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun saveCurrentSongId(songId: String) {
+    private fun saveCurrentSongId(songId: String, position: Int) {
         musicStateRepository.setCurrentPlaySongId(songId)
         musicStateRepository.setMiniPlayerActivated(false)
+        musicStateRepository.setCurrentPlaySongPosition(position)
     }
 
     @SuppressLint("NewApi")

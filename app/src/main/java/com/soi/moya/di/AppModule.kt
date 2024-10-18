@@ -3,6 +3,7 @@ package com.soi.moya.di
 import android.app.Application
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.UserPreferences
+import com.soi.moya.repository.AddItemUseCase
 import com.soi.moya.repository.MediaControllerManager
 import com.soi.moya.repository.MusicPlaybackManager
 import com.soi.moya.repository.MusicStateRepository
@@ -54,5 +55,13 @@ object AppModule {
         application: Application
     ): MusicPlaybackManager {
         return MusicPlaybackManager(controllerManager, application)
+    }
+
+    @Provides
+    fun provideAddItemUseCase(
+        storedMusicRepository: StoredMusicRepository,
+        controllerManager: MediaControllerManager,
+    ): AddItemUseCase {
+        return AddItemUseCase(storedMusicRepository, controllerManager)
     }
 }

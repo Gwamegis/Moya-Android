@@ -1,30 +1,37 @@
 package com.soi.moya.models
 
-import android.media.Image
 import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import com.soi.moya.ui.Utility
 import java.io.File
 
+interface BaseMusic {
+    val id: String
+    val title: String
+    val lyrics: String
+    val info: String
+    val type: Boolean
+    val url: String
+}
 data class Music(
-    val id: String = "",
-    val info: String = "",
-    val lyrics: String = "",
-    val title: String = "",
-    val type: Boolean = false,
-    val url: String = ""
-)
+    override val id: String = "",
+    override val info: String = "",
+    override val lyrics: String = "",
+    override val title: String = "",
+    override val type: Boolean = false,
+    override val url: String = ""
+) : BaseMusic
 
 data class MusicInfo(
-    val id: String = "",
-    val info: String = "",
-    val lyrics: String = "",
-    val title: String = "",
-    val type: Boolean = false,
+    override val id: String = "",
+    override val info: String = "",
+    override val lyrics: String = "",
+    override val title: String = "",
+    override val type: Boolean = false,
     val team: Team = Team.doosan,
-    val url: String = ""
-)
+    override val url: String = ""
+) : BaseMusic
 
 fun Music.toMusicInfo(team: Team): MusicInfo = MusicInfo(
     id = id,

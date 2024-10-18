@@ -137,6 +137,14 @@ class MediaControllerManager @Inject constructor(
         return -1 // 아이템을 찾지 못한 경우
     }
 
+    fun updateMediaController() {
+        controller?.let {
+            if(it.mediaItemCount > 0 ) {
+                it.seekTo(it.mediaItemCount-1, 0)
+            }
+        }
+    }
+
     fun releaseController() {
         controller?.release()
     }

@@ -110,6 +110,8 @@ class MusicPlaybackManager @Inject constructor(
             if (!file.exists()) {
                 downloadFileAsync(currentMusic.url, file.absolutePath)
             }
+
+            Log.d("** playMusic", currentMusic.title )
             controllerManager.controller?.prepare()
             controllerManager.controller?.play()
         }

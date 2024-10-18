@@ -1,5 +1,6 @@
 package com.soi.moya.ui.music_storage
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -10,6 +11,9 @@ import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.Team
 import com.soi.moya.models.toDefaultItem
+import com.soi.moya.models.toMediaItem
+import com.soi.moya.repository.AddItemUseCase
+import com.soi.moya.repository.MediaControllerManager
 import com.soi.moya.repository.MusicPlaybackManager
 import com.soi.moya.repository.MusicStateRepository
 import com.soi.moya.ui.Utility
@@ -25,9 +29,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MusicStorageViewModel @Inject constructor(
+    private val application: Application,
     private val storedMusicRepository: StoredMusicRepository,
     private val musicPlaybackManager: MusicPlaybackManager,
-    private val musicStateRepository: MusicStateRepository
+    private val mediaControllerManager: MediaControllerManager,
+    private val musicStateRepository: MusicStateRepository,
+    private val addItemUseCase: AddItemUseCase,
 ): ViewModel() {
 
     val currentSongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
@@ -61,41 +68,34 @@ class MusicStorageViewModel @Inject constructor(
     }
 
     fun onTapListItem(music: StoredMusic) {
+        val mediaItem = music.toMediaItem(application.filesDir.absolutePath)
+
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val existingMusic = storedMusicRepository.getItemById(music.songId, "default")
+                val count = storedMusicRepository.getItemCount("default")
+                val position: Int
 
                 if (existingMusic != null) {
-                    storedMusicRepository.updateOrder(
-                        start = 0,
-                        end = existingMusic.order,
-                        increment = 1
-                    )
-                    storedMusicRepository.updateOrder(existingMusic.songId, 0)
+                    position = addItemUseCase.handleExistingMusic(existingMusic, mediaItem, count)
                 } else {
-                    val order = storedMusicRepository.getItemCount(playlist = "default")
-                    storedMusicRepository.updateOrder(
-                        start = 0,
-                        end = order,
-                        increment = 1
-                    )
-                    val newMusic = music.toDefaultItem(
-                        playlist = "default",
-                        order = 0,
-                        date = Utility.getCurrentTimeString()
-                    )
-                    storedMusicRepository.insertItem(newMusic)
+                    position = addItemUseCase.handleNewMusic(music, mediaItem, count)
                 }
-                saveCurrentSongId(music.songId)
-                if (currentSongId.value != music.songId) {
+
+                withContext(Dispatchers.Main) {
+                    mediaControllerManager.updateMediaController()
+                }
+                saveCurrentSongId(music.id, position)
+                if (currentSongId.value != music.id) {
                     playMusic(music)
                 }
             }
         }
     }
-    private fun saveCurrentSongId(songId: String) {
+    private fun saveCurrentSongId(songId: String, position: Int) {
         musicStateRepository.setCurrentPlaySongId(songId)
         musicStateRepository.setMiniPlayerActivated(false)
+        musicStateRepository.setCurrentPlaySongPosition(position)
     }
 
     private fun playMusic(music: StoredMusic) {
