@@ -6,6 +6,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import com.soi.moya.data.StoredMusicRepository
+import com.soi.moya.repository.HandlePlaylistItemUseCase
 import com.soi.moya.repository.MediaControllerManager
 import com.soi.moya.repository.MusicPlaybackManager
 import com.soi.moya.repository.MusicStateRepository
@@ -22,7 +23,8 @@ class PlaylistViewModel @Inject constructor(
     private val storedMusicRepository: StoredMusicRepository,
     private val mediaControllerManager: MediaControllerManager,
     private val musicPlaybackManager: MusicPlaybackManager,
-    private val musicStateRepository: MusicStateRepository
+    private val musicStateRepository: MusicStateRepository,
+    private val handlePlaylistItemUseCase: HandlePlaylistItemUseCase
 ) : ViewModel() {
     val currentSongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
     val currentSongPosition: LiveData<Int?> = musicStateRepository.currentPlaySongPosition.asLiveData()
@@ -46,10 +48,7 @@ class PlaylistViewModel @Inject constructor(
 
     fun deletePlaylistItem(songId: String, order: Int) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                storedMusicRepository.deleteById(id = songId, playlist = "default")
-                storedMusicRepository.updateOrder(start = order + 1, end = mediaItemList.value.count(), increment = -1)
-            }
+            handlePlaylistItemUseCase.removePlaylistItem(songId, order, mediaItemList.value.count())
         }
     }
 

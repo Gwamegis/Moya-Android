@@ -1,8 +1,6 @@
 package com.soi.moya.ui.music_list
 
 import android.app.Application
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -13,14 +11,11 @@ import com.soi.moya.data.SeasonSongManager
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
-import com.soi.moya.models.toItem
 import com.soi.moya.models.toMediaItem
-import com.soi.moya.models.toStoredMusic
-import com.soi.moya.repository.AddItemUseCase
+import com.soi.moya.repository.HandlePlaylistItemUseCase
 import com.soi.moya.repository.MediaControllerManager
 import com.soi.moya.repository.MusicPlaybackManager
 import com.soi.moya.repository.MusicStateRepository
-import com.soi.moya.ui.Utility
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,7 +29,7 @@ class MusicListViewModel @Inject constructor(
     private val musicPlaybackManager: MusicPlaybackManager,
     private val mediaControllerManager: MediaControllerManager,
     private val musicStateRepository: MusicStateRepository,
-    private val addItemUseCase: AddItemUseCase
+    private val handlePlaylistItemUseCase: HandlePlaylistItemUseCase
 ) : ViewModel() {
     val selectedTeam: LiveData<Team?> = musicStateRepository.selectedTeam.asLiveData()
     val currentSongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
@@ -62,11 +57,10 @@ class MusicListViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 val existingMusic = storedMusicRepository.getItemById(music.id, "default")
                 val count = storedMusicRepository.getItemCount("default")
-                val position: Int
-                if (existingMusic != null) {
-                    position = addItemUseCase.handleExistingMusic(existingMusic, mediaItem, count)
+                val position: Int = if (existingMusic != null) {
+                    handlePlaylistItemUseCase.handleExistingMusic(existingMusic, mediaItem, count)
                 } else {
-                    position = addItemUseCase.handleNewMusic(music, mediaItem, count)
+                    handlePlaylistItemUseCase.handleNewMusic(music, mediaItem, count)
                 }
 
                 withContext(Dispatchers.Main) {

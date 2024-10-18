@@ -11,14 +11,11 @@ import com.soi.moya.data.SeasonSongManager
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.Team
-import com.soi.moya.models.toItem
 import com.soi.moya.models.toMediaItem
-import com.soi.moya.models.toStoredMusic
-import com.soi.moya.repository.AddItemUseCase
+import com.soi.moya.repository.HandlePlaylistItemUseCase
 import com.soi.moya.repository.MediaControllerManager
 import com.soi.moya.repository.MusicPlaybackManager
 import com.soi.moya.repository.MusicStateRepository
-import com.soi.moya.ui.Utility
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +32,7 @@ class SearchViewModel @Inject constructor(
     private val musicPlaybackManager: MusicPlaybackManager,
     private val mediaControllerManager: MediaControllerManager,
     private val musicStateRepository: MusicStateRepository,
-    private val addItemUseCase: AddItemUseCase
+    private val handlePlaylistItemUseCase: HandlePlaylistItemUseCase
 ) : ViewModel() {
 
     private val _musicManager = MusicManager.getInstance()
@@ -105,9 +102,9 @@ class SearchViewModel @Inject constructor(
                 val existingMusic = storedMusicRepository.getItemById(music.id, "default")
                 val count = storedMusicRepository.getItemCount("default")
                 val position: Int = if (existingMusic != null) {
-                    addItemUseCase.handleExistingMusic(existingMusic, mediaItem, count)
+                    handlePlaylistItemUseCase.handleExistingMusic(existingMusic, mediaItem, count)
                 } else {
-                    addItemUseCase.handleNewMusic(music, mediaItem, count)
+                    handlePlaylistItemUseCase.handleNewMusic(music, mediaItem, count)
                 }
 
                 withContext(Dispatchers.Main) {

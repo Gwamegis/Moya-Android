@@ -36,8 +36,6 @@ class MediaControllerManager @Inject constructor(
     }
 
     private fun initializeController() {
-        Log.e("**initializeController", "initializeController")
-
         controllerFuture = MediaController.Builder(
             application,
             SessionToken(application, ComponentName(application, PlaybackService::class.java))
@@ -46,10 +44,8 @@ class MediaControllerManager @Inject constructor(
         controllerFuture.addListener({ setController() }, MoreExecutors.directExecutor())
     }
     private fun setController() {
-        Log.e("**setController", "setController")
-
         val controller = this.controller ?: return
-        // Controller 설정 및 이벤트 리스너 등록
+
         initializeMediaList()
 
         controller.addListener(
@@ -85,7 +81,7 @@ class MediaControllerManager @Inject constructor(
     private fun getCurrentMediaItemIndex(): Int {
         return controller?.currentMediaItemIndex ?: -1
     }
-    fun initializeMediaList() {
+    private fun initializeMediaList() {
         val controller = this.controller ?: return
         clearMediaItemList()
         for (i in 0 until controller.mediaItemCount) {
@@ -99,7 +95,7 @@ class MediaControllerManager @Inject constructor(
         controller?.setMediaItems(_mediaItemList.value)
     }
 
-    fun clearMediaItemList() {
+    private fun clearMediaItemList() {
         _mediaItemList.value = emptyList()
     }
     fun addMediaItem(mediaItem: MediaItem) {
@@ -112,6 +108,17 @@ class MediaControllerManager @Inject constructor(
         currentList.add(mediaItem)
         _mediaItemList.value = currentList
     }
+
+    fun removeMediaItem(index: Int) {
+        val currentList = _mediaItemList.value.toMutableList()
+
+        if (index != -1) {
+            currentList.removeAt(index)
+            controller?.removeMediaItem(index)
+        }
+        _mediaItemList.value = currentList
+    }
+
     private fun updateMediaMetadataUI() {
         val controller = this.controller
         if (controller == null || controller.mediaItemCount == 0) {

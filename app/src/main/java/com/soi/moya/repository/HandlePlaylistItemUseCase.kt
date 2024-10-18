@@ -1,7 +1,6 @@
 package com.soi.moya.repository
 
-import android.support.v4.media.session.MediaControllerCompat
-import android.util.Log
+import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.BaseMusic
@@ -9,14 +8,14 @@ import com.soi.moya.models.MusicInfo
 import com.soi.moya.models.StoredMusic
 import com.soi.moya.models.toDefaultItem
 import com.soi.moya.models.toItem
-import com.soi.moya.models.toMediaItem
 import com.soi.moya.models.toStoredMusic
 import com.soi.moya.ui.Utility
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class AddItemUseCase @Inject constructor(
+class HandlePlaylistItemUseCase @Inject constructor(
     private val storedMusicRepository: StoredMusicRepository,
     private val mediaControllerManager: MediaControllerManager,
 ) {
@@ -27,7 +26,6 @@ class AddItemUseCase @Inject constructor(
     ): Int {
         val existingIndex = mediaControllerManager.mediaItemList.value.indexOfFirst { it.mediaId == mediaItem.mediaId }
 
-        Log.d("**AddItemUseCase-exist", existingMusic.title + " " + existingIndex.toString())
         storedMusicRepository.updateOrder(
             start = existingIndex,
             end = count,
@@ -36,9 +34,7 @@ class AddItemUseCase @Inject constructor(
         storedMusicRepository.updateOrder(existingMusic.songId, count - 1)
 
         withContext(Dispatchers.Main) {
-            if (existingIndex != null) {
-                mediaControllerManager.controller?.removeMediaItem(existingIndex)
-            }
+            mediaControllerManager.controller?.removeMediaItem(existingIndex)
             mediaControllerManager.controller?.addMediaItem(mediaItem)
             mediaControllerManager.addMediaItem(mediaItem)
         }
@@ -50,7 +46,6 @@ class AddItemUseCase @Inject constructor(
             mediaControllerManager.controller?.addMediaItem(mediaItem)
             mediaControllerManager.addMediaItem(mediaItem)
         }
-        Log.d("**AddItemUseCase-new", music.title + " ")
 
         val newMusic = when (music) {
             is MusicInfo -> {
@@ -73,5 +68,20 @@ class AddItemUseCase @Inject constructor(
         storedMusicRepository.insertItem(newMusic.toItem())
 
         return count
+    }
+
+    suspend fun removePlaylistItem(songId: String, order: Int, count: Int) {
+        val controller = mediaControllerManager.controller
+        val index = mediaControllerManager.mediaItemList.value.indexOfFirst { it.mediaId == songId }
+
+        if (index != -1) {
+            withContext(Dispatchers.Main) {
+                mediaControllerManager.removeMediaItem(index)
+            }
+        }
+        withContext(Dispatchers.IO) {
+            storedMusicRepository.deleteById(id = songId, playlist = "default")
+            storedMusicRepository.updateOrder(start = order + 1, end = count, increment = -1)
+        }
     }
 }
