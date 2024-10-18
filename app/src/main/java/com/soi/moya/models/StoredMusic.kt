@@ -79,7 +79,7 @@ fun StoredMusic.toMusicInfo(): MusicInfo = MusicInfo(
 )
 
 fun StoredMusic.toMediaItem(filePath: String): MediaItem {
-    val file = File(filePath, "${id}-${title}.mp3")
+    val file = File(filePath, "${songId}-${title}.mp3")
 
     val resourceId = if(type) {
         Team.valueOf(team).getPlayerAlbumImageResourceId()
@@ -90,7 +90,7 @@ fun StoredMusic.toMediaItem(filePath: String): MediaItem {
 
     return Utility.buildMediaItem(
         title = title,
-        mediaId = id,
+        mediaId = songId,
         mediaType = MediaMetadata.MEDIA_TYPE_MUSIC,
         artist = Team.valueOf(team).getKrTeamName(),
         sourceUri = Uri.fromFile(file),

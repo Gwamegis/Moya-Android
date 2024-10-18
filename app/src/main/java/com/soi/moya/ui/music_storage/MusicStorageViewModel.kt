@@ -1,6 +1,7 @@
 package com.soi.moya.ui.music_storage
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -35,7 +36,7 @@ class MusicStorageViewModel @Inject constructor(
     private val handlePlaylistItemUseCase: HandlePlaylistItemUseCase,
 ): ViewModel() {
 
-    val currentSongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
+    private val currentSongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
 
     val storageUiState: StateFlow<StorageUiState> =
         storedMusicRepository.getByStoragePlaylist().map { StorageUiState(it) }
@@ -74,7 +75,7 @@ class MusicStorageViewModel @Inject constructor(
                 val count = storedMusicRepository.getItemCount("default")
 
                 val position: Int = if (existingMusic != null) {
-                    handlePlaylistItemUseCase.handleExistingMusic(existingMusic, mediaItem, count)
+                    handlePlaylistItemUseCase.handleExistingMusic(mediaItem, count)
                 } else {
                     handlePlaylistItemUseCase.handleNewMusic(music, mediaItem, count)
                 }
@@ -82,8 +83,8 @@ class MusicStorageViewModel @Inject constructor(
                 withContext(Dispatchers.Main) {
                     mediaControllerManager.updateMediaController()
                 }
-                saveCurrentSongId(music.id, position)
-                if (currentSongId.value != music.id) {
+                saveCurrentSongId(music.songId, position)
+                if (currentSongId.value != music.songId) {
                     playMusic(music)
                 }
             }

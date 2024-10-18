@@ -1,5 +1,6 @@
 package com.soi.moya.repository
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import com.soi.moya.data.StoredMusicRepository
@@ -20,18 +21,16 @@ class HandlePlaylistItemUseCase @Inject constructor(
     private val mediaControllerManager: MediaControllerManager,
 ) {
     suspend fun handleExistingMusic(
-        existingMusic: StoredMusic,
         mediaItem: MediaItem,
         count: Int
     ): Int {
         val existingIndex = mediaControllerManager.mediaItemList.value.indexOfFirst { it.mediaId == mediaItem.mediaId }
-
         storedMusicRepository.updateOrder(
             start = existingIndex,
             end = count,
             increment = -1
         )
-        storedMusicRepository.updateOrder(existingMusic.songId, count - 1)
+        storedMusicRepository.updateOrder(mediaItem.mediaId, count - 1)
 
         withContext(Dispatchers.Main) {
             mediaControllerManager.controller?.removeMediaItem(existingIndex)

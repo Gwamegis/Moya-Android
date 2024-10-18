@@ -58,7 +58,7 @@ class MusicListViewModel @Inject constructor(
                 val existingMusic = storedMusicRepository.getItemById(music.id, "default")
                 val count = storedMusicRepository.getItemCount("default")
                 val position: Int = if (existingMusic != null) {
-                    handlePlaylistItemUseCase.handleExistingMusic(existingMusic, mediaItem, count)
+                    handlePlaylistItemUseCase.handleExistingMusic(mediaItem, count)
                 } else {
                     handlePlaylistItemUseCase.handleNewMusic(music, mediaItem, count)
                 }

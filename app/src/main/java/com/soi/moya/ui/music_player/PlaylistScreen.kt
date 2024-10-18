@@ -100,7 +100,7 @@ fun PlaylistScreen(
                     PlaylistItem(
                         viewModel,
                         music = item,
-                        isCurrentSong = viewModel.getMediaItemIndex(item.mediaId) == currentSongPosition
+                        isCurrentSong = item.mediaId == currentSongId
                     )
                 }
             }

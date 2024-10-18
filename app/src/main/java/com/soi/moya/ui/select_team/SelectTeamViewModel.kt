@@ -30,9 +30,9 @@ class SelectTeamViewModel @Inject constructor(
         }
     }
     fun onClickNext() {
+        musicStateRepository.setNeedHideMiniPlayer(false)
         viewModelScope.launch {
             selectTeam.value?.let { userPreferences.saveSelectedTeam(team = it) }
-            userPreferences.saveIsNeedHideMiniPlayer(isNeedToHide = false)
         }
     }
 }
