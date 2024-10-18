@@ -85,7 +85,7 @@ class MediaControllerManager @Inject constructor(
         val controller = this.controller ?: return
         clearMediaItemList()
         for (i in 0 until controller.mediaItemCount) {
-            addMediaItem(controller.getMediaItemAt(i))
+            addMediaItem(_mediaItemList.value.size, controller.getMediaItemAt(i))
         }
     }
 
@@ -98,14 +98,14 @@ class MediaControllerManager @Inject constructor(
     private fun clearMediaItemList() {
         _mediaItemList.value = emptyList()
     }
-    fun addMediaItem(mediaItem: MediaItem) {
+    fun addMediaItem(index: Int, mediaItem: MediaItem) {
         val currentList = _mediaItemList.value.toMutableList()
         val existingIndex = currentList.indexOfFirst { it.mediaId == mediaItem.mediaId }
 
         if (existingIndex != -1 ){
             currentList.removeAt(existingIndex)
         }
-        currentList.add(mediaItem)
+        currentList.add(index, mediaItem)
         _mediaItemList.value = currentList
     }
 
@@ -147,7 +147,7 @@ class MediaControllerManager @Inject constructor(
     fun updateMediaController() {
         controller?.let {
             if(it.mediaItemCount > 0 ) {
-                it.seekTo(it.mediaItemCount-1, 0)
+                it.seekTo(0, 0)
             }
         }
     }

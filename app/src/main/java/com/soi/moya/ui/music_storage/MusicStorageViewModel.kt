@@ -74,7 +74,7 @@ class MusicStorageViewModel @Inject constructor(
                 val existingMusic = storedMusicRepository.getItemById(music.songId, "default")
                 val count = storedMusicRepository.getItemCount("default")
 
-                val position: Int = if (existingMusic != null) {
+                if (existingMusic != null) {
                     handlePlaylistItemUseCase.handleExistingMusic(mediaItem, count)
                 } else {
                     handlePlaylistItemUseCase.handleNewMusic(music, mediaItem, count)
@@ -83,7 +83,7 @@ class MusicStorageViewModel @Inject constructor(
                 withContext(Dispatchers.Main) {
                     mediaControllerManager.updateMediaController()
                 }
-                saveCurrentSongId(music.songId, position)
+                saveCurrentSongId(music.songId, 0)
                 if (currentSongId.value != music.songId) {
                     playMusic(music)
                 }

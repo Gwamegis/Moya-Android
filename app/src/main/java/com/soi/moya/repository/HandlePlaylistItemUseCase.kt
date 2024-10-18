@@ -23,7 +23,7 @@ class HandlePlaylistItemUseCase @Inject constructor(
     suspend fun handleExistingMusic(
         mediaItem: MediaItem,
         count: Int
-    ): Int {
+    ){
         val existingIndex = mediaControllerManager.mediaItemList.value.indexOfFirst { it.mediaId == mediaItem.mediaId }
         storedMusicRepository.updateOrder(
             start = existingIndex,
@@ -34,16 +34,14 @@ class HandlePlaylistItemUseCase @Inject constructor(
 
         withContext(Dispatchers.Main) {
             mediaControllerManager.controller?.removeMediaItem(existingIndex)
-            mediaControllerManager.controller?.addMediaItem(mediaItem)
-            mediaControllerManager.addMediaItem(mediaItem)
+            mediaControllerManager.controller?.addMediaItem(0, mediaItem)
+            mediaControllerManager.addMediaItem(0, mediaItem)
         }
-
-        return count - 1
     }
-    suspend fun handleNewMusic(music: BaseMusic, mediaItem: MediaItem, count: Int): Int {
+    suspend fun handleNewMusic(music: BaseMusic, mediaItem: MediaItem, count: Int) {
         withContext(Dispatchers.Main) {
-            mediaControllerManager.controller?.addMediaItem(mediaItem)
-            mediaControllerManager.addMediaItem(mediaItem)
+            mediaControllerManager.controller?.addMediaItem(0, mediaItem)
+            mediaControllerManager.addMediaItem(0, mediaItem)
         }
 
         val newMusic = when (music) {
@@ -65,8 +63,6 @@ class HandlePlaylistItemUseCase @Inject constructor(
             else -> throw IllegalArgumentException("Unknown music type")
         }
         storedMusicRepository.insertItem(newMusic.toItem())
-
-        return count
     }
 
     suspend fun removePlaylistItem(songId: String, order: Int, count: Int) {
