@@ -74,12 +74,11 @@ class MusicStorageViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 val existingMusic = storedMusicRepository.getItemById(music.songId, "default")
                 val count = storedMusicRepository.getItemCount("default")
-                val position: Int
 
-                if (existingMusic != null) {
-                    position = addItemUseCase.handleExistingMusic(existingMusic, mediaItem, count)
+                val position: Int = if (existingMusic != null) {
+                    addItemUseCase.handleExistingMusic(existingMusic, mediaItem, count)
                 } else {
-                    position = addItemUseCase.handleNewMusic(music, mediaItem, count)
+                    addItemUseCase.handleNewMusic(music, mediaItem, count)
                 }
 
                 withContext(Dispatchers.Main) {

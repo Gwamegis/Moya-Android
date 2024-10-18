@@ -26,6 +26,7 @@ class MainViewModel @Inject constructor(
     val currentPlaySongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
     val isMiniplayerActivated: LiveData<Boolean> = musicStateRepository.isMiniPlayerActivated.asLiveData()
     val isNeedHideMiniplayer: LiveData<Boolean> = musicStateRepository.isNeedHideMiniPlayer.asLiveData()
+    val isInitialLoad: LiveData<Boolean> = musicStateRepository.isInitialLoad.asLiveData()
 
     init {
         viewModelScope.launch {

@@ -100,8 +100,6 @@ class SearchViewModel @Inject constructor(
 
     fun onTapListItem(music: MusicInfo) {
         val mediaItem = music.toMediaItem(application.filesDir.absolutePath)
-        val controller = mediaControllerManager.controller
-
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val existingMusic = storedMusicRepository.getItemById(music.id, "default")

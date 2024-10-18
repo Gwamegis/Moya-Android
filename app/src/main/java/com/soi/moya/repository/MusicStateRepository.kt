@@ -10,7 +10,6 @@ import javax.inject.Inject
 class MusicStateRepository  @Inject constructor (
     private val userPreferences: UserPreferences
 ) {
-
     private val _selectedTeam = MutableStateFlow<Team?>(null)
     val selectedTeam: StateFlow<Team?> get() = _selectedTeam
 
@@ -28,6 +27,9 @@ class MusicStateRepository  @Inject constructor (
 
     private val _isLyricDisplaying = MutableStateFlow(false)
     val isLyricDisplaying: StateFlow<Boolean> get() = _isLyricDisplaying
+
+    private val _isInitialLoad = MutableStateFlow(false)
+    val isInitialLoad: StateFlow<Boolean> get() = _isInitialLoad
 
     fun setSelectedTeam(team: Team) {
         _selectedTeam.value = team
@@ -47,12 +49,12 @@ class MusicStateRepository  @Inject constructor (
     fun setLyricDisplaying(displaying: Boolean) {
         _isLyricDisplaying.value = displaying
     }
+    fun setInitialLoad(isLoaded: Boolean) {
+        _isInitialLoad.value = isLoaded
+    }
 
     //TODO: 앱 종료시 데이터 백업
     suspend fun saveToDataStore() {
-        Log.d("**stateRepo", "save to dataStore")
-        Log.d("**stateRepo", selectedTeam.value?.name ?: "")
-
         userPreferences.saveSelectedTeam(selectedTeam.value ?: Team.doosan)
         userPreferences.saveCurrentSongId(currentPlaySongId.value ?: "")
         userPreferences.saveCurrentSongPosition(currentPlaySongPosition.value.toInt())
@@ -65,6 +67,7 @@ class MusicStateRepository  @Inject constructor (
         // 데이터 스토어에서 값을 불러와 MutableStateFlow에 설정
         userPreferences.getSelectedTeam.collect {team ->
             _selectedTeam.value = team?.let { Team.valueOf(it) }
+            setInitialLoad(true)
         }
         userPreferences.currentPlaySongId.collect { songId ->
             _currentPlaySongId.value = songId

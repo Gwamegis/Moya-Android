@@ -1,6 +1,5 @@
 package com.soi.moya.ui.main_activity
 
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -17,7 +16,6 @@ import com.soi.moya.R
 import com.soi.moya.base.BaseComposeActivity
 import com.soi.moya.data.MusicManager
 import com.soi.moya.models.MusicInfo
-import com.soi.moya.models.Team
 import com.soi.moya.ui.bottom_nav.BottomNavScreen
 import com.soi.moya.ui.mini_player.MiniPlayerScreen
 import com.soi.moya.ui.select_team.SelectTeamScreen
@@ -52,16 +50,15 @@ class MainActivity : BaseComposeActivity() {
         }
 
         val navController = rememberNavController()
-        var selectedTeam by remember { mutableStateOf<Team?>(null) }
-        var isLoaded by remember { mutableStateOf(false) }
+        val selectedTeam = mainViewModel.selectedTeam.observeAsState().value
+        var isLoaded = mainViewModel.isInitialLoad.observeAsState().value
+
         var currentMusic by remember { mutableStateOf<MusicInfo?>(null) }
         var isNeedToHideMiniPlayer by remember { mutableStateOf(false) }
 
         mainViewModel.currentPlaySongId.observeAsState().value?.let { songId ->
-            if (songId != null) {
-                musicManager.getMusicById(songId)?.let { musicInfo ->
-                    currentMusic = musicInfo
-                }
+            musicManager.getMusicById(songId)?.let { musicInfo ->
+                currentMusic = musicInfo
             }
         }
         mainViewModel.isMiniplayerActivated.observeAsState().value?.let { activated ->
@@ -70,14 +67,10 @@ class MainActivity : BaseComposeActivity() {
         mainViewModel.isNeedHideMiniplayer.observeAsState().value?.let { hide ->
             isNeedToHideMiniPlayer = hide
         }
-        mainViewModel.selectedTeam.observeAsState().value?.let { team ->
-            selectedTeam = team
-            isLoaded = true
-        }
 
-        if (isLoaded) {
+        if (isLoaded == true) {
             if (selectedTeam != null) {
-                MoyaTheme(team = selectedTeam!!) {
+                MoyaTheme(team = selectedTeam) {
                     BottomNavScreen()
                     currentMusic?.let { music ->
                         if (!isNeedToHideMiniPlayer) {
