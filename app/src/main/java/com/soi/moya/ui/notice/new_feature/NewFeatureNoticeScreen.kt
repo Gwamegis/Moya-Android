@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -54,7 +53,6 @@ fun NewFeatureNoticeScreen(
         }
     }
 
-    BackHandler { }
 
     ModalBottomSheetLayout(
         sheetState = sheetState,

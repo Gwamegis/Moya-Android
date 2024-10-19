@@ -3,6 +3,7 @@ package com.soi.moya.ui.main_activity
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -92,13 +93,18 @@ class MainActivity : BaseComposeActivity() {
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 //            setupOnBackPressedDispatcher()
 //        }
+
+        BackHandler {
+            handleBackPress()
+        }
     }
-    private fun computeWindowSizeClasses(): Float{
+
+    private fun computeWindowSizeClasses(): Float {
         val metrics = WindowMetricsCalculator.getOrCreate().computeCurrentWindowMetrics(this)
         val height = metrics.bounds.height()
         val density = resources.displayMetrics.density
 
-        return height/density
+        return height / density
     }
 
 
@@ -113,18 +119,14 @@ class MainActivity : BaseComposeActivity() {
         }
     }
     private fun handleBackPress() {
+
         if (backPressedTime + 2000 > System.currentTimeMillis()) {
             toast.cancel()
-            finish()
+            moveTaskToBack(true)
         } else {
             toast.show()
         }
         backPressedTime = System.currentTimeMillis()
     }
-
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//        handleBackPress()
-//    }
 }
 

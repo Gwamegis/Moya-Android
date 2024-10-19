@@ -1,10 +1,9 @@
 package com.soi.moya.playback
 
 import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Intent
-import android.os.Build
-import androidx.core.app.TaskStackBuilder
-import com.soi.moya.ui.MoyaApplication
+import android.util.Log
 import com.soi.moya.ui.main_activity.MainActivity
 
 class PlaybackService() : MoyaPlaybackService() {
@@ -23,8 +22,16 @@ class PlaybackService() : MoyaPlaybackService() {
 
     override fun getBackStackedActivity(): PendingIntent? {
         return TaskStackBuilder.create(this).run {
+            Log.d("**stop service", "stop service getBackStackedActivity")
             addNextIntent(Intent(this@PlaybackService, MainActivity::class.java))
             getPendingIntent(0, immutableFlag or PendingIntent.FLAG_UPDATE_CURRENT)
         }
     }
+
+    override fun stopService(name: Intent?): Boolean {
+        Log.d("**stop service", "stop service PlaybackService")
+        stopSelf()
+        return super.stopService(name)
+    }
+
 }

@@ -3,6 +3,7 @@ package com.soi.moya.base
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -17,19 +18,21 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-abstract class BaseComposeActivity: ComponentActivity() {
+abstract class BaseComposeActivity : ComponentActivity() {
 
     @Inject
     lateinit var musicStateRepository: MusicStateRepository
 
     @Composable
     abstract fun Content()
+    private lateinit var playbackService: PlaybackService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(AppLifecycleObserver(musicStateRepository, this))
 
+        Log.d("**start moya service", "on create activity")
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
                 scrim = Color.TRANSPARENT,
@@ -45,5 +48,13 @@ abstract class BaseComposeActivity: ComponentActivity() {
             val intent = Intent(this, PlaybackService::class.java)
             startService(intent)
         }
+
+    }
+
+    override fun onDestroy() {
+        Log.d("**stop moya service", "on destroy base component activity")
+        val intent = Intent(this, PlaybackService::class.java)
+        stopService(intent)
+        super.onDestroy()
     }
 }
