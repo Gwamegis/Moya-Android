@@ -51,7 +51,7 @@ open class MoyaPlaybackService() : MediaSessionService() {
     private lateinit var mediaRepository: OfflineItemsRepository
 
     companion object {
-        const val NOTIFICATION_ID = 123
+        private const val NOTIFICATION_ID = 123
         private const val CHANNEL_ID = "moya_session_notification_channel_id"
         private const val CHANNEL_NAME = "Moya Media Playback"
         const val SAVE_TO_FAVORITES = "com.moya.save_to_favorites"

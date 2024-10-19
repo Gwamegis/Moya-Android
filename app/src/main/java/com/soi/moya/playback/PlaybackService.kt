@@ -1,10 +1,9 @@
 package com.soi.moya.playback
 
 import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Intent
 import android.util.Log
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.TaskStackBuilder
 import com.soi.moya.ui.main_activity.MainActivity
 
 class PlaybackService() : MoyaPlaybackService() {
@@ -35,11 +34,4 @@ class PlaybackService() : MoyaPlaybackService() {
         return super.stopService(name)
     }
 
-    override fun onDestroy() {
-        Log.d("**stop service", "onDestroy PlaybackService")
-        val notificationManager = NotificationManagerCompat.from(this)
-        notificationManager.cancel(NOTIFICATION_ID)
-        stopSelf()
-        super.onDestroy()
-    }
 }
