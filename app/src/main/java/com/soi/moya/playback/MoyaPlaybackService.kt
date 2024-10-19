@@ -279,28 +279,6 @@ open class MoyaPlaybackService() : MediaSessionService() {
             }
             return settable
         }
-
-        //        override fun onAddMediaItems(
-//            mediaSession: MediaSession,
-//            controller: ControllerInfo,
-//            mediaItems: List<MediaItem>
-//        ): ListenableFuture<List<MediaItem>> {
-//            return Futures.immediateFuture(resolveMediaItems(mediaItems))
-//        }
-//
-//        @OptIn(UnstableApi::class)
-//        override fun onSetMediaItems(
-//            mediaSession: MediaSession,
-//            controller: ControllerInfo,
-//            mediaItems: List<MediaItem>,
-//            startIndex: Int,
-//            startPositionMs: Long
-//        ): ListenableFuture<MediaItemsWithStartPosition> {
-//
-//            return Futures.immediateFuture(
-//                MediaItemsWithStartPosition(resolveMediaItems(mediaItems), startIndex, startPositionMs)
-//            )
-//        }
         fun getCurrentMediaItemsFromSession(mediaSession: MediaSession): List<MediaItem>? {
             val player = mediaSession.player
             return if (player.mediaItemCount > 0) {

@@ -41,12 +41,6 @@ class MainActivity : BaseComposeActivity() {
 
     @Composable
     override fun Content() {
-        val isBackPressedDispatcherSetup = remember { mutableStateOf(false) }
-
-        if (!isBackPressedDispatcherSetup.value) {
-            setupOnBackPressedDispatcher()
-            isBackPressedDispatcherSetup.value = true
-        }
 
         val navController = rememberNavController()
         val selectedTeam = mainViewModel.selectedTeam.observeAsState().value
@@ -62,10 +56,6 @@ class MainActivity : BaseComposeActivity() {
                 Log.d("**mainActivity", "currentMusic: ${currentMusic!!.title}")
             }
         }
-//            ?: run {
-//            currentMusic = null
-//            Log.d("**mainActivity", "songID: null")
-//        }
         mainViewModel.isMiniplayerActivated.observeAsState().value?.let { activated ->
             _isMiniPlayerActivated.value = !activated
         }
@@ -88,12 +78,6 @@ class MainActivity : BaseComposeActivity() {
                 SelectTeamScreen(navController = navController)
             }
         }
-
-        //TODO: 버전별 동작 확인하기
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//            setupOnBackPressedDispatcher()
-//        }
-
         BackHandler {
             handleBackPress()
         }
@@ -107,17 +91,6 @@ class MainActivity : BaseComposeActivity() {
         return height / density
     }
 
-
-    private fun setupOnBackPressedDispatcher() {
-        if (backPressedCallback == null) {
-            backPressedCallback = object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    handleBackPress()
-                }
-            }
-            onBackPressedDispatcher.addCallback(this, backPressedCallback!!)
-        }
-    }
     private fun handleBackPress() {
 
         if (backPressedTime + 2000 > System.currentTimeMillis()) {
