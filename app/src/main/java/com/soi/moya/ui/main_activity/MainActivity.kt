@@ -107,7 +107,7 @@ class MainActivity : BaseComposeActivity() {
 
         if (backPressedTime + 2000 > System.currentTimeMillis()) {
             toast.cancel()
-            finish()
+            moveTaskToBack(true)
         } else {
             toast.show()
         }

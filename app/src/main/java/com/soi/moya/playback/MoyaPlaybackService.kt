@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -18,7 +19,6 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
-import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.util.EventLogger
@@ -27,7 +27,6 @@ import androidx.media3.session.MediaSession.ConnectionResult
 import androidx.media3.session.MediaSession.ControllerInfo
 import androidx.media3.session.MediaSession.MediaItemsWithStartPosition
 import androidx.media3.session.MediaSessionService
-import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.SettableFuture
 import com.soi.moya.R
@@ -44,15 +43,15 @@ import java.io.File
 
 open class MoyaPlaybackService() : MediaSessionService() {
 
-    private lateinit var mediaSession: MediaSession
-    private lateinit var player: ExoPlayer
+    private var mediaSession: MediaSession? = null
+    private var player: ExoPlayer? = null
     private val scope = CoroutineScope(Dispatchers.IO)
     private lateinit var application: MoyaApplication
 
     private lateinit var mediaRepository: OfflineItemsRepository
 
     companion object {
-        private const val NOTIFICATION_ID = 123
+        const val NOTIFICATION_ID = 123
         private const val CHANNEL_ID = "moya_session_notification_channel_id"
         private const val CHANNEL_NAME = "Moya Media Playback"
         const val SAVE_TO_FAVORITES = "com.moya.save_to_favorites"
@@ -63,6 +62,7 @@ open class MoyaPlaybackService() : MediaSessionService() {
     protected open fun createSessionCallback(): MediaSession.Callback {
         return MoyaMediaSessionCallback(this)
     }
+
     override fun onGetSession(controllerInfo: ControllerInfo): MediaSession? = mediaSession
 
     @OptIn(UnstableApi::class)
@@ -78,20 +78,27 @@ open class MoyaPlaybackService() : MediaSessionService() {
         }
     }
 
+    override fun stopService(name: Intent?): Boolean {
+        Log.d("**stop service", "stop service moya play back service")
+        stopSelf()
+        return super.stopService(name)
+    }
+
     private fun initializeSessionAndPlayer() {
         player =
             ExoPlayer.Builder(this)
                 .setAudioAttributes(AudioAttributes.DEFAULT, /* handleAudioFocus= */ true)
                 .build()
-        player.addAnalyticsListener(EventLogger())
-        player.repeatMode = Player.REPEAT_MODE_ALL
+
+        player?.addAnalyticsListener(EventLogger())
+        player?.repeatMode = Player.REPEAT_MODE_ALL
 
         /*
         * ForwardingPlayer :Android의 Media3 라이브러리에서 제공하는 추상 클래스
         * Player인터페이스를 구현하는 여러 플레이어 객체를 감싸서 다양한 플레이어에 대한 공통된 기능을 제공하는데 사용
         */
 
-        mediaSession = MediaSession.Builder(this, player)
+        mediaSession = MediaSession.Builder(this, player!!)
             .setCallback(createSessionCallback())
             .build()
     }
@@ -108,7 +115,7 @@ open class MoyaPlaybackService() : MediaSessionService() {
             val file = File(filePath, "${song.songId}-${song.title}.mp3")
             if (!file.exists()) return@mapNotNull null
 
-            val resourceId = if(song.type) {
+            val resourceId = if (song.type) {
                 Team.valueOf(song.team).getPlayerAlbumImageResourceId()
             } else {
                 Team.valueOf(song.team).getTeamImageResourceId()
@@ -126,7 +133,7 @@ open class MoyaPlaybackService() : MediaSessionService() {
         }
 
         withContext(Dispatchers.Main) {
-            player.setMediaItems(mediaItems)
+            player?.setMediaItems(mediaItems)
         }
     }
 
@@ -150,7 +157,8 @@ open class MoyaPlaybackService() : MediaSessionService() {
                     .setColor(getColor(Color.WHITE))
                     .setContentTitle(getString(R.string.notification_content_title))
                     .setStyle(
-                        NotificationCompat.BigTextStyle().bigText(getString(R.string.notification_content_text))
+                        NotificationCompat.BigTextStyle()
+                            .bigText(getString(R.string.notification_content_text))
                     )
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setAutoCancel(true)
@@ -175,26 +183,41 @@ open class MoyaPlaybackService() : MediaSessionService() {
             notificationManagerCompat.createNotificationChannel(channel)
         }
     }
+
     //최근 앱 목록에서 제거 시 호출
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
-        val player = mediaSession.player
-        if (!player.playWhenReady || player.mediaItemCount == 0) {
-            stopSelf()
-        }
+
+        val player = mediaSession?.player
+        if (player == null
+            || !player.playWhenReady
+            || player.mediaItemCount == 0
+            || player.playbackState == Player.STATE_ENDED
+        ) stopSelf()
+
+        mediaSession?.release()
     }
+
     @OptIn(UnstableApi::class)
     override fun onDestroy() {
-        getBackStackedActivity()?.let { mediaSession.setSessionActivity(it) }
-        player.release()
-        mediaSession.release()
+        val player = mediaSession?.player
+        if (player == null
+            || !player.playWhenReady
+            || player.mediaItemCount == 0
+            || player.playbackState == Player.STATE_ENDED
+        ) stopSelf()
+
+        mediaSession?.release()
+        getBackStackedActivity()?.let { mediaSession?.setSessionActivity(it) }
+        player?.release()
+        mediaSession?.release()
         clearListener()
         super.onDestroy()
     }
 
     private inner class MoyaMediaSessionCallback(
         private val context: Context
-    ): MediaSession.Callback {
+    ) : MediaSession.Callback {
         /*
         * MediaSession의 클라이언트인 MediaController가 MediaSession에 연결할때 호출되는 콜백 메서드로
         * 클라이언트가 세션에 연결될 때 어떤 명령어를 사용할 수 있는지를 정의함
@@ -207,6 +230,7 @@ open class MoyaPlaybackService() : MediaSessionService() {
         val mediaNotificationSessionCommands =
             ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
                 .build()
+
         @OptIn(UnstableApi::class)
         override fun onConnect(
             session: MediaSession,
@@ -238,7 +262,8 @@ open class MoyaPlaybackService() : MediaSessionService() {
             val settable = SettableFuture.create<MediaItemsWithStartPosition>()
             scope.launch {
                 try {
-                    val mediaItems = getCurrentMediaItemsFromSession(mediaSession) ?: loadPlaylist(application)
+                    val mediaItems =
+                        getCurrentMediaItemsFromSession(mediaSession) ?: loadPlaylist(application)
                     restoreMediaSession(application, mediaSession)
                     settable.set(MediaItemsWithStartPosition(mediaItems, 0, 0))
                 } catch (e: Exception) {
@@ -247,7 +272,8 @@ open class MoyaPlaybackService() : MediaSessionService() {
             }
             return settable
         }
-//        override fun onAddMediaItems(
+
+        //        override fun onAddMediaItems(
 //            mediaSession: MediaSession,
 //            controller: ControllerInfo,
 //            mediaItems: List<MediaItem>
@@ -280,6 +306,7 @@ open class MoyaPlaybackService() : MediaSessionService() {
                 null  // 세션에 재생 목록이 없을 경우
             }
         }
+
         @SuppressLint("Range")
         @OptIn(UnstableApi::class)
         suspend fun loadPlaylist(application: MoyaApplication): List<MediaItem> {
@@ -292,7 +319,7 @@ open class MoyaPlaybackService() : MediaSessionService() {
                 val file = File(filePath, "${song.songId}-${song.title}.mp3")
                 if (!file.exists()) return@mapNotNull null
 
-                val resourceId = if(song.type) {
+                val resourceId = if (song.type) {
                     Team.valueOf(song.team).getPlayerAlbumImageResourceId()
                 } else {
                     Team.valueOf(song.team).getTeamImageResourceId()
@@ -328,8 +355,10 @@ open class MoyaPlaybackService() : MediaSessionService() {
         private fun resolveMediaItems(mediaItems: List<MediaItem>): List<MediaItem> {
             val currentPlaylist = mutableListOf<MediaItem>()
 
-            for (i in 0 until player.mediaItemCount) {
-                currentPlaylist.add(player.getMediaItemAt(i))
+            player?.let {
+                for (i in 0 until it.mediaItemCount) {
+                    currentPlaylist.add(it.getMediaItemAt(i))
+                }
             }
             currentPlaylist.addAll(mediaItems)
 
