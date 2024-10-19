@@ -49,8 +49,14 @@ class PlaylistViewModel @Inject constructor(
     fun deletePlaylistItem(songId: String, order: Int) {
         viewModelScope.launch {
             handlePlaylistItemUseCase.removePlaylistItem(songId, order, mediaItemList.value.count())
+
+            if (mediaItemList.value.isEmpty()) {
+                musicStateRepository.setMiniPlayerActivated(true)
+                musicStateRepository.setCurrentPlaySongId(null)
+            }
         }
     }
+
 
     fun onTapListItem(music: MediaItem) {
         //TODO: currentSongId가 아닌 current position을 저장

@@ -5,6 +5,8 @@ import com.soi.moya.models.Team
 import com.soi.moya.models.UserPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.collect
 import javax.inject.Inject
 
 class MusicStateRepository  @Inject constructor (
@@ -19,7 +21,7 @@ class MusicStateRepository  @Inject constructor (
     private val _currentPlaySongPosition = MutableStateFlow<Int>(0)
     val currentPlaySongPosition: StateFlow<Int> get() = _currentPlaySongPosition
 
-    private val _isMiniPlayerActivated = MutableStateFlow(false)
+    private val _isMiniPlayerActivated = MutableStateFlow(true)
     val isMiniPlayerActivated: StateFlow<Boolean> get() = _isMiniPlayerActivated
 
     private val _isNeedHideMiniPlayer = MutableStateFlow(false)
@@ -34,7 +36,7 @@ class MusicStateRepository  @Inject constructor (
     fun setSelectedTeam(team: Team) {
         _selectedTeam.value = team
     }
-    fun setCurrentPlaySongId(songId: String) {
+    fun setCurrentPlaySongId(songId: String?) {
         _currentPlaySongId.value = songId
     }
     fun setCurrentPlaySongPosition(position: Int) {
@@ -64,13 +66,13 @@ class MusicStateRepository  @Inject constructor (
     }
 
     suspend fun loadUserPreferences() {
-        // 데이터 스토어에서 값을 불러와 MutableStateFlow에 설정
         userPreferences.getSelectedTeam.collect {team ->
             _selectedTeam.value = team?.let { Team.valueOf(it) }
             setInitialLoad(true)
         }
         userPreferences.currentPlaySongId.collect { songId ->
             _currentPlaySongId.value = songId
+            Log.d("**stateRepo", "currentSogId: $songId")
         }
         userPreferences.currentPlaySongPosition.collect { position ->
             _currentPlaySongPosition.value = position ?: 0

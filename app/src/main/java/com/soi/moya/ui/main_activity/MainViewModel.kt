@@ -1,6 +1,5 @@
 package com.soi.moya.ui.main_activity
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,10 +17,6 @@ class MainViewModel @Inject constructor(
     private val musicStateRepository: MusicStateRepository
 ) : ViewModel() {
 
-    private val _selectedMusic = MutableLiveData<MusicInfo?>()
-    val selectedMusic: LiveData<MusicInfo?> = _selectedMusic
-
-    // MusicStateRepository의 StateFlow들을 LiveData로 변환
     val selectedTeam: LiveData<Team?> = musicStateRepository.selectedTeam.asLiveData()
     val currentPlaySongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
     val isMiniplayerActivated: LiveData<Boolean> = musicStateRepository.isMiniPlayerActivated.asLiveData()

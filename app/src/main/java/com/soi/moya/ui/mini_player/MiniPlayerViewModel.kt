@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import com.soi.moya.models.Team
+import com.soi.moya.repository.MediaControllerManager
 import com.soi.moya.repository.MusicStateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MiniPlayerViewModel @Inject constructor(
-    private val musicStateRepository: MusicStateRepository
+    private val musicStateRepository: MusicStateRepository,
+    private val mediaControllerManager: MediaControllerManager
 ) : ViewModel() {
     val minHeight = 55f
     private val _maxHeight = MutableStateFlow(0f)
@@ -23,6 +26,8 @@ class MiniPlayerViewModel @Inject constructor(
     val horizontalPadding = 10f
 
     val isMiniPlayerActivated: LiveData<Boolean> = musicStateRepository.isMiniPlayerActivated.asLiveData()
+    val selectedTeam: LiveData<Team?> = musicStateRepository.selectedTeam.asLiveData()
+
 
     fun setMaxHeight(value: Float) {
         _maxHeight.value = value
@@ -34,9 +39,9 @@ class MiniPlayerViewModel @Inject constructor(
     }
 
     fun popBackStack() {
-        //미니플레이어 상태 활성화
-        Log.d("**miniPlayerViewModel", "back")
-
         musicStateRepository.setMiniPlayerActivated(true)
+    }
+    fun isMediaItemListNotEmpty(): Boolean {
+        return mediaControllerManager.mediaItemList.value.isNotEmpty()
     }
 }

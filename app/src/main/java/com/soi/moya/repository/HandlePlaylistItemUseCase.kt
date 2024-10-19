@@ -1,7 +1,5 @@
 package com.soi.moya.repository
 
-import android.util.Log
-import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import com.soi.moya.data.StoredMusicRepository
 import com.soi.moya.models.BaseMusic
@@ -12,7 +10,6 @@ import com.soi.moya.models.toItem
 import com.soi.moya.models.toStoredMusic
 import com.soi.moya.ui.Utility
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -66,7 +63,6 @@ class HandlePlaylistItemUseCase @Inject constructor(
     }
 
     suspend fun removePlaylistItem(songId: String, order: Int, count: Int) {
-        val controller = mediaControllerManager.controller
         val index = mediaControllerManager.mediaItemList.value.indexOfFirst { it.mediaId == songId }
 
         if (index != -1) {

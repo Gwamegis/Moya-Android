@@ -29,7 +29,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MusicPlayerViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
     private val storedMusicRepository: StoredMusicRepository,
     private val mediaControllerManager: MediaControllerManager,
     private val musicPlaybackManager: MusicPlaybackManager,
@@ -38,11 +37,9 @@ class MusicPlayerViewModel @Inject constructor(
 
     val currentSongId: LiveData<String?> = musicStateRepository.currentPlaySongId.asLiveData()
     val isLyricDisplaying: LiveData<Boolean> = musicStateRepository.isLyricDisplaying.asLiveData()
+    val selectedTeam: LiveData<Team?> = musicStateRepository.selectedTeam.asLiveData()
 
     var music: StoredMusic? = null
-
-    private val _teamName: String = savedStateHandle["team"] ?: "doosan"
-    val team: Team = Team.valueOf(_teamName)
 
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying
@@ -63,8 +60,6 @@ class MusicPlayerViewModel @Inject constructor(
             while (true) {
                 _currentPosition.value = musicPlaybackManager.getCurrentPosition()
                 _isPlaying.value = mediaControllerManager.controller?.isPlaying ?: false
-//                _currentPosition.value = musicPlayerManager.value.getCurrentPosition()
-//                _isPlaying.value = musicPlayerManager.value.isPlaying.value
                 delay(1000)
             }
         }
@@ -135,12 +130,14 @@ class MusicPlayerViewModel @Inject constructor(
             }
         }
     }
-
     private fun unlikeMusic(music: MusicInfo) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 storedMusicRepository.deleteById(id = music.id, playlist = "favorite")
             }
         }
+    }
+    fun isMediaItemListNotEmpty(): Boolean {
+        return mediaControllerManager.mediaItemList.value.isNotEmpty()
     }
 }

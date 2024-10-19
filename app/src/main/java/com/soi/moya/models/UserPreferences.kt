@@ -65,13 +65,13 @@ class UserPreferences(private val context: Context) {
 
     suspend fun saveCurrentSongId(songId: String) {
         context.dataStore.edit { preferences ->
+            Log.d("**UserPreferences", "songId: $songId")
             preferences[CURRENT_PLAY_SONG_ID] = songId
         }
     }
 
     suspend fun saveCurrentSongPosition(position: Int) {
         context.dataStore.edit { preferences ->
-            Log.e("***UserPreference", "currentPosition: ${position}")
             preferences[CURRENT_PLAY_SONG_POSITION] = position.toString()
         }
     }

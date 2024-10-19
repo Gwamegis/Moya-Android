@@ -31,12 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
-import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.ui.music_player.MusicPlayerScreen
@@ -52,8 +52,7 @@ import kotlin.math.max
 @Composable
 fun MiniPlayerScreen(
     maxHeight: Float,
-    navController: NavHostController,
-    music: MusicInfo
+    music: MusicInfo?
 ) {
 
     val viewModel: MiniPlayerViewModel = hiltViewModel()
@@ -65,9 +64,9 @@ fun MiniPlayerScreen(
     viewModel.setMaxHeight(maxHeight)
 
     val isMiniActivated by viewModel.isMiniPlayerActivated.observeAsState(false)
+    val selectedTeam by viewModel.selectedTeam.observeAsState()
 
     LaunchedEffect(isMiniActivated) {
-        Log.d("**miniPlayer", "Mini player activated: $isMiniActivated")
         if (!isMiniActivated) {
             height.animateTo(maxHeight)
         } else {
@@ -76,7 +75,6 @@ fun MiniPlayerScreen(
     }
 
     BackHandler(enabled = !isMiniActivated) {
-        Log.d("**miniPlayer", "back")
         viewModel.popBackStack()
     }
 
@@ -110,51 +108,53 @@ fun MiniPlayerScreen(
                         bottomEnd = if (height.value == maxHeight) 0.dp else 12.dp
                     )
                 )
-                .background(color = music.team.getSubColor())
+                .background(color = music?.team?.getSubColor() ?: selectedTeam?.getSubColor() ?: MoyaColor.background)
                 .pointerInput(Unit) {
-                    var dragStarted = false
-                    var dragDirection = 0f
-                    detectVerticalDragGestures(
-                        onDragStart = { dragStarted = true },
-                        onVerticalDrag = { change, dragAmount ->
-                            if (dragStarted) {
-                                dragDirection = dragAmount
-                                dragStarted = false
+                    if (music != null) {
+                        var dragStarted = false
+                        var dragDirection = 0f
+                        detectVerticalDragGestures(
+                            onDragStart = { dragStarted = true },
+                            onVerticalDrag = { change, dragAmount ->
+                                if (dragStarted) {
+                                    dragDirection = dragAmount
+                                    dragStarted = false
+                                }
+                                val newHeight =
+                                    max(
+                                        viewModel.minHeight,
+                                        height.value - dragAmount * viewModel.scalingFactor
+                                    )
+                                coroutineScope.launch {
+                                    height.snapTo(newHeight)
+                                }
+                                change.consume()
+                            },
+                            onDragEnd = {
+                                val targetHeight = when {
+                                    dragDirection < 0 && height.value > viewModel.threshold.value -> maxHeight
+                                    dragDirection > 0 && height.value < viewModel.threshold.value -> viewModel.minHeight
+                                    dragDirection < 0 && height.value <= viewModel.threshold.value -> viewModel.minHeight
+                                    dragDirection > 0 && height.value >= viewModel.threshold.value -> maxHeight
+                                    else -> height.value
+                                }
+                                val isMiniActivated = when {
+                                    dragDirection < 0 && height.value > viewModel.threshold.value -> false
+                                    dragDirection > 0 && height.value < viewModel.threshold.value -> true
+                                    dragDirection < 0 && height.value <= viewModel.threshold.value -> true
+                                    dragDirection > 0 && height.value >= viewModel.threshold.value -> false
+                                    else -> true
+                                }
+                                viewModel.setIsMiniplayerActivated(isMiniActivated)
+                                coroutineScope.launch {
+                                    height.animateTo(targetHeight)
+                                }
                             }
-                            val newHeight =
-                                max(
-                                    viewModel.minHeight,
-                                    height.value - dragAmount * viewModel.scalingFactor
-                                )
-                            coroutineScope.launch {
-                                height.snapTo(newHeight)
-                            }
-                            change.consume()
-                        },
-                        onDragEnd = {
-                            val targetHeight = when {
-                                dragDirection < 0 && height.value > viewModel.threshold.value -> maxHeight
-                                dragDirection > 0 && height.value < viewModel.threshold.value -> viewModel.minHeight
-                                dragDirection < 0 && height.value <= viewModel.threshold.value -> viewModel.minHeight
-                                dragDirection > 0 && height.value >= viewModel.threshold.value -> maxHeight
-                                else -> height.value
-                            }
-                            val isMiniActivated = when {
-                                dragDirection < 0 && height.value > viewModel.threshold.value -> false
-                                dragDirection > 0 && height.value < viewModel.threshold.value -> true
-                                dragDirection < 0 && height.value <= viewModel.threshold.value -> true
-                                dragDirection > 0 && height.value >= viewModel.threshold.value -> false
-                                else -> true
-                            }
-                            viewModel.setIsMiniplayerActivated(isMiniActivated)
-                            coroutineScope.launch {
-                                height.animateTo(targetHeight)
-                            }
-                        }
-                    )
+                        )
+                    }
                 }
                 .then(
-                    if (height.value == viewModel.minHeight)
+                    if (height.value == viewModel.minHeight && viewModel.isMediaItemListNotEmpty())
                         Modifier
                             .clickable {
                                 coroutineScope.launch {
@@ -169,7 +169,6 @@ fun MiniPlayerScreen(
 
             if (heightFraction > 0.1f) {
                 MusicPlayerScreen(
-                    navController = navController,
                     music = music,
                     modifier = Modifier
                         .alpha(heightFraction)
@@ -203,11 +202,13 @@ fun MiniPlayerScreen(
 
 @Composable
 fun MiniPlayer(
-    music: MusicInfo,
+    music: MusicInfo?,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: MusicPlayerViewModel = hiltViewModel()
     val isPlaying by viewModel.isPlaying.collectAsState()
+    val alphaValue = if (viewModel.isMediaItemListNotEmpty()) 1f else 0.2f
+
     Row(
         modifier = modifier
             .padding(horizontal = 20.dp)
@@ -220,17 +221,21 @@ fun MiniPlayer(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = music.title,
+                text = if (viewModel.isMediaItemListNotEmpty()) music?.title ?: ""  else "재생 중인 곡이 없습니다.",
                 color = MoyaColor.background,
                 style = getTextStyle(style = MoyaFont.CustomBodyBold),
-                modifier = Modifier.align(Alignment.Start)
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .graphicsLayer(alpha = if (viewModel.isMediaItemListNotEmpty()) 1f else 0.6f)
             )
-            Text(
-                text = music.team.getKrTeamName(),
-                color = MoyaColor.gray.copy(alpha = 0.6f),
-                style = getTextStyle(style = MoyaFont.CustomCaptionMedium),
-                modifier = Modifier.align(Alignment.Start)
-            )
+            if (music != null && viewModel.isMediaItemListNotEmpty()) {
+                Text(
+                    text = music.team.getKrTeamName(),
+                    color = MoyaColor.gray.copy(alpha = 0.6f),
+                    style = getTextStyle(style = MoyaFont.CustomCaptionMedium),
+                    modifier = Modifier.align(Alignment.Start)
+                )
+            }
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(20.dp),
@@ -240,13 +245,17 @@ fun MiniPlayer(
                 painter = painterResource(id = if (isPlaying) R.drawable.pause_fill else {R.drawable.play_arrow }),
                 contentDescription = "play/Pause",
                 modifier = Modifier
-                    .clickable { viewModel.togglePlayPause() }
+                    .clickable (enabled = viewModel.isMediaItemListNotEmpty()) { viewModel.togglePlayPause() }
                     .height(20.dp)
+                    .graphicsLayer(alpha = alphaValue)
             )
             Image(
                 painter = painterResource(R.drawable.play_next),
                 contentDescription = "play next",
-                modifier = Modifier.clickable { viewModel.playNextSong(1) })
+                modifier = Modifier
+                    .clickable (enabled = viewModel.isMediaItemListNotEmpty()) { viewModel.playNextSong(1) }
+                    .graphicsLayer(alpha = alphaValue)
+            )
         }
     }
 }

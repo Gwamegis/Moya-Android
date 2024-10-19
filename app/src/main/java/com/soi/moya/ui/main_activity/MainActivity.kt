@@ -40,10 +40,8 @@ class MainActivity : BaseComposeActivity() {
 
     @Composable
     override fun Content() {
-        // 초기 콜백 등록 여부를 기억하는 상태 변수
         val isBackPressedDispatcherSetup = remember { mutableStateOf(false) }
 
-        // setupOnBackPressedDispatcher가 이미 호출되지 않았다면 호출
         if (!isBackPressedDispatcherSetup.value) {
             setupOnBackPressedDispatcher()
             isBackPressedDispatcherSetup.value = true
@@ -59,8 +57,14 @@ class MainActivity : BaseComposeActivity() {
         mainViewModel.currentPlaySongId.observeAsState().value?.let { songId ->
             musicManager.getMusicById(songId)?.let { musicInfo ->
                 currentMusic = musicInfo
+                Log.d("**mainActivity", "songID: $songId")
+                Log.d("**mainActivity", "currentMusic: ${currentMusic!!.title}")
             }
         }
+//            ?: run {
+//            currentMusic = null
+//            Log.d("**mainActivity", "songID: null")
+//        }
         mainViewModel.isMiniplayerActivated.observeAsState().value?.let { activated ->
             _isMiniPlayerActivated.value = !activated
         }
@@ -72,14 +76,11 @@ class MainActivity : BaseComposeActivity() {
             if (selectedTeam != null) {
                 MoyaTheme(team = selectedTeam) {
                     BottomNavScreen()
-                    currentMusic?.let { music ->
-                        if (!isNeedToHideMiniPlayer) {
-                            MiniPlayerScreen(
-                                maxHeight = computeWindowSizeClasses(),
-                                navController = navController,
-                                music = music
-                            )
-                        }
+                    if (!isNeedToHideMiniPlayer) {
+                        MiniPlayerScreen(
+                            maxHeight = computeWindowSizeClasses(),
+                            music = currentMusic
+                        )
                     }
                 }
             } else {
@@ -102,7 +103,6 @@ class MainActivity : BaseComposeActivity() {
 
 
     private fun setupOnBackPressedDispatcher() {
-        Log.d("**main", "main back")
         if (backPressedCallback == null) {
             backPressedCallback = object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {

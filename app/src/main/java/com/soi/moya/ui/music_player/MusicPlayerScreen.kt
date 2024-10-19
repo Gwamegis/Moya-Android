@@ -1,6 +1,5 @@
 package com.soi.moya.ui.music_player
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,19 +35,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import com.soi.moya.R
 import com.soi.moya.models.MusicInfo
 import com.soi.moya.ui.theme.MoyaColor
 import com.soi.moya.ui.theme.MoyaFont
 import com.soi.moya.ui.theme.getTextStyle
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun MusicPlayerScreen(
-    navController: NavHostController,
-    music: MusicInfo,
+    music: MusicInfo?,
     modifier: Modifier = Modifier,
     onClickBackButton: () -> Unit
 ) {
@@ -60,20 +55,18 @@ fun MusicPlayerScreen(
     val progress = remember { mutableFloatStateOf(0f) }
     val isLike by viewModel.isLike.collectAsState()
     val isLyricDisplaying by viewModel.isLyricDisplaying.observeAsState()
+    val selectedTeam by viewModel.selectedTeam.observeAsState()
 
-    music?.team?.let {
-        Modifier
-            .background(it.getSubColor())
+    Column(
+        modifier = modifier
             .fillMaxSize()
-    }?.let {
-        Column(
-            modifier = modifier.then(it)
+            .background(music?.team?.getSubColor() ?: selectedTeam?.getSubColor() ?: MoyaColor.background)
     ) {
         music?.let { music ->
             MusicNavigationBar(
                 music = music,
                 isLike = isLike,
-                onClickBackButton = {onClickBackButton()}
+                onClickBackButton = onClickBackButton
             ) {
                 viewModel.updateLikeMusic(music)
             }
@@ -109,28 +102,25 @@ fun MusicPlayerScreen(
                     )
                 }
             }
-
-        }
-
-        MusicPlayerSlider(
-            music = music,
-            currentPosition = currentPosition ?: 0,
-            duration = duration,
-            viewModel = viewModel
-        ) { newProgress ->
-            progress.value = newProgress
-        }
+            MusicPlayerSlider(
+                music = music,
+                currentPosition = currentPosition,
+                duration = duration,
+                viewModel = viewModel
+            ) { newProgress ->
+                progress.value = newProgress
+            }
 
             MusicPlayerBottomButtonView(
-            isPlaying = viewModel.isPlaying.value,
-            onClickPlayButton = {
-                viewModel.togglePlayPause()
-            },
-            onClickSkipButton = {increment ->
-                viewModel.playNextSong(increment)
-            }
-        )
-    }
+                isPlaying = viewModel.isPlaying.value,
+                onClickPlayButton = {
+                    viewModel.togglePlayPause()
+                },
+                onClickSkipButton = {increment ->
+                    viewModel.playNextSong(increment)
+                }
+            )
+        }
     }
 }
 
